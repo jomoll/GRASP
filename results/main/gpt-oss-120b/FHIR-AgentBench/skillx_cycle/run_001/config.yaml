@@ -1,0 +1,52 @@
+_resume: true
+agent:
+  base_url: <REDACTED>
+  enable_cache: true
+  max_retries: 1
+  model: openai/gpt-oss-120b
+  strategy: multi_turn_code_resource
+  timeout: 120
+  verbose: false
+cycle:
+  batch_concurrency: 4
+  epochs: 5
+  run_baseline: true
+  seed: 1
+  update_every: 40
+data:
+  csv: final_dataset/questions_answers_sql_fhir.csv
+  dev_limit: 80
+  dev_splits:
+  - train
+  test_limit: 80
+  test_splits:
+  - test
+  val_limit: 40
+  val_splits:
+  - valid
+eval:
+  base_url: <REDACTED>
+  max_retries: 1
+  model: openai/gpt-oss-120b
+  timeout: 120
+output_dir: outputs/skillx_cycle
+skillx:
+  enable_llm_merge: true
+  extractor_max_retries: 2
+  filter_stage1: true
+  filter_stage2: false
+  max_action_chars: 600
+  max_actions: 12
+  max_history_messages: 24
+  max_message_chars: 1200
+  plan_extractor_max_retries: 1
+  retrieval_top_k: 5
+  skill_type: functional
+  use_plan_extraction: true
+updater:
+  base_url: <REDACTED>
+  max_retries: 2
+  max_tokens: 32768
+  model: openai/gpt-oss-120b
+  temperature: 0.7
+  timeout: 240

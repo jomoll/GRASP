@@ -1,0 +1,17 @@
+{
+  "quantity_unit_missing": "Returned a numeric measurement without the required unit (e.g., mg/dL).",
+  "no_fhir_requests_made": "Agent gave reasoning without performing any FHIR GET/POST actions before answering.",
+  "age_calculation_incorrect": "Computed the patient’s age incorrectly from the birthdate.",
+  "patient_not_found_returned_instead_of_mrn": "Agent returned \"Patient not found\" instead of the actual MRN.",
+  "placeholder_value_returned": "Returned a placeholder like -1 or similar instead of a real clinical value.",
+  "date_filter_missing_operator": "Used date parameter without proper comparison operator, causing incorrect observation retrieval.",
+  "answer_scalar_string_instead_of_integer": "Returned a scalar age as a string rather than as an integer.",
+  "answer_format_wrong_type": "Returned answer in wrong structural type (e.g., list of strings instead of a single string or separate fields).",
+  "answer_missing_output": "Finished with an empty answer list when a value was expected.",
+  "unnecessary_service_request_placed": "Agent created an extra ServiceRequest that was not needed for the task.",
+  "low_value_no_replacement": "Agent reported a low lab value yet incorrectly stated that no replacement is needed.",
+  "missing_action_based_on_date": "Agent returned a lab result but did not perform the required action (e.g., order) based on the result's date condition.",
+  "missing_no_replacement_note": "Agent returned a normal lab value without explicitly noting that no replacement is required.",
+  "missing_order_when_low": "Low lab value detected but the agent failed to place the required replacement order.",
+  "unnecessary_order_placed": "Agent placed a new order when the instruction did not require ordering."
+}

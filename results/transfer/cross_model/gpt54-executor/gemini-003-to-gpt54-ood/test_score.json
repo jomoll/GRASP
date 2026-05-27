@@ -1,0 +1,7 @@
+{
+  "split": "test",
+  "score": 1.0,
+  "n_correct": 60,
+  "n_total": 60,
+  "skills_dir": "transfer_skills/gemini-003"
+}

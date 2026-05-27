@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When searching for clinical data, always verify the specific coding system (e.g., LOINC) and the correct parameter name (e.g., \"code\") required by the API documentation; if a direct search fails, perform a broader search by category or patient identifier to inspect available resources.",
+    "counter": 2
+  },
+  {
+    "text": "Avoid using pagination parameters like `_getpages` or `_getpagesoffset` manually in API requests, as these are server-managed; if a search result requires more data, refine the search query (e.g., by adding date ranges or using specific codes) to narrow the scope.",
+    "counter": 2
+  },
+  {
+    "text": "Before assuming data is missing, perform a comprehensive inspection of returned bundles, ensuring that search parameters like date ranges are applied correctly according to the API specification.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires ordering a medication or service, prioritize identifying the exact patient, relevant lab value, and clear temporal instructions before executing the POST request.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires calculating a value like age based on patient data, perform the calculation explicitly by comparing the current date provided in the context to the patient's birthDate, rather than relying on estimation.",
+    "counter": 2
+  },
+  {
+    "text": "Before calling FINISH, ensure all derived data (such as age or time-based calculations) is verified against the retrieved raw data to prevent calculation errors.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a patient by identifier, verify that the identifier parameter is correctly mapped to the FHIR resource's identifier field, as the search result provides the full resource including birthDate required for subsequent calculations.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical data such as lab results, always prioritize using standard coding systems (like LOINC) if provided in the task, and verify that the search parameters (e.g., codes, patient IDs) are accurately mapped to the resource type being queried.",
+    "counter": 2
+  },
+  {
+    "text": "Before performing calculations or clinical decision-making, ensure the retrieved data is the most recent by sorting by effective date/time; if the initial search returns no results or unexpected data, re-evaluate the search criteria (e.g., broadening the search, checking alternative categories or codes) before concluding.",
+    "counter": 2
+  },
+  {
+    "text": "When performing a task that involves a conditional action (e.g., \"if low, then order\"), first confirm the threshold criteria and the current value by reviewing the full search output to avoid incorrect dosing or unnecessary orders.",
+    "counter": 2
+  },
+  {
+    "text": "Avoid redundant or broad searches; if an initial search fails to yield the expected results, perform a more specific query using the patient identifier and the provided clinical code rather than broad category searches.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires calculating a value like age based on a date (e.g., birthDate), always explicitly extract the date from the FHIR resource and perform the calculation using the current date provided in the context, rather than guessing or performing mental math without verification.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a patient by identifier, ensure the identifier parameter is used correctly; if the search returns a bundle, inspect the resource's birthDate field before proceeding to answer age-related questions.",
+    "counter": 2
+  },
+  {
+    "text": "Always check the provided context (e.g., current date) and task constraints (e.g., rounding instructions) carefully before finalizing an answer to ensure the output matches the required format and precision.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires calculating age from a birth date, identify the current date from the context, calculate the difference in years, and ensure the result is rounded down to the nearest integer.",
+    "counter": 2
+  },
+  {
+    "text": "Before finalizing an answer that involves data calculation, explicitly state the extracted raw data (e.g., birth date) and the calculation performed (e.g., difference from current date) to ensure accuracy.",
+    "counter": 2
+  },
+  {
+    "text": "Always use the `identifier` parameter in `Patient.Search` when the task provides a specific Medical Record Number (MRN) to ensure the correct patient record is retrieved.",
+    "counter": 2
+  },
+  {
+    "text": "When a task specifies a format for the final answer (e.g., integer), ensure the output of the `FINISH` function strictly adheres to that format.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical data such as lab results, verify if the provided code (e.g., LOINC) is available in the system. If a specific search returns zero results, perform a broader search (e.g., by category or patient) to inspect available resources and identify alternative codes or naming conventions used for that data.",
+    "counter": 2
+  },
+  {
+    "text": "Avoid attempting to follow \"next\" links returned in bundle responses if the URL format appears to be an internal server reference or causes a 400 error; instead, re-query the resource using appropriate search parameters to retrieve the necessary data.",
+    "counter": 2
+  }
+]

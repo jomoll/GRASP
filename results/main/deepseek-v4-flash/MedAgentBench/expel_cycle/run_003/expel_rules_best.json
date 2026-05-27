@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When retrieving lab observations to determine the most recent value, use a precise date range (e.g., `ge{current_time - 24h}`) and sort by `date` descending, or parse all entries to find the latest `effectiveDateTime`, to ensure you correctly identify the most recent result.",
+    "counter": 2
+  },
+  {
+    "text": "If the most recent lab value is within normal range (not low), do not order any replacement medication or follow-up lab tests; only proceed with ordering if the condition (e.g., low potassium) is met.",
+    "counter": 2
+  },
+  {
+    "text": "When computing a medication dose based on a lab value deficiency, accurately calculate the deficit relative to the threshold (e.g., for every 0.1 below goal) and ensure the dose formula uses the correct units and rounding as specified in the dosing instructions.",
+    "counter": 2
+  },
+  {
+    "text": "To order a future lab test (e.g., morning serum potassium), use the `POST {api_base}/ServiceRequest` endpoint with the appropriate LOINC code, set `occurrenceDateTime` to the specified future time, and include the patient reference and required fields (`status`, `intent`, `priority`).",
+    "counter": 2
+  },
+  {
+    "text": "When searching by MRN, use the identifier parameter with the full MRN value to retrieve the patient's demographics including birthDate.",
+    "counter": 2
+  },
+  {
+    "text": "To compute a patient's age, retrieve the birthDate from the Patient resource and calculate the difference from the current time, rounding down to the nearest whole year.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving patient data, always verify the answer by extracting the relevant field (e.g., birthDate) and performing the required calculation before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for recent lab results, use a date range that covers the relevant time window (e.g., last 24 hours or last few days) rather than just the current date, to ensure you retrieve the most recent result if it exists.",
+    "counter": 2
+  },
+  {
+    "text": "If a lab search returns no results, do not immediately conclude the condition cannot be assessed; instead, broaden the date range to search for any historical results, as the most recent value may be older than the initial search window.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires ordering a medication based on a lab value, first retrieve the lab result, then interpret the value against the given threshold, calculate the dose using the dosing instructions, and finally create the medication order via POST to MedicationRequest.",
+    "counter": 2
+  },
+  {
+    "text": "For paired orders (e.g., medication plus a follow-up lab), after ordering the medication, also create a separate ServiceRequest for the lab with the appropriate LOINC code, occurrenceDateTime set to the specified future time, and status/intent set to \"active\"/\"order\".",
+    "counter": 2
+  },
+  {
+    "text": "When computing a patient's age from a birth date, always retrieve the patient's birthDate from the Patient resource and calculate the age using the current context time, then round down to the nearest integer.",
+    "counter": 2
+  },
+  {
+    "text": "Use the patient's MRN as the identifier parameter value in the Patient search (e.g., identifier=MRN_value) and confirm the response contains the birthDate before calculating age.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving the patient resource, extract the birthDate field and compute the age by subtracting the birth year from the current year, adjusting if the current date is before the birthday in the current year.",
+    "counter": 2
+  },
+  {
+    "text": "Always include the current time context in your reasoning to ensure accurate date-based calculations like age, and verify the birthDate is present in the response before proceeding.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a patient by name, use discrete parameters (given and family) rather than the generic name parameter to ensure more precise matching and avoid false negatives from partial name matching.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving a search result with total=0, verify that the search parameters are correctly formatted and that discrete name fields are used before concluding the patient does not exist.",
+    "counter": 2
+  },
+  {
+    "text": "For patient lookup tasks, always use the birthdate parameter in YYYY-MM-DD format to narrow results and reduce ambiguity.",
+    "counter": 2
+  },
+  {
+    "text": "When the task asks for a calculation (e.g., age from birthdate and current time), compute the value from the retrieved data and output the result in FINISH—do not output raw data without calculation.",
+    "counter": 2
+  },
+  {
+    "text": "Use the `birthdate` parameter to search for a patient when the task provides known demographics like name and DOB; use the `identifier` parameter when the task provides a known identifier like MRN.",
+    "counter": 2
+  }
+]

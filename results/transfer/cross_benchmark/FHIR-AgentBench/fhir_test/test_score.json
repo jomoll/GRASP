@@ -1,0 +1,7 @@
+{
+  "split": "test",
+  "score": 0.5875,
+  "n_correct": 47,
+  "n_total": 80,
+  "skills_dir": "outputs/skill_cycle_code/run_001/skills/learned"
+}

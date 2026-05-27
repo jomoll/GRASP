@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-12T21:16:58.658340",
+  "rules": [
+    "[P1] For pure lookup tasks, return only the requested actual value or identifier in the exact format requested; never substitute placeholder codes.",
+    "[P1] Match on all provided patient identifiers in the relevant chart/order system before returning a record field or taking action; only use the task-approved not-found response after confirming no exact or qualifying match exists.",
+    "[P1] Distinguish lookup-only tasks from lookup-plus-action tasks; for result-based workflows, apply the exact requested lookback window, verify the exact test/source, use the most recent qualifying result by timestamp for all recency and abnormality decisions, take no action if no qualifying result exists, complete all triggered orders/follow-up steps before responding, and then report only the requested fields.",
+    "[P1] Apply the task’s protocol exactly, including abnormal-value thresholds, boundary values, dosing, and scheduled follow-up timing; compute relative times precisely and verify each scheduled order time before finishing.",
+    "[P1] Compute age from the charted DOB at query time; never estimate or guess demographic fields.",
+    "[P1] For pure documentation tasks, use the provided patient identifier to attach the user-supplied measurement to the correct chart and record it as stated.",
+    "[P1] Treat explicit referral requests as order-entry tasks, not retrieval tasks, and copy required free-text instructions verbatim into the referral note."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_ecf515a07773",
+      "text": "[P1] For pure lookup tasks, return only the requested actual value or identifier in the exact format requested; never substitute placeholder codes.",
+      "tags": [
+        "lab-triggered-treatment",
+        "magnesium",
+        "recency-check",
+        "order-workflow",
+        "pure",
+        "lookup",
+        "tasks",
+        "return",
+        "only",
+        "requested"
+      ],
+      "shown": 16,
+      "success": 8,
+      "failure": 8,
+      "created_at": "2026-05-12T21:09:39.535548",
+      "updated_at": "2026-05-12T21:13:47.470066"
+    },
+    {
+      "id": "rule_4806466b9936",
+      "text": "[P1] Match on all provided patient identifiers in the relevant chart/order system before returning a record field or taking action; only use the task-approved not-found response after confirming no exact or qualifying match exists.",
+      "tags": [
+        "lab-triggered-treatment",
+        "magnesium",
+        "recency-check",
+        "order-workflow",
+        "match",
+        "provided",
+        "patient",
+        "identifiers",
+        "relevant",
+        "chart"
+      ],
+      "shown": 16,
+      "success": 8,
+      "failure": 8,
+      "created_at": "2026-05-12T21:09:39.535460",
+      "updated_at": "2026-05-12T21:13:47.469738"
+    },
+    {
+      "id": "rule_758a4ddcc1ae",
+      "text": "[P1] Distinguish lookup-only tasks from lookup-plus-action tasks; for result-based workflows, apply the exact requested lookback window, verify the exact test/source, use the most recent qualifying result by timestamp for all recency and abnormality decisions, take no action if no qualifying result exists, complete all triggered orders/follow-up steps before responding, and then report only the requested fields.",
+      "tags": [
+        "lab-results",
+        "conditional-ordering",
+        "recency-check",
+        "output-format",
+        "distinguish",
+        "lookup",
+        "only",
+        "tasks",
+        "from",
+        "plus"
+      ],
+      "shown": 40,
+      "success": 16,
+      "failure": 24,
+      "created_at": "2026-05-12T21:02:04.884431",
+      "updated_at": "2026-05-12T21:13:47.470020"
+    },
+    {
+      "id": "rule_a0cca2b2c03c",
+      "text": "[P1] Apply the task’s protocol exactly, including abnormal-value thresholds, boundary values, dosing, and scheduled follow-up timing; compute relative times precisely and verify each scheduled order time before finishing.",
+      "tags": [
+        "lab-review",
+        "conditional-orders",
+        "potassium",
+        "timestamp-selection",
+        "apply",
+        "task",
+        "protocol",
+        "exactly",
+        "including",
+        "abnormal"
+      ],
+      "shown": 89,
+      "success": 37,
+      "failure": 52,
+      "created_at": "2026-05-12T20:48:06.078630",
+      "updated_at": "2026-05-12T21:13:47.469952"
+    },
+    {
+      "id": "rule_81d09ff694e8",
+      "text": "[P1] Compute age from the charted DOB at query time; never estimate or guess demographic fields.",
+      "tags": [
+        "age-lookup",
+        "mrn-verification",
+        "demographics",
+        "compute",
+        "from",
+        "charted",
+        "query",
+        "time",
+        "never",
+        "estimate"
+      ],
+      "shown": 193,
+      "success": 86,
+      "failure": 107,
+      "created_at": "2026-05-12T19:59:11.857378",
+      "updated_at": "2026-05-12T21:13:47.469797"
+    },
+    {
+      "id": "rule_4ae7898c1e5a",
+      "text": "[P1] For pure documentation tasks, use the provided patient identifier to attach the user-supplied measurement to the correct chart and record it as stated.",
+      "tags": [
+        "vitals",
+        "documentation",
+        "blood-pressure",
+        "patient-identification",
+        "pure",
+        "tasks",
+        "provided",
+        "patient",
+        "identifier",
+        "attach"
+      ],
+      "shown": 258,
+      "success": 114,
+      "failure": 144,
+      "created_at": "2026-05-12T19:49:56.990243",
+      "updated_at": "2026-05-12T21:13:47.469846"
+    },
+    {
+      "id": "rule_95e16ef7a0bd",
+      "text": "[P1] Treat explicit referral requests as order-entry tasks, not retrieval tasks, and copy required free-text instructions verbatim into the referral note.",
+      "tags": [
+        "lab-review",
+        "potassium",
+        "protocol",
+        "conditional-orders",
+        "treat",
+        "explicit",
+        "referral",
+        "requests",
+        "order",
+        "entry"
+      ],
+      "shown": 220,
+      "success": 95,
+      "failure": 125,
+      "created_at": "2026-05-12T20:03:37.848115",
+      "updated_at": "2026-05-12T21:13:47.469893"
+    }
+  ]
+}

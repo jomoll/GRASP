@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-16T02:18:57.843768",
+  "rules": [
+    "[P1] Do not proceed with contingent actions if required data or context is missing",
+    "[P1] Do not fabricate or infer values or clinical/demographic data not present in context",
+    "[P1] Request clarification or indicate missing information when context is insufficient",
+    "[P1] Extract and confirm all required values, measurements, and identifiers from the provided context before proceeding",
+    "[P1] Check if values meet recency or threshold criteria before finalizing actions",
+    "[P1] When instructions include multiple independent actions, attempt all feasible steps even if one cannot be completed",
+    "[P1] Confirm patient identifiers before performing or documenting clinical actions"
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_d38e1cd6ad25",
+      "text": "[P1] Do not proceed with contingent actions if required data or context is missing",
+      "tags": [
+        "missing-data",
+        "contingent-action",
+        "clinical-workflow",
+        "proceed",
+        "with",
+        "contingent",
+        "actions",
+        "required",
+        "data",
+        "context"
+      ],
+      "shown": 3,
+      "success": 1,
+      "failure": 2,
+      "created_at": "2026-05-16T02:15:11.155174",
+      "updated_at": "2026-05-16T02:15:28.446303"
+    },
+    {
+      "id": "rule_230ba0f86d9f",
+      "text": "[P1] Do not fabricate or infer values or clinical/demographic data not present in context",
+      "tags": [
+        "data-absent",
+        "fabrication",
+        "patient-identifier",
+        "fabricate",
+        "infer",
+        "values",
+        "clinical",
+        "demographic",
+        "data",
+        "present"
+      ],
+      "shown": 22,
+      "success": 12,
+      "failure": 10,
+      "created_at": "2026-05-16T02:07:43.550321",
+      "updated_at": "2026-05-16T02:15:28.446413"
+    },
+    {
+      "id": "rule_cf6da3c0f0bd",
+      "text": "[P1] Request clarification or indicate missing information when context is insufficient",
+      "tags": [
+        "context-insufficient",
+        "lab-value",
+        "clarification",
+        "request",
+        "indicate",
+        "missing",
+        "information",
+        "when",
+        "context",
+        "insufficient"
+      ],
+      "shown": 14,
+      "success": 4,
+      "failure": 8,
+      "created_at": "2026-05-16T02:07:01.546465",
+      "updated_at": "2026-05-16T02:15:28.446508"
+    },
+    {
+      "id": "rule_16a3a9e4782b",
+      "text": "[P1] Extract and confirm all required values, measurements, and identifiers from the provided context before proceeding",
+      "tags": [
+        "medical-recording",
+        "confirmation",
+        "measurement",
+        "extract",
+        "confirm",
+        "required",
+        "values",
+        "measurements",
+        "identifiers",
+        "from"
+      ],
+      "shown": 60,
+      "success": 28,
+      "failure": 32,
+      "created_at": "2026-05-16T02:01:10.627817",
+      "updated_at": "2026-05-16T02:15:28.446638"
+    },
+    {
+      "id": "rule_421914b76844",
+      "text": "[P1] Check if values meet recency or threshold criteria before finalizing actions",
+      "tags": [
+        "conditional-action",
+        "lab-results",
+        "check",
+        "values",
+        "meet",
+        "recency",
+        "threshold",
+        "criteria",
+        "before",
+        "finalizing"
+      ],
+      "shown": 67,
+      "success": 31,
+      "failure": 28,
+      "created_at": "2026-05-16T01:59:07.584807",
+      "updated_at": "2026-05-16T02:15:28.446729"
+    },
+    {
+      "id": "rule_a211742355d1",
+      "text": "[P1] When instructions include multiple independent actions, attempt all feasible steps even if one cannot be completed",
+      "tags": [
+        "missing-data",
+        "multi-step",
+        "lab-order",
+        "workflow",
+        "when",
+        "instructions",
+        "include",
+        "multiple",
+        "independent",
+        "actions"
+      ],
+      "shown": 41,
+      "success": 16,
+      "failure": 25,
+      "created_at": "2026-05-16T02:02:28.031737",
+      "updated_at": "2026-05-16T02:15:28.446825"
+    },
+    {
+      "id": "rule_2c9d15ac315a",
+      "text": "[P1] Confirm patient identifiers before performing or documenting clinical actions",
+      "tags": [
+        "lab-check",
+        "identifier-confirmation",
+        "procedural-safety",
+        "confirm",
+        "patient",
+        "identifiers",
+        "before",
+        "performing",
+        "documenting",
+        "clinical"
+      ],
+      "shown": 43,
+      "success": 13,
+      "failure": 23,
+      "created_at": "2026-05-16T02:03:02.275681",
+      "updated_at": "2026-05-16T02:15:28.446913"
+    }
+  ]
+}

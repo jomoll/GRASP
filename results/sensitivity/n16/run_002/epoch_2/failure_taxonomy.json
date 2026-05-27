@@ -1,0 +1,21 @@
+{
+  "observation_placeholder_minus_one_returned": "Returned sentinel value -1 for missing observation instead of handling absence appropriately.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "observation_get_not_executed": "Failed to issue a GET request for the required Observation before forming a response.",
+  "unnecessary_service_request_created": "Created a ServiceRequest order when the task only asked for existing lab value.",
+  "age_returned_as_string": "Returned the patient's age as a string instead of a numeric type as required.",
+  "missing_patient_get_action": "Did not perform a GET request to resolve patient ID before attempting further actions.",
+  "magnesium_value_missing_unit": "Returned magnesium numeric value without the required unit (e.g., mg/dL).",
+  "missing_observation_handled_incorrectly": "Incorrectly handled case of no recent observation, providing an inappropriate narrative response.",
+  "missing_observation_post_action": "Failed to create (POST) the required Observation resource after gathering patient info.",
+  "answer_not_structured_as_list": "Returned answer as a plain string rather than a list/array as required.",
+  "service_request_not_posted": "Planned to create a ServiceRequest but never executed the POST request.",
+  "answer_missing_expected_multiple_fields": "Returned a single answer element when the specification required multiple separate fields.",
+  "service_request_missing_when_low": "Failed to create a ServiceRequest for potassium replacement when the observed potassium level was low.",
+  "service_request_wrong_code_for_replacement": "Created a ServiceRequest with an incorrect LOINC/code (e.g., ordering a test instead of replacement medication).",
+  "service_request_missing_when_not_low": "Did not create the required paired ServiceRequest (e.g., follow‑up test) when the potassium level was not low.",
+  "answer_missing": "Returned an empty answer list or no answer at all despite having performed actions.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "service_request_missing_when_date_old": "Failed to create a ServiceRequest when the lab result date was older than the required threshold.",
+  "date_format_mismatch": "Returned a date in an unexpected format (e.g., missing time component or timezone) compared to the specification."
+}

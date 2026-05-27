@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When a task depends on a recent result, query the relevant Observation with an explicit time filter anchored to the stated current time before deciding on any order.",
+    "counter": 2
+  },
+  {
+    "text": "If a treatment is conditional on a lab threshold, compare the numeric result against the provided dosing bands exactly and only place an order when the result meets the low-range criteria.",
+    "counter": 2
+  },
+  {
+    "text": "When asked for the “last” result, verify the most recent observation by effective time rather than assuming any returned entry is the latest.",
+    "counter": 2
+  },
+  {
+    "text": "If no qualifying result exists within the required lookback window, stop and report that no action or order should be made.",
+    "counter": 2
+  },
+  {
+    "text": "When a task asks for a derived value (for example, age), retrieve the source field first and compute the result explicitly from the provided task context before answering.",
+    "counter": 2
+  },
+  {
+    "text": "For age calculations, compare the birth month and day against the stated current date and round down by subtracting one if the birthday has not yet occurred this year.",
+    "counter": 2
+  },
+  {
+    "text": "Use the most direct patient search parameter that matches the identifier given in the question (for example, search Patient by identifier for an MRN).",
+    "counter": 2
+  },
+  {
+    "text": "Before calling FINISH, verify that the final response matches the task’s requested form exactly, including any formatting or type expectations.",
+    "counter": 2
+  },
+  {
+    "text": "When a task depends on recent clinical data, query the relevant resource with an explicit time window before deciding whether any action is needed.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving observations, verify both recency and the actual result value/units before concluding whether treatment or ordering is indicated.",
+    "counter": 2
+  },
+  {
+    "text": "If the required triggering data is absent within the specified timeframe, stop and report that no order should be placed rather than inferring from older or unrelated data.",
+    "counter": 2
+  },
+  {
+    "text": "When treatment depends on threshold-based dosing instructions, map the latest qualifying result to the correct severity range and create an order only if the threshold is met.",
+    "counter": 2
+  },
+  {
+    "text": "Match the task’s time reference precisely: use the result timestamp (for example, issued) when asked for a lab result date, and use the collection/measurement timestamp (for example, effectiveDateTime) only when the task asks when the sample was taken.",
+    "counter": 2
+  },
+  {
+    "text": "Before placing an order based on elapsed time, compare the requested threshold against the correct clinical date field named in the task rather than the first available timestamp.",
+    "counter": 2
+  },
+  {
+    "text": "In the final response, explicitly include both the retrieved clinical value and the relevant date, plus whether a follow-up order was placed, so every part of the task is answered.",
+    "counter": 2
+  },
+  {
+    "text": "When a resource contains multiple plausible fields for the requested fact, inspect them carefully and avoid assuming they are interchangeable.",
+    "counter": 2
+  },
+  {
+    "text": "When a task asks for a derived value (such as age), do not stop at retrieval; compute it explicitly from the returned data using the provided current date or context.",
+    "counter": 2
+  },
+  {
+    "text": "For age calculations, subtract birth year from current year and reduce by 1 if the birthday has not yet occurred in the current year; round down to a whole number.",
+    "counter": 2
+  },
+  {
+    "text": "After finding a matching patient, verify the key identifier and birthdate from the response before finalizing any answer derived from that record.",
+    "counter": 2
+  },
+  {
+    "text": "Before FINISH, double-check that the final output matches both the requested content and any special instructions in the task context.",
+    "counter": 2
+  }
+]

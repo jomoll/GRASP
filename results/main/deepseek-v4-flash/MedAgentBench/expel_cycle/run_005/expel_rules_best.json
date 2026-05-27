@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When retrieving lab observations for a conditional task (e.g., checking if a result is too old), always include a date filter (e.g., `date=ge` with a calculated threshold) to retrieve only relevant records and avoid missing older data that may trigger an action.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving an empty search result for a lab observation, do not immediately conclude the measurement is unavailable; instead, re-query without date restrictions to check for older results that may still be relevant for decision-making (e.g., to determine if an order is needed).",
+    "counter": 2
+  },
+  {
+    "text": "For tasks requiring both retrieval of a value and conditional ordering, always first retrieve the most recent observation to assess its date, then perform the date comparison before deciding to order a new test; do not skip the date evaluation step.",
+    "counter": 2
+  },
+  {
+    "text": "When a lab value is found but the result date is greater than 1 year old, use the POST {api_base}/ServiceRequest endpoint with the appropriate LOINC code to order a new lab test, and include all required fields (resourceType, code, authoredOn, status, intent, priority, subject).",
+    "counter": 2
+  },
+  {
+    "text": "When querying by identifier, use the full identifier system (e.g., \"MRN|S0722219\") or include the appropriate system prefix to avoid ambiguous matches; do not pass the identifier value alone without specifying its type.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving patient data, always compute derived values (like age) from the returned fields (e.g., birthDate) and the current time provided in the context, rather than assuming the value is directly available.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires a computed answer (e.g., age), extract the necessary raw data from the API response and perform the calculation explicitly, rounding down as instructed, before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving lab observations, always include a date range parameter (e.g., `date=ge` with the current time minus a relevant period) to filter for recent results, as the API returns all historical data by default and you need to determine the most recent relevant value.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving lab results, always parse the `effectiveDateTime` of each entry to identify the most recent one, then check if that date is older than the specified threshold (e.g., 1 year) before deciding to order a new test; do not rely on the order of results in the response.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires both retrieving a value and conditionally performing an action (e.g., ordering a lab), verify the condition (e.g., date age) first before proceeding with the action, and include the conditional reasoning in your response or FINISH call.",
+    "counter": 2
+  },
+  {
+    "text": "Use the `FINISH` action only when all task questions are answered and all required actions are completed; if a conditional action (like ordering a test) is needed, perform that action (e.g., via a POST to ServiceRequest) before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "When checking lab results against thresholds (e.g., low magnesium), always compare the numeric value to the specific threshold given in the task (e.g., <1.5 mg/dL for mild deficiency) rather than assuming a generic normal range. If the value is above the threshold, do not order any treatment.",
+    "counter": 2
+  },
+  {
+    "text": "When checking lab results, always retrieve the most recent value by sorting by effectiveDateTime descending; if multiple results exist, use the latest one to determine clinical action.",
+    "counter": 2
+  },
+  {
+    "text": "When a lab value is above the specified threshold, explicitly confirm that no intervention is needed and do not proceed with ordering medications or follow-up tests unless the task explicitly requires them regardless of the result.",
+    "counter": 2
+  },
+  {
+    "text": "Use precise ISO 8601 timestamps for date filters (including timezone) when querying for recent observations to ensure accurate retrieval of the most relevant results.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires ordering both a medication and a follow-up lab test, ensure both actions are performed if the condition is met; do not skip the follow-up lab order even if the medication is not needed.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for lab observations, use a date range with \"ge\" and \"le\" parameters (e.g., date=geYYYY-MM-DDT00:00:00) rather than a specific date to capture results from the previous 24 hours or relevant period.",
+    "counter": 2
+  },
+  {
+    "text": "If a lab search returns no results, check whether the date filter is too restrictive and consider broadening the date range to find the most recent observation before concluding no data exists.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires checking the \"most recent\" level, search for all available observations for that patient/code and then sort by date to identify the latest one, rather than assuming a specific date will return results.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving lab results, always evaluate the value against the given threshold to determine if an intervention is needed before finishing the task.",
+    "counter": 2
+  }
+]

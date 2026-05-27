@@ -1,0 +1,17 @@
+{
+  "missing_required_order_due_to_outdated_result": "Did not place a new test order despite the existing result being older than the allowed time window.",
+  "placeholder_value_returned": "Returned a sentinel placeholder (e.g., -1) instead of a real clinical value.",
+  "patient_not_found_assumption": "Returned 'Patient not found' without verifying that the patient actually exists in the FHIR response.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "answer_format_wrong_type": "answer format wrong type",
+  "missing_necessary_order_due_to_low_value": "Failed to create a replacement order when a lab value was below the required threshold.",
+  "missing_necessary_replacement_order": "Did not place a replacement medication/order when the observed value indicated a deficiency.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "unnecessary_service_request_created": "Created a ServiceRequest (order) when the task did not require placing a new order.",
+  "age_computation_error": "Calculated patient age incorrectly from the birthdate.",
+  "observation_missing_assumed_present": "Assumed a recent observation existed without verifying its presence or recency.",
+  "missing_paired_followup_order": "Failed to create the required follow‑up test order that should accompany a replacement medication order.",
+  "date_filter_omitted": "date filter omitted",
+  "resource_query_missing": "Did not issue any FHIR query before producing an answer.",
+  "threshold_comparison_error": "Incorrectly compared observed value to clinical threshold, leading to a wrong decision about ordering replacement or follow‑up."
+}

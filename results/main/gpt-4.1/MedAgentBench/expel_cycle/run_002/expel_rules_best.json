@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When multiple observations are returned, select the most recent one based on the date for reporting or decision-making.",
+    "counter": 2
+  },
+  {
+    "text": "Always provide both the value and date when reporting the latest lab result, ensuring completeness and clarity.",
+    "counter": 2
+  },
+  {
+    "text": "If a required action (such as ordering a lab) is triggered by a date threshold, check the date of the latest relevant observation before proceeding.",
+    "counter": 2
+  },
+  {
+    "text": "After completing all required actions and obtaining answers, summarize all outcomes in the FINISH response in accordance with the task requirements.",
+    "counter": 2
+  },
+  {
+    "text": "Always format numeric answers as numbers, not strings, unless otherwise specified.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the answer representation matches the expected output type and format stated in the task.",
+    "counter": 2
+  },
+  {
+    "text": "Carefully review task instructions for answer formatting requirements before finalizing the response.",
+    "counter": 2
+  },
+  {
+    "text": "Always extract patient demographic details such as birthDate from the Patient resource to answer age-related questions.",
+    "counter": 2
+  },
+  {
+    "text": "Calculate age using the birthDate and the specified current date, rounding down to the nearest integer as instructed.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the final answer complies with all formatting and task-specific requirements provided in the instructions.",
+    "counter": 2
+  },
+  {
+    "text": "Use appropriate search parameters (e.g., identifier for MRN or name/birthdate for patient lookup) to accurately identify the patient.",
+    "counter": 2
+  },
+  {
+    "text": "Always filter observations by the correct date range specified in the task to ensure only relevant results are considered.",
+    "counter": 2
+  },
+  {
+    "text": "If multiple observations are returned, select the most recent one within the required time window.",
+    "counter": 2
+  },
+  {
+    "text": "If no observations are found within the specified date range, return the designated fallback value as defined in the task.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the final answer format matches task requirements, including unit and data type.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify and correctly interpret the most recent relevant lab result before making clinical decisions or orders.",
+    "counter": 2
+  },
+  {
+    "text": "Calculate medication dosing accurately based on the provided clinical thresholds and dosing instructions.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure all required actions in a multi-step clinical task are completed before finalizing, including paired or follow-up orders when specified.",
+    "counter": 2
+  },
+  {
+    "text": "Summarize all actions taken and the clinical reasoning in the final response for clarity and auditability.",
+    "counter": 2
+  },
+  {
+    "text": "Always check if the retrieved observation date meets recency requirements specified in the task before concluding if further action (e.g., ordering a new test) is needed.",
+    "counter": 2
+  }
+]

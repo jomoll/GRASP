@@ -1,0 +1,316 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-17T14:13:30.084409",
+  "rules": [
+    "[P1] When aggregating numeric observation values, compute the required statistic (e.g., average) by summing values and dividing by the count, and document the method.",
+    "[P1] Query all relevant resource types (e.g., Procedure, MedicationRequest) using comprehensive code sets before clinical decisions.",
+    "[P1] Document any assumptions or rationale when data is partially missing or when actions are taken.",
+    "[P1] If required clinical data is absent after a successful query, treat the condition as unmet and follow protocol‑defined fallback actions (e.g., schedule, order).",
+    "[P1] Summarize all actions in a single FINISH JSON array; never return an empty FINISH payload.",
+    "[P1] Perform required GET requests with proper query parameters before any reasoning or modification; after any change, issue a GET to confirm the resulting state.",
+    "[P1] For time‑sensitive procedures, query Procedure resources filtered by patient ID and specific codes, evaluate the most recent occurrence against the required interval, and if absent or outdated, create a new order and verify its activation.",
+    "[P1] When querying any FHIR resource for a clinical concept, filter by patient ID and standardized codes, sort by the relevant date field (e.g., effectiveDateTime, occurrenceDateTime, administeredDate) descending, and select the most recent record.",
+    "[P1] Ensure exactly one active order of a given type: GET existing orders, PATCH or DELETE older ones to inactive, POST a new order if none, and verify the final state with a subsequent GET.",
+    "[P1] Parse the task to identify the target entity, event/procedure, and thresholds before taking any action.",
+    "[P1] Never fabricate field values; rely exclusively on data returned by the FHIR server.",
+    "[P1] If a query returns no results, verify syntax, patient identifier, and time window; request clarification if needed and report \"insufficient data\" only when truly unavailable.",
+    "[P1] When thresholds are specified, compare values to protocol thresholds and note the exact action and interval defined.",
+    "[P1] Validate that retrieved resources match expected standardized codes (LOINC, CPT, SNOMED, RxNorm) before use."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_a537f67a7332",
+      "text": "[P1] When aggregating numeric observation values, compute the required statistic (e.g., average) by summing values and dividing by the count, and document the method.",
+      "tags": [
+        "heart-rate",
+        "average",
+        "time-window",
+        "data-retrieval",
+        "when",
+        "aggregating",
+        "numeric",
+        "observation",
+        "values",
+        "compute"
+      ],
+      "shown": 10,
+      "success": 9,
+      "failure": 1,
+      "created_at": "2026-05-17T13:30:05.406939",
+      "updated_at": "2026-05-17T14:13:30.076437"
+    },
+    {
+      "id": "rule_246d3185d5c4",
+      "text": "[P1] Query all relevant resource types (e.g., Procedure, MedicationRequest) using comprehensive code sets before clinical decisions.",
+      "tags": [
+        "order-management",
+        "duplicate-handling",
+        "patch",
+        "medicationrequest",
+        "query",
+        "relevant",
+        "resource",
+        "types",
+        "procedure",
+        "using"
+      ],
+      "shown": 5,
+      "success": 3,
+      "failure": 1,
+      "created_at": "2026-05-17T13:13:44.886627",
+      "updated_at": "2026-05-17T14:13:30.076401"
+    },
+    {
+      "id": "rule_e8ba677c08b9",
+      "text": "[P1] Document any assumptions or rationale when data is partially missing or when actions are taken.",
+      "tags": [
+        "order-management",
+        "duplicate-handling",
+        "api-actions",
+        "verification",
+        "document",
+        "assumptions",
+        "rationale",
+        "when",
+        "data",
+        "partially"
+      ],
+      "shown": 4,
+      "success": 2,
+      "failure": 2,
+      "created_at": "2026-05-17T13:24:46.047905",
+      "updated_at": "2026-05-17T14:13:30.076318"
+    },
+    {
+      "id": "rule_f08bef32ef7d",
+      "text": "[P1] If required clinical data is absent after a successful query, treat the condition as unmet and follow protocol‑defined fallback actions (e.g., schedule, order).",
+      "tags": [
+        "vaccination",
+        "booster",
+        "time‑interval",
+        "order‑creation",
+        "required",
+        "clinical",
+        "data",
+        "absent",
+        "after",
+        "successful"
+      ],
+      "shown": 4,
+      "success": 2,
+      "failure": 2,
+      "created_at": "2026-05-17T13:53:08.530856",
+      "updated_at": "2026-05-17T14:13:30.076368"
+    },
+    {
+      "id": "rule_856918563bac",
+      "text": "[P1] Summarize all actions in a single FINISH JSON array; never return an empty FINISH payload.",
+      "tags": [
+        "vitals",
+        "average_calculation",
+        "time_window_query",
+        "data_validation",
+        "summarize",
+        "actions",
+        "single",
+        "finish",
+        "json",
+        "array"
+      ],
+      "shown": 4,
+      "success": 2,
+      "failure": 2,
+      "created_at": "2026-05-17T12:32:18.180870",
+      "updated_at": "2026-05-17T14:13:30.076529"
+    },
+    {
+      "id": "rule_fd4bb51566b6",
+      "text": "[P1] Perform required GET requests with proper query parameters before any reasoning or modification; after any change, issue a GET to confirm the resulting state.",
+      "tags": [
+        "order-management",
+        "duplicate-handling",
+        "api-actions",
+        "verification",
+        "perform",
+        "required",
+        "requests",
+        "with",
+        "proper",
+        "query"
+      ],
+      "shown": 10,
+      "success": 7,
+      "failure": 3,
+      "created_at": "2026-05-17T13:24:46.047985",
+      "updated_at": "2026-05-17T14:13:30.076608"
+    },
+    {
+      "id": "rule_2b61ad0be946",
+      "text": "[P1] For time‑sensitive procedures, query Procedure resources filtered by patient ID and specific codes, evaluate the most recent occurrence against the required interval, and if absent or outdated, create a new order and verify its activation.",
+      "tags": [
+        "procedure_lookup",
+        "date_threshold",
+        "order_creation",
+        "verification",
+        "time",
+        "sensitive",
+        "procedures",
+        "query",
+        "procedure",
+        "resources"
+      ],
+      "shown": 8,
+      "success": 5,
+      "failure": 3,
+      "created_at": "2026-05-17T13:43:45.364297",
+      "updated_at": "2026-05-17T14:13:30.076498"
+    },
+    {
+      "id": "rule_e8479fb81435",
+      "text": "[P1] When querying any FHIR resource for a clinical concept, filter by patient ID and standardized codes, sort by the relevant date field (e.g., effectiveDateTime, occurrenceDateTime, administeredDate) descending, and select the most recent record.",
+      "tags": [
+        "vaccination",
+        "fallback",
+        "order",
+        "time-check",
+        "when",
+        "querying",
+        "fhir",
+        "resource",
+        "clinical",
+        "concept"
+      ],
+      "shown": 2,
+      "success": 0,
+      "failure": 2,
+      "created_at": "2026-05-17T14:05:43.822112",
+      "updated_at": "2026-05-17T14:13:30.076277"
+    },
+    {
+      "id": "rule_7789da59f243",
+      "text": "[P1] Ensure exactly one active order of a given type: GET existing orders, PATCH or DELETE older ones to inactive, POST a new order if none, and verify the final state with a subsequent GET.",
+      "tags": [
+        "order-management",
+        "duplicate-handling",
+        "api-actions",
+        "verification",
+        "ensure",
+        "exactly",
+        "active",
+        "order",
+        "given",
+        "type"
+      ],
+      "shown": 13,
+      "success": 9,
+      "failure": 4,
+      "created_at": "2026-05-17T13:24:46.047873",
+      "updated_at": "2026-05-17T14:13:30.076572"
+    },
+    {
+      "id": "rule_8fd213a98b4d",
+      "text": "[P1] Parse the task to identify the target entity, event/procedure, and thresholds before taking any action.",
+      "tags": [
+        "order-management",
+        "duplicate-handling",
+        "api-actions",
+        "verification",
+        "parse",
+        "task",
+        "identify",
+        "target",
+        "entity",
+        "event"
+      ],
+      "shown": 12,
+      "success": 8,
+      "failure": 4,
+      "created_at": "2026-05-17T13:24:46.047658",
+      "updated_at": "2026-05-17T14:13:30.076676"
+    },
+    {
+      "id": "rule_6bbff7c2f3fb",
+      "text": "[P1] Never fabricate field values; rely exclusively on data returned by the FHIR server.",
+      "tags": [
+        "vitals",
+        "average_calculation",
+        "time_window_query",
+        "data_validation",
+        "never",
+        "fabricate",
+        "field",
+        "values",
+        "rely",
+        "exclusively"
+      ],
+      "shown": 8,
+      "success": 4,
+      "failure": 4,
+      "created_at": "2026-05-17T12:32:18.180802",
+      "updated_at": "2026-05-17T14:13:30.076749"
+    },
+    {
+      "id": "rule_61e5fe07cfd5",
+      "text": "[P1] If a query returns no results, verify syntax, patient identifier, and time window; request clarification if needed and report \"insufficient data\" only when truly unavailable.",
+      "tags": [
+        "order-management",
+        "duplicate-handling",
+        "api-actions",
+        "verification",
+        "query",
+        "returns",
+        "results",
+        "verify",
+        "syntax",
+        "patient"
+      ],
+      "shown": 14,
+      "success": 9,
+      "failure": 5,
+      "created_at": "2026-05-17T13:24:46.047829",
+      "updated_at": "2026-05-17T14:13:30.076646"
+    },
+    {
+      "id": "rule_124f80c6db76",
+      "text": "[P1] When thresholds are specified, compare values to protocol thresholds and note the exact action and interval defined.",
+      "tags": [
+        "order-management",
+        "duplicate-handling",
+        "api-actions",
+        "verification",
+        "when",
+        "thresholds",
+        "specified",
+        "compare",
+        "values",
+        "protocol"
+      ],
+      "shown": 10,
+      "success": 5,
+      "failure": 5,
+      "created_at": "2026-05-17T13:24:46.048020",
+      "updated_at": "2026-05-17T14:13:30.076718"
+    },
+    {
+      "id": "rule_623747274bb5",
+      "text": "[P1] Validate that retrieved resources match expected standardized codes (LOINC, CPT, SNOMED, RxNorm) before use.",
+      "tags": [
+        "order-management",
+        "duplicate-handling",
+        "api-actions",
+        "verification",
+        "validate",
+        "that",
+        "retrieved",
+        "resources",
+        "match",
+        "expected"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T13:24:46.047788",
+      "updated_at": "2026-05-17T14:13:30.076780"
+    }
+  ]
+}

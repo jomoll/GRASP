@@ -1,0 +1,11 @@
+{
+  "no_final_answer": "Agent never produced a final answer output, leaving the response empty.",
+  "final_placement_omitted": "Agent performed earlier steps but omitted the final placement of the item into the target receptacle.",
+  "object_not_examined": "Agent never examined or looked at the target object as needed.",
+  "cleaning_step_omitted": "Agent failed to perform the cleaning step before placement.",
+  "incorrect_receptacle_placement": "Agent placed the object into the wrong receptacle instead of the specified target.",
+  "heating_step_omitted": "Agent omitted the heating operation required by the task.",
+  "wrong_item_chosen_for_cooling": "Agent selected an incorrect object (not the task's target) when attempting to cool.",
+  "required_object_not_picked": "Agent never picked up the object required by the instruction.",
+  "cooling_step_omitted": "Agent skipped the required cooling operation before placement."
+}

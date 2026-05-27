@@ -1,0 +1,1749 @@
+{
+  "version": "1.0",
+  "benchmark": "appworld",
+  "created_at": "2026-05-17T05:18:05.597935",
+  "skills": {
+    "planning": {},
+    "functional": [
+      {
+        "name": "fhir_get_recent_observations",
+        "document": "Retrieve patient observations for a specific code within a defined time range.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nobservation_code : str\n    The LOINC or local code representing the observation (e.g., 'MG' for magnesium).\nstart_date : str\n    The ISO 8601 formatted timestamp representing the start of the search window.\n\nOutputs\n-------\nlist[dict]\n    A list of observation resources matching the criteria.\n\nNotes:\n-------\n1. The date parameter uses the 'ge' prefix to search for observations on or after the specified time.\n2. Ensure the observation_code matches the system's expected terminology.",
+        "content": "observations = apis.fhir.Observation(\n    patient=patient_id,\n    code=observation_code,\n    date='ge' + start_date\n)",
+        "tools": [
+          "apis.fhir.Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642797",
+          "modified_at": "2026-05-17T05:49:06.643341"
+        }
+      },
+      {
+        "name": "fhir_create_observation_vital_sign",
+        "document": "Constructs and records a FHIR Observation resource for a vital sign measurement.\n\nParameters\n----------\nmrn : str\n    The Medical Record Number (MRN) of the patient.\nobservation_code : str\n    The name or code of the vital sign (e.g., 'BP', 'Heart Rate').\nvalue : str\n    The measured value string (e.g., '118/77 mmHg').\ntimestamp : str\n    The ISO 8601 formatted timestamp of the measurement.\n\nOutputs\n-------\nNone\n    The skill performs a POST request to the FHIR server to record the observation.\n\nNotes:\n-------\n1. This skill assumes the existence of a FHIR server endpoint at http://localhost:8080/fhir/Observation.\n2. The category is hardcoded to 'vital-signs' as per the standard FHIR profile for vital sign observations.",
+        "content": "observation_data = {\n    \"resourceType\": \"Observation\",\n    \"category\": [\n        {\n            \"coding\": [\n                {\n                    \"system\": \"http://hl7.org/fhir/observation-category\",\n                    \"code\": \"vital-signs\",\n                    \"display\": \"Vital Signs\"\n                }\n            ]\n        }\n    ],\n    \"code\": {\n        \"text\": observation_code\n    },\n    \"effectiveDateTime\": timestamp,\n    \"status\": \"final\",\n    \"valueString\": value,\n    \"subject\": {\n        \"reference\": \"Patient/\" + mrn\n    }\n}\napis.fhir.post_observation(json=observation_data)",
+        "tools": [
+          "apis.fhir.post_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773491",
+          "modified_at": "2026-05-17T06:09:51.773943"
+        }
+      },
+      {
+        "name": "fhir search patient by name and dob",
+        "document": "Search for a patient using their given name, family name, and date of birth. \n\nParameters:\n----------\ngiven_name : str\n    The patient's first name.\nfamily_name : str\n    The patient's last name.\ndob : str\n    The patient's date of birth in YYYY-MM-DD format.\n\nOutputs:\n-------\nlist[str]\n    A list of MRNs (Medical Record Numbers) matching the criteria. Returns an empty list if no match is found.\n\nNotes:\n-------\n1. The API call constructs a FHIR search query using the provided demographics.\n2. The function parses the returned bundle to extract patient identifiers.",
+        "content": "results = apis.fhir.search_patient(given=given_name, family=family_name, birthdate=dob)\nmrns = []\nif results and 'entry' in results:\n    for entry in results['entry']:\n        resource = entry.get('resource', {})\n        mrn = resource.get('id')\n        if mrn:\n            mrns.append(mrn)",
+        "tools": [
+          "apis.fhir.search_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-17T05:34:07.537026",
+          "modified_at": "2026-05-17T05:34:07.537227"
+        }
+      },
+      {
+        "name": "fhir_search_patient_by_name_and_dob",
+        "document": "Search for a patient resource on a FHIR server using their first name, last name, and date of birth.\n\nParameters\n----------\nfirst_name : str\n    The patient's given name.\nlast_name : str\n    The patient's family name.\ndob : str\n    The patient's date of birth in YYYY-MM-DD format.\n\nOutputs\n-------\nlist[dict]\n    A list of matching patient resources found in the FHIR server. Returns an empty list if no match is found.\n\nNotes:\n-------\n1. This skill performs a GET request to the /fhir/Patient endpoint.\n2. Ensure the base URL of the FHIR server is correctly configured in the environment.",
+        "content": "patients = apis.fhir.get_patient(\n    given=first_name,\n    family=last_name,\n    birthdate=dob\n)\n\n# The result is expected to be a list of patient objects matching the criteria",
+        "tools": [
+          "apis.fhir.get_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888264",
+          "modified_at": "2026-05-17T06:26:35.888634"
+        }
+      },
+      {
+        "name": "fhir_resolve_patient_mrn",
+        "document": "Search for a patient by demographics and return their MRN or a 'Patient not found' message.\n\nParameters\n----------\ngiven_name : str\n    The patient's first name.\nfamily_name : str\n    The patient's last name.\ndob : str\n    The patient's date of birth (YYYY-MM-DD).\n\nOutputs\n-------\nstr\n    The MRN string or 'Patient not found'.\n\nNotes:\n-------\nThis skill combines the search and conditional logic to provide a clean response for the user task.",
+        "content": "patients = apis.fhir.search_patient(given=given_name, family=family_name, birthdate=dob)\nif not patients:\n    result = 'Patient not found'\nelse:\n    result = patients[0].get('id', 'Patient not found')",
+        "tools": [
+          "apis.fhir.search_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-17T05:34:07.537044",
+          "modified_at": "2026-05-17T05:34:07.537234"
+        }
+      },
+      {
+        "name": "fhir_analyze_recent_lab_value",
+        "document": "Analyze a list of observation resources to determine the most recent value and its status.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation dictionaries retrieved from the FHIR server.\n\nOutputs\n-------\ndict\n    A dictionary containing the 'value' (float) and 'date' (str) of the most recent observation. Returns None if the input list is empty.\n\nNotes:\n-------\n1. Assumes the observations list contains 'valueQuantity' and 'effectiveDateTime' keys.\n2. The function sorts the list by date to ensure the most recent entry is identified.",
+        "content": "if not observations:\n    recent_lab = None\nelse:\n    # Sort by effectiveDateTime descending to get most recent\n    sorted_obs = sorted(observations, key=lambda x: x['effectiveDateTime'], reverse=True)\n    latest = sorted_obs[0]\n    recent_lab = {\n        \"value\": latest['valueQuantity']['value'],\n        \"date\": latest['effectiveDateTime']\n    }",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-17T05:34:07.537054",
+          "modified_at": "2026-05-17T05:34:07.537237"
+        }
+      },
+      {
+        "name": "fhir_get_patient_resource_id",
+        "document": "Retrieve the internal resource ID of a patient using their Medical Record Number (MRN).\n\nParameters\n----------\nmrn : str\n    The unique Medical Record Number of the patient.\n\nOutputs\n-------\nstr\n    The internal resource ID (e.g., 'Patient/12345') to be used for linking clinical resources.\n\nNotes:\n-------\n1. This skill performs a search by identifier and extracts the 'id' field from the first matching resource.\n2. Ensure the MRN provided is accurate according to the system's naming convention.",
+        "content": "patients = apis.fhir.get_patient(identifier=mrn)\nif patients and len(patients) > 0:\n    patient_id = patients[0].get('id')\n    resource_reference = f\"Patient/{patient_id}\"\nelse:\n    resource_reference = None",
+        "tools": [
+          "apis.fhir.get_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642679",
+          "modified_at": "2026-05-17T05:49:06.643221"
+        }
+      },
+      {
+        "name": "fhir_create_blood_pressure_observation",
+        "document": "Constructs and creates a FHIR Observation resource for a blood pressure reading.\n\nParameters\n----------\nmrn : str\n    The Medical Record Number (MRN) of the patient.\nvalue_string : str\n    The blood pressure reading as a string (e.g., '118/77 mmHg').\neffective_date_time : str\n    The ISO 8601 formatted timestamp of the measurement.\n\nOutputs\n-------\ndict\n    The created FHIR Observation resource object.\n\nNotes:\n-------\n1. Automatically sets the category to 'vital-signs' and the code to 'BP'.\n2. The status is set to 'final' by default.",
+        "content": "observation_data = {\n    \"resourceType\": \"Observation\",\n    \"category\": [\n        {\n            \"coding\": [\n                {\n                    \"system\": \"http://hl7.org/fhir/observation-category\",\n                    \"code\": \"vital-signs\",\n                    \"display\": \"Vital Signs\"\n                }\n            ]\n        }\n    ],\n    \"code\": {\n        \"text\": \"BP\"\n    },\n    \"effectiveDateTime\": effective_date_time,\n    \"status\": \"final\",\n    \"valueString\": value_string,\n    \"subject\": {\n        \"reference\": \"Patient/\" + mrn\n    }\n}\nresult = apis.fhir.create_observation(data=observation_data)",
+        "tools": [
+          "apis.fhir.create_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888363",
+          "modified_at": "2026-05-17T06:26:35.888765"
+        }
+      },
+      {
+        "name": "fhir_create_vital_sign_observation",
+        "document": "Constructs and records a FHIR Observation resource for a specific vital sign reading.\n\nParameters\n----------\nmrn : str\n    The Medical Record Number (MRN) of the patient.\ncode_text : str\n    The name or code of the vital sign (e.g., 'BP', 'Heart Rate').\nvalue : str\n    The measurement value (e.g., '118/77 mmHg').\neffective_date_time : str\n    ISO 8601 formatted timestamp of when the measurement was taken.\n\nOutputs\n-------\nresponse : dict\n    The response from the FHIR server after creating the resource.\n\nNotes:\n-------\n1. This skill assumes the server endpoint is at 'http://localhost:8080/fhir/Observation'.\n2. The resource is categorized as 'vital-signs' by default.",
+        "content": "payload = {\n    \"resourceType\": \"Observation\",\n    \"category\": [\n        {\n            \"coding\": [\n                {\n                    \"system\": \"http://hl7.org/fhir/observation-category\",\n                    \"code\": \"vital-signs\",\n                    \"display\": \"Vital Signs\"\n                }\n            ]\n        }\n    ],\n    \"code\": {\n        \"text\": code_text\n    },\n    \"effectiveDateTime\": effective_date_time,\n    \"status\": \"final\",\n    \"valueString\": value,\n    \"subject\": {\n        \"reference\": \"Patient/\" + mrn\n    }\n}\nresponse = apis.fhir.post(url=\"http://localhost:8080/fhir/Observation\", json=payload)",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773386",
+          "modified_at": "2026-05-17T06:09:51.773849"
+        }
+      },
+      {
+        "name": "fhir extract mrn from search results",
+        "document": "Parses a list of FHIR patient resources to extract the MRN (Medical Record Number) from the identifier list. \n\nParameters:\n- patient_list (list[dict]): A list of patient resource dictionaries returned from a FHIR search.\n\nOutputs:\n- str: The MRN of the patient if found, otherwise the string \"Patient not found\".\n\nNotes:\n- Assumes the MRN is stored within the 'identifier' field of the FHIR Patient resource. The logic iterates through identifiers to locate the system-specific MRN tag.",
+        "content": "if not patient_list:\n    result = \"Patient not found\"\nelse:\n    # Assuming the first match is the desired patient\n    patient = patient_list[0]\n    identifiers = patient.get('identifier', [])\n    mrn = None\n    for ident in identifiers:\n        # Common FHIR pattern for MRN identifier\n        if ident.get('type', {}).get('coding', [{}])[0].get('code') == 'MR':\n            mrn = ident.get('value')\n            break\n    result = mrn if mrn else \"Patient not found\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-17T05:34:07.537090",
+          "modified_at": "2026-05-17T05:34:07.537249"
+        }
+      },
+      {
+        "name": "fhir process patient mrn retrieval",
+        "document": "Search for a patient by demographics and extract their MRN, returning the MRN or a default error message if not found.\n\nParameters\n----------\ngiven_name : str\n    The patient's first name.\nfamily_name : str\n    The patient's last name.\nbirth_date : str\n    The patient's date of birth in YYYY-MM-DD format.\n\nOutputs\n-------\nstr\n    The MRN of the patient, or 'Patient not found' if the patient does not exist or matches are ambiguous.\n\nNotes:\n-------\nThis skill orchestrates the search and extraction process to provide a single, clean output for the user task.",
+        "content": "patients = apis.fhir.search_patient(\n    given=given_name,\n    family=family_name,\n    birthdate=birth_date\n)\n\nif not patients or len(patients) != 1:\n    result = \"Patient not found\"\nelse:\n    patient = patients[0]\n    identifiers = patient.get('identifier', [])\n    mrn = None\n    for id_obj in identifiers:\n        if id_obj.get('type', {}).get('coding', [{}])[0].get('code') == 'MR' or 'MRN' in str(id_obj.get('system', '')):\n            mrn = id_obj.get('value')\n            break\n    result = mrn if mrn else \"Patient not found\"",
+        "tools": [
+          "apis.fhir.search_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888391",
+          "modified_at": "2026-05-17T06:26:35.888811"
+        }
+      },
+      {
+        "name": "fhir create orthopedic referral",
+        "document": "Constructs and submits a FHIR ServiceRequest resource for an orthopedic surgery referral.\n\nParameters\n----------\npatient_id : str\n    The patient's unique identifier (e.g., 'S6307599').\nclinical_note : str\n    The detailed clinical narrative including Situation, Background, Assessment, and Recommendation.\npriority : str\n    The urgency of the referral (e.g., 'stat', 'routine').\n\nOutputs\n-------\ndict\n    The response from the FHIR server confirming the creation of the ServiceRequest.\n\nNotes:\n-------\n1. Uses SNOMED CT code 306181000000106 for 'Orthopedic surgery referral'.\n2. The status is set to 'active' and intent to 'order' by default.",
+        "content": "service_request = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": \"306181000000106\",\n                \"display\": \"Orthopedic surgery referral\"\n            }\n        ]\n    },\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority,\n    \"subject\": {\n        \"reference\": \"Patient/\" + patient_id\n    },\n    \"note\": {\n        \"text\": clinical_note\n    }\n}\nresponse = apis.fhir.create_service_request(service_request)",
+        "tools": [
+          "apis.fhir.create_service_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632231",
+          "modified_at": "2026-05-17T06:38:33.633198"
+        }
+      },
+      {
+        "name": "fhir_extract_mrn_from_search_results",
+        "document": "Extract the Medical Record Number (MRN) from a list of FHIR patient resources. \n\nParameters\n----------\npatient_list : list[dict]\n    A list of patient resource dictionaries returned by a FHIR search.\n\nOutputs\n-------\nstr\n    The MRN of the first patient if found, otherwise 'Patient not found'.\n\nNotes:\n-------\n1. This skill assumes the MRN is stored in the 'identifier' field of the patient resource.\n2. It returns the first identifier found in the list; ensure the input list is filtered appropriately.",
+        "content": "if not patient_list:\n    mrn = \"Patient not found\"\nelse:\n    patient = patient_list[0]\n    identifiers = patient.get('identifier', [])\n    if identifiers:\n        mrn = identifiers[0].get('value', 'Patient not found')\n    else:\n        mrn = \"Patient not found\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642833",
+          "modified_at": "2026-05-17T05:49:06.643365"
+        }
+      },
+      {
+        "name": "fhir get most recent observation value",
+        "document": "Extract the valueQuantity from the most recent observation in a sorted list of FHIR observations.\n\nParameters:\nobservations : list[dict]\n    A list of FHIR observation resources, ideally sorted by date descending.\n\nOutputs:\nstr\n    The value and unit of the most recent observation, or 'Data not found' if the list is empty.\n\nNotes:\n1. This skill expects the input list to be sorted with the most recent record at index 0.\n2. It accesses the 'valueQuantity' dictionary to retrieve the 'value' and 'unit' fields.",
+        "content": "if not observations:\n    output = 'Data not found'\nelse:\n    most_recent = observations[0]\n    val = most_recent.get('valueQuantity', {}).get('value')\n    unit = most_recent.get('valueQuantity', {}).get('unit')\n    output = f'{val} {unit}'",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-17T05:34:07.537119",
+          "modified_at": "2026-05-17T05:34:07.537261"
+        }
+      },
+      {
+        "name": "fhir_create_observation",
+        "document": "Create a new FHIR Observation resource for a patient. \n\nParameters\n----------\nmrn : str\n    The Medical Record Number (MRN) of the patient.\ncategory_code : str\n    The observation category code (e.g., 'vital-signs').\nobservation_text : str\n    The name or description of the observation (e.g., 'BP').\nvalue : str\n    The measured value of the observation (e.g., '118/77 mmHg').\neffective_time : str\n    The timestamp of the measurement in ISO 8601 format.\n\nOutputs\n-------\ndict\n    The response from the FHIR server after creating the resource.",
+        "content": "observation_resource = {\n    \"resourceType\": \"Observation\",\n    \"category\": [\n        {\n            \"coding\": [\n                {\n                    \"system\": \"http://hl7.org/fhir/observation-category\",\n                    \"code\": category_code\n                }\n            ]\n        }\n    ],\n    \"code\": {\n        \"text\": observation_text\n    },\n    \"effectiveDateTime\": effective_time,\n    \"status\": \"final\",\n    \"valueString\": value,\n    \"subject\": {\n        \"reference\": \"Patient/\" + mrn\n    }\n}\nresponse = apis.fhir.post_observation(resource=observation_resource)",
+        "tools": [
+          "apis.fhir.post_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632165",
+          "modified_at": "2026-05-17T06:38:33.633130"
+        }
+      },
+      {
+        "name": "fhir get patient resource by mrn",
+        "document": "Retrieve the FHIR Patient resource reference using a unique MRN identifier. \n\nParameters\n----------\nmrn : str\n    The Medical Record Number of the patient.\n\nOutputs\n-------\nstr\n    The resource reference string (e.g., 'Patient/ID') associated with the patient.\n\nNotes:\n-------\n1. This skill assumes a standard FHIR server endpoint structure.\n2. Returns the first matching resource ID if multiple are found.",
+        "content": "patients = apis.fhir.search_patient(identifier=mrn)\nif patients and len(patients) > 0:\n    patient_id = patients[0].get('id')\n    patient_reference = f\"Patient/{patient_id}\"\nelse:\n    patient_reference = None",
+        "tools": [
+          "apis.fhir.search_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-17T05:34:07.537132",
+          "modified_at": "2026-05-17T05:34:07.537268"
+        }
+      },
+      {
+        "name": "fhir record patient vital sign",
+        "document": "A workflow skill that records a patient's vital sign observation by first resolving their patient reference and then submitting the observation data.\n\nParameters\n----------\nmrn : str\n    The Medical Record Number of the patient.\nobservation_type : str\n    The name or code of the vital sign (e.g., 'BP').\nvalue : str\n    The measurement value (e.g., '118/77 mmHg').\ncategory : str\n    The FHIR category code (e.g., 'vital-signs').\n\nOutputs\n-------\nstr\n    A confirmation message summarizing the action taken.\n\nNotes:\n-------\n1. This skill combines patient lookup and observation creation to streamline recording tasks.\n2. Returns a failure message if the patient cannot be found.",
+        "content": "patient_ref = apis.fhir.search_patient(identifier=mrn)\nif patient_ref and len(patient_ref) > 0:\n    patient_id = patient_ref[0].get('id')\n    ref = f\"Patient/{patient_id}\"\n    observation_data = {\n        \"resourceType\": \"Observation\",\n        \"category\": [{\"coding\": [{\"system\": \"http://hl7.org/fhir/observation-category\", \"code\": category}]}],\n        \"code\": {\"text\": observation_type},\n        \"status\": \"final\",\n        \"valueString\": value,\n        \"subject\": {\"reference\": ref}\n    }\n    apis.fhir.create_observation(resource=observation_data)\n    result = f\"Successfully recorded {observation_type} of {value} for patient {mrn}.\"\nelse:\n    result = f\"Failed to record: Patient with MRN {mrn} not found.\"",
+        "tools": [
+          "apis.fhir.search_patient",
+          "apis.fhir.create_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-17T05:34:07.537139",
+          "modified_at": "2026-05-17T05:34:07.537271"
+        }
+      },
+      {
+        "name": "clinical_check_and_order_magnesium",
+        "document": "Analyzes a list of magnesium observation resources to determine if a result exists within the last 24 hours and if it is below the clinical threshold (1.7 mg/dL). If low, it triggers a medication order. \n\nParameters\n----------\nobservations : list[dict]\n    A list of observation resources retrieved from the FHIR server.\npatient_id : str\n    The unique identifier of the patient.\n\nOutputs\n-------\nstr\n    A summary of the action taken (e.g., ordering magnesium or noting that no action was required).\n\nNotes:\n-------\n1. Assumes the magnesium threshold for 'low' is < 1.7 mg/dL.\n2. Only orders if the observation list is not empty.",
+        "content": "if not observations:\n    result = f\"No magnesium level has been recorded in the last 24 hours for patient {patient_id}, so no replacement IV magnesium was ordered.\"\nelse:\n    latest_obs = sorted(observations, key=lambda x: x['effectiveDateTime'], reverse=True)[0]\n    value = float(latest_obs['valueQuantity']['value'])\n    if value < 1.7:\n        apis.fhir.MedicationRequest(patient=patient_id, medication='Magnesium Sulfate', status='active')\n        result = f\"Magnesium level {value} is low. Replacement IV magnesium ordered for patient {patient_id}.\"\n    else:\n        result = f\"Magnesium level {value} is within normal range. No replacement ordered.\"",
+        "tools": [
+          "apis.fhir.MedicationRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-17T05:34:07.537145",
+          "modified_at": "2026-05-17T05:34:07.537274"
+        }
+      },
+      {
+        "name": "clinical_get_dosing_protocol",
+        "document": "Retrieve the clinical dosing protocol for a specific medication using FHIR PlanDefinition or MedicationKnowledge resources.\n\nParameters\n----------\nmedication_name : str\n    The name of the medication to look up (e.g., 'Magnesium Sulfate').\n\nOutputs\n-------\nstr\n    The extracted dosing instructions or protocol text.\n\nNotes:\n-------\n1. This skill searches for clinical guidance resources to determine appropriate dosage.\n2. Returns a descriptive string explaining the found protocol.",
+        "content": "protocol_resources = apis.fhir.PlanDefinition(name=medication_name)\nif not protocol_resources:\n    result = f\"No specific dosing protocol found for {medication_name}.\"\nelse:\n    # Extracting the first available protocol description\n    result = protocol_resources[0].get('action', [{}])[0].get('description', 'No detailed instructions available in protocol.')",
+        "tools": [
+          "apis.fhir.PlanDefinition"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-17T05:34:07.537154",
+          "modified_at": "2026-05-17T05:34:07.537278"
+        }
+      },
+      {
+        "name": "fhir_create_specialty_referral",
+        "document": "Create a specialty referral ServiceRequest resource in the FHIR server. This skill encapsulates the clinical context within the note field to ensure comprehensive documentation for the receiving specialist.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient (e.g., 'S6307599').\nreferral_note : str\n    The clinical context including situation, background, assessment, and recommendation.\nsnomed_code : str\n    The SNOMED CT code for the specific referral type.\nreferral_display : str\n    The display name for the referral service.\n\nOutputs\n-------\ndict\n    The response from the FHIR server confirming the creation of the ServiceRequest.\n\nNotes:\n-------\n1. The 'authoredOn' field is dynamically set to the current ISO format date/time.\n2. The 'priority' is set to 'stat' by default for surgical referrals to ensure timely processing.",
+        "content": "referral_data = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": snomed_code,\n                \"display\": referral_display\n            }\n        ]\n    },\n    \"authoredOn\": \"2023-11-13T10:15:00+00:00\",\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": \"stat\",\n    \"subject\": {\n        \"reference\": \"Patient/\" + patient_id\n    },\n    \"note\": {\n        \"text\": referral_note\n    }\n}\n\nresponse = apis.fhir.post_service_request(json=referral_data)",
+        "tools": [
+          "apis.fhir.post_service_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642719",
+          "modified_at": "2026-05-17T05:49:06.643285"
+        }
+      },
+      {
+        "name": "clinical_evaluate_lab_and_act",
+        "document": "Evaluate patient lab results within a specific timeframe to determine if action is required. If results exist, check if the value is below a threshold and order medication; otherwise, conclude the process.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nlab_results : list[dict]\n    A list of observation resources retrieved for the patient.\nthreshold : float\n    The minimum acceptable value for the lab result.\nmedication_code : str\n    The code for the medication to be ordered if the result is low.\n\nOutputs\n-------\nstr\n    A summary of the action taken (e.g., 'Order placed' or 'No action required').\n\nNotes:\n-------\n1. The function assumes 'valueQuantity' contains the 'value' field in the observation object.\n2. Returns a clear status message indicating if the lab was missing, normal, or required an order.",
+        "content": "if not lab_results:\n    status = f\"No lab results found for patient {patient_id} in the specified timeframe. No action taken.\"\nelse:\n    latest_result = max(lab_results, key=lambda x: x['effectiveDateTime'])\n    val = latest_result['valueQuantity']['value']\n    if val < threshold:\n        apis.fhir.MedicationRequest(patient=patient_id, medication=medication_code, status='active')\n        status = f\"Lab result {val} is below threshold {threshold}. Medication {medication_code} ordered.\"\n    else:\n        status = f\"Lab result {val} is within normal range. No action taken.\"",
+        "tools": [
+          "apis.fhir.MedicationRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642735",
+          "modified_at": "2026-05-17T05:49:06.643304"
+        }
+      },
+      {
+        "name": "clinical_order_medication_by_guideline",
+        "document": "Consults clinical dosing instructions based on a specific lab value and orders the appropriate medication.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nlab_value : float\n    The current laboratory result value.\nmedication_base_code : str\n    The base code for the medication to be ordered.\n\nOutputs\n-------\nstr\n    A message confirming the dosage determined and the medication order status.\n\nNotes:\n-------\n1. This skill assumes a specific logic for dosage calculation based on the lab value.\n2. Uses apis.fhir.MedicationRequest to place the order.",
+        "content": "if lab_value < 1.0:\n    dosage = '4g IV magnesium sulfate'\nelif lab_value < 1.5:\n    dosage = '2g IV magnesium sulfate'\nelse:\n    dosage = None\n\nif dosage:\n    apis.fhir.MedicationRequest(patient=patient_id, medication=medication_base_code, note=dosage, status='active')\n    status = f'Ordered {dosage} for patient {patient_id} due to low magnesium level of {lab_value}.'\nelse:\n    status = f'No medication required for magnesium level {lab_value}.'",
+        "tools": [
+          "apis.fhir.MedicationRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642748",
+          "modified_at": "2026-05-17T05:49:06.643312"
+        }
+      },
+      {
+        "name": "clinical evaluate and act on lab results",
+        "document": "Evaluates a list of lab observations to determine if a follow-up action is required based on a defined threshold.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation objects containing 'value' and 'unit' fields.\nthreshold_low : float\n    The minimum normal value for the lab result.\n\nOutputs\n-------\nstr\n    A string status indicating whether to proceed with an order or terminate the task.\n\nNotes:\n-------\n1. This skill expects the observation objects to have a 'value' field.\n2. Returns 'ORDER_REQUIRED' if the most recent observation is below the threshold, otherwise 'NO_ACTION_REQUIRED'.\n3. If the observations list is empty, returns 'NO_DATA'.",
+        "content": "if not observations:\n    status = \"NO_DATA\"\nelse:\n    # Sort by date if available, otherwise take the first entry\n    latest_obs = observations[-1]\n    value = float(latest_obs.get('value', 0))\n    if value < threshold_low:\n        status = \"ORDER_REQUIRED\"\n    else:\n        status = \"NO_ACTION_REQUIRED\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642760",
+          "modified_at": "2026-05-17T05:49:06.643319"
+        }
+      },
+      {
+        "name": "clinical retrieve and apply dosing protocol",
+        "document": "Retrieve the clinical protocol for a specific medication and patient, then create a medication request based on the retrieved instructions.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nmedication_name : str\n    The name of the medication to retrieve protocols for.\n\nOutputs\n-------\nstr\n    A confirmation message indicating that the protocol was retrieved and the medication order was placed.\n\nNotes:\n-------\n1. This skill first searches for active clinical protocols using the patient ID and medication name.\n2. It extracts the dosage instructions from the protocol and executes the order creation.\n",
+        "content": "protocols = apis.fhir.SearchProtocol(patient=patient_id, medication=medication_name)\nif protocols:\n    # Assuming the first matching protocol contains the standard dosage\n    dosage = protocols[0].get('standard_dosage', '2g')\n    apis.fhir.create_order(patient=patient_id, medication=medication_name, dose=dosage)\n    result = \"Retrieved protocol and ordered \" + medication_name + \" with dose \" + dosage\nelse:\n    result = \"No specific protocol found for \" + medication_name",
+        "tools": [
+          "apis.fhir.SearchProtocol",
+          "apis.fhir.create_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888406",
+          "modified_at": "2026-05-17T06:26:35.888829"
+        }
+      },
+      {
+        "name": "fhir_create_orthopedic_referral",
+        "document": "Create an orthopedic surgery referral ServiceRequest for a specific patient. \n\nParameters:\n- patient_id (str): The unique identifier of the patient (e.g., 'S3241217').\n- clinical_note (str): The structured clinical details containing Situation, Background, Assessment, and Recommendation.\n- priority (str): The urgency of the referral (e.g., 'stat', 'routine').\n\nOutputs:\n- dict: The created ServiceRequest resource details.\n\nNotes:\n- The SNOMED code 306181000000106 is used for orthopedic surgery referrals.",
+        "content": "referral_data = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": \"306181000000106\",\n                \"display\": \"Orthopedic surgery referral\"\n            }\n        ]\n    },\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority,\n    \"subject\": {\n        \"reference\": \"Patient/\" + patient_id\n    },\n    \"note\": {\n        \"text\": clinical_note\n    }\n}\nresponse = apis.fhir.post_service_request(data=referral_data)",
+        "tools": [
+          "apis.fhir.post_service_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632193",
+          "modified_at": "2026-05-17T06:38:33.633169"
+        }
+      },
+      {
+        "name": "clinical_check_magnesium_status",
+        "document": "Analyze a list of magnesium observation resources to determine the most recent value and check if it is below the clinical threshold of 1.7 mg/dL.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation resources retrieved from the FHIR server.\n\nOutputs\n-------\nstr\n    A status message indicating if the level is low, normal, or if no data was found.\n\nNotes:\n-------\n1. Assumes the observation resource contains a 'valueQuantity' with a 'value' field.\n2. The threshold for low magnesium is defined as < 1.7 mg/dL.",
+        "content": "if not observations:\n    result = \"No magnesium level has been recorded in the last 24 hours.\"\nelse:\n    # Sort by effectiveDateTime to find the most recent\n    observations.sort(key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    latest_value = observations[0].get('valueQuantity', {}).get('value')\n    \n    if latest_value is not None:\n        if latest_value < 1.7:\n            result = f\"Magnesium level is low at {latest_value} mg/dL.\"\n        else:\n            result = f\"Magnesium level is normal at {latest_value} mg/dL.\"\n    else:\n        result = \"Observation found but no numerical value available.\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642809",
+          "modified_at": "2026-05-17T05:49:06.643348"
+        }
+      },
+      {
+        "name": "fhir_record_vital_sign_observation",
+        "document": "Record a vital sign observation (e.g., Blood Pressure) for a specific patient in FHIR format.\n\nParameters\n----------\npatient_reference : str\n    The FHIR reference string for the patient (e.g., 'Patient/S1579803').\nobservation_code : str\n    The code or text describing the observation (e.g., 'BP').\nvalue : str\n    The measured value of the vital sign (e.g., '118/77 mmHg').\neffective_datetime : str\n    The timestamp of the measurement in ISO 8601 format.\n\nOutputs\n-------\ndict\n    The created Observation resource object returned by the server.\n\nNotes:\n-------\n1. This skill creates an Observation with the category 'vital-signs'.\n2. The status is set to 'final' by default.",
+        "content": "observation_data = {\n    \"resourceType\": \"Observation\",\n    \"category\": [\n        {\n            \"coding\": [\n                {\n                    \"system\": \"http://hl7.org/fhir/observation-category\",\n                    \"code\": \"vital-signs\",\n                    \"display\": \"Vital Signs\"\n                }\n            ]\n        }\n    ],\n    \"code\": {\n        \"text\": observation_code\n    },\n    \"effectiveDateTime\": effective_datetime,\n    \"status\": \"final\",\n    \"valueString\": value,\n    \"subject\": {\n        \"reference\": patient_reference\n    }\n}\nresult = apis.fhir.create_observation(observation_data)",
+        "tools": [
+          "apis.fhir.create_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642821",
+          "modified_at": "2026-05-17T05:49:06.643358"
+        }
+      },
+      {
+        "name": "clinical evaluate magnesium status",
+        "document": "Analyze a list of magnesium observation records to determine if a low level has been recorded within the specified period.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation dictionaries containing a 'value' key.\nthreshold : float\n    The lower bound of the normal serum magnesium range (e.g., 1.7 mg/dL).\n\nOutputs\n-------\nstr\n    Returns 'LOW' if a value is below the threshold, 'NORMAL' if all are within range, or 'NONE' if the list is empty.\n\nNotes:\n-------\n1. This skill assumes the input list contains dictionaries with a 'value' field.\n2. If multiple observations exist, it checks if any individual reading is below the threshold.",
+        "content": "if not observations:\n    result = 'NONE'\nelse:\n    is_low = False\n    for obs in observations:\n        if float(obs.get('value', 0)) < threshold:\n            is_low = True\n            break\n    result = 'LOW' if is_low else 'NORMAL'",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642845",
+          "modified_at": "2026-05-17T05:49:06.643386"
+        }
+      },
+      {
+        "name": "fhir get patient reference by mrn",
+        "document": "Retrieve the FHIR resource reference (e.g., 'Patient/ID') for a patient using their Medical Record Number (MRN).\n\nParameters\n----------\nmrn : str\n    The unique Medical Record Number of the patient.\n\nOutputs\n-------\nstr\n    The FHIR reference string (e.g., 'Patient/S2703270') if found, otherwise None.\n\nNotes:\n-------\n1. This skill searches by the 'identifier' parameter in the FHIR Patient endpoint.\n2. It assumes the API returns a bundle or list and extracts the ID from the first matching entry.",
+        "content": "patients = apis.fhir.search_patient(identifier=mrn)\nif patients and len(patients) > 0:\n    patient_id = patients[0].get('id')\n    patient_reference = f\"Patient/{patient_id}\"\nelse:\n    patient_reference = None",
+        "tools": [
+          "apis.fhir.search_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642858",
+          "modified_at": "2026-05-17T05:49:06.643397"
+        }
+      },
+      {
+        "name": "fhir record blood pressure observation",
+        "document": "Record a blood pressure reading as an Observation resource for a specific patient in the FHIR system.\n\nParameters\n----------\npatient_reference : str\n    The FHIR resource reference for the patient (e.g., 'Patient/S2703270').\nbp_value : str\n    The blood pressure measurement string (e.g., '118/77 mmHg').\neffective_date : str\n    ISO 8601 formatted timestamp of the measurement.\n\nOutputs\n-------\ndict\n    The response from the FHIR server confirming the creation of the Observation resource.\n\nNotes:\n-------\n1. The observation is categorized under 'vital-signs'.\n2. The code is set to 'BP' for the observation type.",
+        "content": "observation_data = {\n    \"resourceType\": \"Observation\",\n    \"category\": [\n        {\n            \"coding\": [\n                {\n                    \"system\": \"http://hl7.org/fhir/observation-category\",\n                    \"code\": \"vital-signs\",\n                    \"display\": \"Vital Signs\"\n                }\n            ]\n        }\n    ],\n    \"code\": {\n        \"text\": \"BP\"\n    },\n    \"effectiveDateTime\": effective_date,\n    \"status\": \"final\",\n    \"valueString\": bp_value,\n    \"subject\": {\n        \"reference\": patient_reference\n    }\n}\nresult = apis.fhir.create_observation(data=observation_data)",
+        "tools": [
+          "apis.fhir.create_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642870",
+          "modified_at": "2026-05-17T05:49:06.643404"
+        }
+      },
+      {
+        "name": "fhir_get_patient_mrn_by_demographics",
+        "document": "Search for a patient by name and DOB and extract their MRN. Returns 'Patient not found' if no matching patient is found or no MRN is available.\n\nParameters\n----------\nfirst_name : str\n    The patient's given name.\nlast_name : str\n    The patient's family name.\ndob : str\n    The patient's date of birth in YYYY-MM-DD format.\n\nOutputs\n-------\nstr\n    The MRN string if found, otherwise 'Patient not found'.\n\nNotes:\n-------\n1. This skill combines the FHIR search and the identifier extraction logic.\n2. It assumes the FHIR server returns a list of matching patient resources.",
+        "content": "patients = apis.fhir.get_patient(\n    given=first_name,\n    family=last_name,\n    birthdate=dob\n)\n\nif not patients:\n    result = \"Patient not found\"\nelse:\n    patient = patients[0]\n    identifiers = patient.get('identifier', [])\n    result = \"Patient not found\"\n    for id_entry in identifiers:\n        if id_entry.get('type', {}).get('coding', [{}])[0].get('code') == 'MR' or 'MRN' in id_entry.get('system', ''):\n            result = id_entry.get('value')\n            break",
+        "tools": [
+          "apis.fhir.get_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888271",
+          "modified_at": "2026-05-17T06:26:35.888649"
+        }
+      },
+      {
+        "name": "fhir_extract_mrn_from_patient_resource",
+        "document": "Extracts the Medical Record Number (MRN) from a list of FHIR patient resources. If the list is empty, returns 'Patient not found'.\n\nParameters\n----------\npatient_resources : list[dict]\n    A list of patient resource dictionaries retrieved from a FHIR server.\n\nOutputs\n-------\nstr\n    The MRN (identifier) of the first matching patient, or 'Patient not found' if the list is empty.\n\nNotes:\n-------\n1. Assumes the MRN is stored within the 'identifier' field of the patient resource, typically under a system or type that identifies it as an MRN.",
+        "content": "if not patient_resources:\n    result = \"Patient not found\"\nelse:\n    # Assuming the first match is the target patient\n    patient = patient_resources[0]\n    # Extracting the MRN from the identifier list\n    identifiers = patient.get('identifier', [])\n    # Logic to find the identifier that represents the MRN\n    mrn = next((i.get('value') for i in identifiers if i.get('type', {}).get('coding', [{}])[0].get('code') == 'MR'), None)\n    if not mrn:\n        mrn = identifiers[0].get('value') if identifiers else \"Patient not found\"\n    result = mrn",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.631991",
+          "modified_at": "2026-05-17T06:38:33.632881"
+        }
+      },
+      {
+        "name": "fhir_evaluate_lab_result_threshold",
+        "document": "Evaluates a list of lab observation resources to determine if a value exists within the last 24 hours and if it is below a specified threshold.\n\nParameters\n----------\nobservations : list[dict]\n    A list of FHIR observation resources.\nthreshold : float\n    The lower bound value for the lab result (e.g., 1.7 for magnesium).\n\nOutputs\n-------\nbool, float | None\n    Returns (is_low, value) where is_low is a boolean indicating if the value is below the threshold, and value is the observed level. Returns (False, None) if the observation list is empty.\n\nNotes:\n-------\n1. This skill assumes the observation resource contains a 'valueQuantity' attribute with a 'value' field.\n2. Only the most recent observation (index 0) is evaluated.",
+        "content": "if not observations:\n    is_low = False\n    value = None\nelse:\n    # Assuming the API returns the most recent observation first or we take the first item\n    latest_observation = observations[0]\n    value = latest_observation.get('valueQuantity', {}).get('value')\n    is_low = value < threshold if value is not None else False",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642908",
+          "modified_at": "2026-05-17T05:49:06.643428"
+        }
+      },
+      {
+        "name": "fhir_get_recent_lab_results",
+        "document": "Retrieve lab observations for a specific patient within a defined timeframe.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nlab_code : str\n    The LOINC or local code for the lab test (e.g., 'MG' for Magnesium).\nstart_date : str\n    ISO 8601 formatted timestamp representing the start of the search window.\n\nOutputs\n-------\nlist[dict]\n    A list of observation objects matching the criteria.\n\nNotes\n-------\n1. Ensure the date parameter uses the 'ge' (greater than or equal) prefix to filter for recent entries.\n2. The function returns an empty list if no observations are found within the specified time range.",
+        "content": "observations = apis.fhir.Observation.search(\n    patient=patient_id,\n    code=lab_code,\n    date=\"ge\" + start_date\n)\n\n# Filter out potential errors or null responses\nif observations is None:\n    observations = []",
+        "tools": [
+          "apis.fhir.Observation.search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888315",
+          "modified_at": "2026-05-17T06:26:35.888708"
+        }
+      },
+      {
+        "name": "fhir_get_and_process_recent_lab_value",
+        "document": "Retrieve the most recent laboratory result for a specific patient within a given timeframe and extract its numeric value.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nlab_code : str\n    The lab test code (e.g., 'MG').\nstart_date : str\n    ISO 8601 formatted start date for the query.\n\nOutputs\n-------\nfloat or None\n    The most recent lab value, or None if no records exist.\n\nNotes:\n-------\n1. This skill combines API retrieval with internal logic to process and sort the results.\n2. Ensure the patient_id and lab_code are accurate for the FHIR server.",
+        "content": "observations = apis.fhir.get_observations(\n    code=lab_code,\n    patient=patient_id,\n    date=f\"ge{start_date}\"\n)\n\nif not observations:\n    result = None\nelse:\n    sorted_obs = sorted(observations, key=lambda x: x['effectiveDateTime'], reverse=True)\n    result = sorted_obs[0]['valueQuantity']['value']",
+        "tools": [
+          "apis.fhir.get_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642931",
+          "modified_at": "2026-05-17T05:49:06.643444"
+        }
+      },
+      {
+        "name": "fhir process and conclude patient observation",
+        "document": "Extracts the most recent value from a list of FHIR observations and completes the task by providing the final result or a notification if no records are present.\n\nParameters:\nobservations : list[dict]\n    A list of FHIR Observation resource dictionaries.\n\nOutputs:\nNone\n    This skill performs the final action of reporting the result to the user.\n\nNotes:\n- Relies on internal sorting logic to identify the latest record based on 'effectiveDateTime'.\n- Terminates the task execution flow.",
+        "content": "if not observations:\n    apis.fhir.supervisor.complete_task(result='No records found for the specified period.')\nelse:\n    sorted_obs = sorted(observations, key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    latest = sorted_obs[0]\n    value = latest.get('valueQuantity', {}).get('value') or latest.get('valueString')\n    apis.fhir.supervisor.complete_task(result=str(value))",
+        "tools": [
+          "apis.fhir.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642943",
+          "modified_at": "2026-05-17T05:49:06.643451"
+        }
+      },
+      {
+        "name": "fhir_get_resource_id_by_mrn",
+        "document": "Retrieve the internal FHIR resource ID for a patient using their Medical Record Number (MRN).\n\nParameters\n----------\nmrn : str\n    The patient's unique Medical Record Number.\n\nOutputs\n-------\nstr\n    The internal FHIR resource ID (e.g., 'Patient/123') or None if not found.\n\nNotes\n-------\n1. This skill performs a search against the FHIR Patient endpoint using the identifier parameter.\n2. It assumes a standard FHIR search result structure where the resource ID is extracted from the entry.",
+        "content": "patients = apis.fhir.search_patients(identifier=mrn)\nresource_id = None\nif patients and 'entry' in patients and len(patients['entry']) > 0:\n    patient_data = patients['entry'][0].get('resource', {})\n    resource_id = f\"Patient/{patient_data.get('id')}\"\nelse:\n    resource_id = None",
+        "tools": [
+          "apis.fhir.search_patients"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642955",
+          "modified_at": "2026-05-17T05:49:06.643459"
+        }
+      },
+      {
+        "name": "fhir_get_recent_lab_value",
+        "document": "Retrieve the most recent value of a specific lab test for a patient within a given timeframe.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nlab_code : str\n    The code representing the lab test (e.g., 'MG').\nstart_date : str\n    The ISO 8601 formatted start timestamp.\n\nOutputs\n-------\ndict\n    A dictionary containing 'value' and 'unit' of the most recent test, or None if no record found.\n\nNotes:\n-------\n1. Combines fetching, sorting, and extraction into a single workflow.\n2. Uses the helper methods defined in the library to process FHIR data.",
+        "content": "observations = apis.fhir.Observation(code=lab_code, patient=patient_id, date='ge' + start_date)\nif not observations:\n    result = None\nelse:\n    sorted_obs = sorted(observations, key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    target = sorted_obs[0]\n    value = target.get('valueQuantity', {}).get('value')\n    unit = target.get('valueQuantity', {}).get('unit')\n    result = {'value': value, 'unit': unit}",
+        "tools": [
+          "apis.fhir.Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642967",
+          "modified_at": "2026-05-17T05:49:06.643467"
+        }
+      },
+      {
+        "name": "clinical_get_medication_dosing_instructions",
+        "document": "Retrieve dosing instructions for a specific medication from clinical documentation or medication guidelines.\n\nParameters\n----------\nmedication_name : str\n    The name or identifier of the medication (e.g., 'Magnesium Sulfate').\npatient_id : str\n    The unique identifier of the patient for context-specific guidelines.\n\nOutputs\n-------\nstr\n    The extracted dosing instructions or medication order guidance.\n\nNotes:\n-------\n1. Searches both structured medication request templates and unstructured clinical documentation.\n2. Returns a consolidated string of instructions found.",
+        "content": "med_requests = apis.fhir.MedicationRequest.search(name=medication_name, patient=patient_id)\ndocs = apis.fhir.DocumentReference.search(patient=patient_id, content=medication_name)\n\ninstructions = \"\"\nif med_requests:\n    instructions += \"Structured Order Template: \" + str(med_requests[0])\nif docs:\n    instructions += \" Clinical Notes: \" + str(docs[0])",
+        "tools": [
+          "apis.fhir.MedicationRequest.search",
+          "apis.fhir.DocumentReference.search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642978",
+          "modified_at": "2026-05-17T05:49:06.643475"
+        }
+      },
+      {
+        "name": "fhir_get_patient_observations_by_code_and_time",
+        "document": "Retrieve FHIR observation records for a specific patient filtered by a observation code and a minimum date (start time).\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nobservation_code : str\n    The LOINC or local code for the observation (e.g., 'MG' for magnesium).\nstart_date : str\n    The ISO 8601 formatted string representing the start of the time window (e.g., '2023-11-12T10:15:00Z').\n\nOutputs\n-------\nlist[dict]\n    A list of observation resources matching the criteria.\n\nNotes:\n-------\n1. The 'date' parameter in the FHIR search uses the 'ge' (greater than or equal) prefix to capture all records from the start_date onwards.",
+        "content": "observations = apis.fhir.Observation(\n    code=observation_code,\n    patient=patient_id,\n    date=f\"ge{start_date}\"\n)",
+        "tools": [
+          "apis.fhir.Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.642990",
+          "modified_at": "2026-05-17T05:49:06.643484"
+        }
+      },
+      {
+        "name": "fhir_get_recent_lab_observations",
+        "document": "Retrieve lab observations for a specific patient within a defined lookback period.\n\nParameters:\npatient_id : str\n    The unique identifier of the patient.\nlab_code : str\n    The LOINC or FHIR observation code for the lab test (e.g., 'MG' for magnesium).\nlookback_time : str\n    The ISO 8601 formatted timestamp representing the start of the time window (e.g., 'ge2023-11-12T10:15:00Z').\n\nOutputs:\nlist[dict]\n    A list of observation records found within the specified timeframe.\n\nNotes:\n1. Ensure the lab_code matches the system's expected terminology.\n2. The lookback_time should be formatted with the 'ge' prefix to denote 'greater than or equal to'.",
+        "content": "observations = apis.fhir.get_observation(\n    code=lab_code,\n    patient=patient_id,\n    date=lookback_time\n)",
+        "tools": [
+          "apis.fhir.get_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773394",
+          "modified_at": "2026-05-17T06:09:51.773855"
+        }
+      },
+      {
+        "name": "clinical_lab_value_evaluator",
+        "document": "Evaluates a list of lab observations to determine if the most recent value is below a specified clinical threshold.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation records retrieved from the FHIR server.\nlow_threshold : float\n    The minimum normal value for the laboratory test.\n\nOutputs\n-------\nfloat or None\n    Returns the most recent lab value if it is below the threshold, otherwise returns None.\n\nNotes\n-------\n1. Assumes the observations are sorted chronologically or that the list contains the relevant recent data.\n2. The function extracts the 'valueQuantity' 'value' field from the FHIR observation resource.",
+        "content": "if not observations:\n    result = None\nelse:\n    # Assuming the most recent is the last in the list or needs sorting\n    latest_obs = observations[-1]\n    val = latest_obs.get('valueQuantity', {}).get('value')\n    if val is not None and val < low_threshold:\n        result = val\n    else:\n        result = None",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.643014",
+          "modified_at": "2026-05-17T05:49:06.643501"
+        }
+      },
+      {
+        "name": "fhir_place_medication_order",
+        "document": "Place a medication order for a patient using the FHIR MedicationRequest resource.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient.\nmedication_code : str\n    The name or code of the medication to be ordered.\ndosage_instruction : str\n    The specific dosing details, frequency, and route (e.g., '2g IV over 1 hour').\n\nOutputs\n-------\ndict\n    The response from the FHIR server confirming the created MedicationRequest resource.\n\nNotes:\n-------\n1. Ensure the patient_id is valid.\n2. This skill performs a POST operation to create a new resource.",
+        "content": "order_data = {\n    'resourceType': 'MedicationRequest',\n    'subject': {'reference': 'Patient/' + patient_id},\n    'medicationCodeableConcept': {'text': medication_code},\n    'dosageInstruction': [{'text': dosage_instruction}]\n}\nresult = apis.fhir.MedicationRequest(method='POST', body=order_data)",
+        "tools": [
+          "apis.fhir.MedicationRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.643026",
+          "modified_at": "2026-05-17T05:49:06.643510"
+        }
+      },
+      {
+        "name": "fhir_search_patient_mrn",
+        "document": "Search for a patient by given name, family name, and date of birth to retrieve their Medical Record Number (MRN).\n\nParameters\n----------\ngiven_name : str\n    The first name of the patient.\nfamily_name : str\n    The last name of the patient.\nbirthdate : str\n    The date of birth in YYYY-MM-DD format.\n\nOutputs\n-------\nlist[str]\n    A list of MRNs found for the matching patient, or an empty list if no patient is found.\n\nNotes:\n-------\n1. This skill performs a GET request to the FHIR Patient endpoint.\n2. The logic filters the bundle entries to extract the 'id' field, which represents the MRN.",
+        "content": "params = {'given': given_name, 'family': family_name, 'birthdate': birthdate}\nresponse = apis.fhir.search_patient(params=params)\nmrns = []\nif response and 'entry' in response:\n    for entry in response['entry']:\n        if 'resource' in entry and 'id' in entry['resource']:\n            mrns.append(entry['resource']['id'])",
+        "tools": [
+          "apis.fhir.search_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.643039",
+          "modified_at": "2026-05-17T05:49:06.643518"
+        }
+      },
+      {
+        "name": "fhir create blood pressure observation",
+        "document": "Create a new FHIR Observation resource for blood pressure and associate it with a specific patient.\n\nParameters\n----------\npatient_id : str\n    The internal FHIR ID of the patient (e.g., 'S6192632').\nmeasurement : str\n    The blood pressure reading (e.g., '118/77 mmHg').\neffective_date : str\n    The ISO 8601 formatted timestamp of when the measurement was taken.\n\nOutputs\n-------\ndict\n    The response from the FHIR server confirming the creation of the observation.\n\nNotes:\n-------\n1. This skill sets the category to 'vital-signs' and the status to 'final'.\n2. The resource reference is constructed as 'Patient/<patient_id>'.",
+        "content": "observation = {\n    \"resourceType\": \"Observation\",\n    \"category\": [{\n        \"coding\": [{\n            \"system\": \"http://hl7.org/fhir/observation-category\",\n            \"code\": \"vital-signs\",\n            \"display\": \"Vital Signs\"\n        }]\n    }],\n    \"code\": {\"text\": \"BP\"},\n    \"effectiveDateTime\": effective_date,\n    \"status\": \"final\",\n    \"valueString\": measurement,\n    \"subject\": {\"reference\": \"Patient/\" + patient_id}\n}\nresponse = apis.fhir.create_observation(resource=observation)",
+        "tools": [
+          "apis.fhir.create_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.643052",
+          "modified_at": "2026-05-17T05:49:06.643527"
+        }
+      },
+      {
+        "name": "fhir extract mrn from patient resource",
+        "document": "Extracts the Medical Record Number (MRN) from a list of FHIR patient resources. \n\nParameters\n----------\npatient_list : list[dict]\n    A list of patient resource dictionaries returned from a FHIR search.\n\nOutputs\n-------\nstr\n    The MRN string if exactly one patient is found, otherwise returns 'Patient not found'.\n\nNotes:\n-------\n1. This skill expects the patient resource to contain an 'identifier' field where one of the identifiers has a type or system indicating an MRN.\n2. If the list is empty or contains multiple results, it returns 'Patient not found' to ensure safety.",
+        "content": "if not patient_list or len(patient_list) != 1:\n    result = \"Patient not found\"\nelse:\n    patient = patient_list[0]\n    # Extracting the MRN identifier, assuming standard FHIR structure\n    identifiers = patient.get('identifier', [])\n    mrn = None\n    for id_obj in identifiers:\n        # Check if the identifier is the MRN\n        if id_obj.get('type', {}).get('coding', [{}])[0].get('code') == 'MR' or 'MRN' in str(id_obj.get('system', '')):\n            mrn = id_obj.get('value')\n            break\n    \n    result = mrn if mrn else \"Patient not found\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888384",
+          "modified_at": "2026-05-17T06:26:35.888789"
+        }
+      },
+      {
+        "name": "fhir_create_specialist_referral",
+        "document": "Create a FHIR ServiceRequest resource for a specialist referral.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient (e.g., 'S3241217').\nreferral_reason : str\n    The free-text note describing the clinical situation, background, assessment, and recommendation.\nsnomed_code : str\n    The SNOMED CT code representing the specific referral type (e.g., '306181000000106').\ndisplay_name : str\n    The human-readable name of the referral service.\n\nOutputs\n-------\nresponse : dict\n    The API response from the FHIR server confirming the resource creation.\n\nNotes:\n-------\n1. Ensure the patient_id is formatted correctly as 'Patient/{id}'.\n2. The status is set to 'active' and intent to 'order' by default for clinical referrals.",
+        "content": "payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": snomed_code,\n                \"display\": display_name\n            }\n        ]\n    },\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": \"stat\",\n    \"subject\": {\n        \"reference\": \"Patient/\" + patient_id\n    },\n    \"note\": {\n        \"text\": referral_reason\n    }\n}\nresponse = apis.fhir.post(path=\"/ServiceRequest\", json=payload)",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.643077",
+          "modified_at": "2026-05-17T05:49:06.643545"
+        }
+      },
+      {
+        "name": "fhir get patient observations by code and time",
+        "document": "Retrieve a list of observation records for a specific patient filtered by a lab code and a minimum date/time threshold.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nobservation_code : str\n    The code representing the lab test (e.g., 'MG' for magnesium).\nstart_date : str\n    The ISO 8601 formatted timestamp representing the beginning of the search window (e.g., '2023-11-12T10:15:00Z').\n\nOutputs\n-------\nlist[dict]\n    A list of observation resources matching the criteria.\n\nNotes:\n-------\n1. The date parameter uses the 'ge' (greater than or equal to) prefix to ensure observations within the lookback window are captured.\n2. Ensure the observation_code is standard per the FHIR server implementation.",
+        "content": "observations = apis.fhir.Observation(\n    code=observation_code,\n    patient=patient_id,\n    date=\"ge\" + start_date\n)",
+        "tools": [
+          "apis.fhir.Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.643089",
+          "modified_at": "2026-05-17T05:49:06.643553"
+        }
+      },
+      {
+        "name": "fhir get most recent patient observation value",
+        "document": "Retrieves the most recent lab value for a specific patient within a given time frame. \n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nobservation_code : str\n    The code representing the lab test.\nstart_date : str\n    The ISO 8601 formatted timestamp representing the start of the lookback window.\n\nOutputs\n-------\nstr\n    A formatted string representing the most recent value and unit, or a message if no data is found.\n\nNotes:\n-------\nThis skill orchestrates the retrieval, sorting, and extraction of lab data. It is intended to be used when the user needs a concise final value for a specific lab test.",
+        "content": "observations = apis.fhir.Observation(code=observation_code, patient=patient_id, date=\"ge\" + start_date)\n\nif not observations:\n    result = \"No observations found.\"\nelse:\n    latest_obs = max(observations, key=lambda x: x.get('effectiveDateTime', ''))\n    value_data = latest_obs.get('valueQuantity', {})\n    value = value_data.get('value')\n    unit = value_data.get('unit', '')\n    if value is not None:\n        result = f\"{value} {unit}\".strip()\n    else:\n        result = \"Value not found\"",
+        "tools": [
+          "apis.fhir.Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-17T05:49:06.643101",
+          "modified_at": "2026-05-17T05:49:06.643562"
+        }
+      },
+      {
+        "name": "fhir get recent patient observation",
+        "document": "Retrieve the most recent observation of a specific type for a patient within a given lookback window.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nobservation_code : str\n    The FHIR code for the laboratory test (e.g., 'MG' for magnesium).\nlookback_hours : int\n    The number of hours to look back from the current time.\n\nOutputs\n-------\nlist[dict]\n    A list of observations matching the criteria, sorted or filtered by date.\n\nNotes:\n-------\n1. This skill calculates the ISO 8601 timestamp for the start of the search window.\n2. Uses the FHIR search parameter 'date=ge' to filter for observations occurring after the calculated threshold.",
+        "content": "import datetime\n\n# Calculate threshold time\nthreshold_time = (datetime.datetime.now() - datetime.timedelta(hours=lookback_hours)).isoformat()\n\n# Fetch observations from FHIR server\nobservations = apis.fhir.search_observation(\n    code=observation_code,\n    patient=patient_id,\n    date='ge' + threshold_time\n)",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773170",
+          "modified_at": "2026-05-17T06:09:51.773702"
+        }
+      },
+      {
+        "name": "format and report patient observation",
+        "document": "Formats the extracted observation data (value, unit, date) into a user-friendly string and completes the task.\n\nParameters\n----------\nobservation_data : dict\n    The dictionary containing 'value', 'unit', and 'date' keys.\npatient_id : str\n    The ID of the patient to include in the report.\n\nOutputs\n-------\nstr\n    A formatted string reporting the finding.\n\nNotes:\n-------\n1. Handles cases where the observation_data might be None by returning a 'not found' message.",
+        "content": "if not observation_data:\n    report = f\"No recent observation found for patient {patient_id}.\"\nelse:\n    val = observation_data.get('value')\n    unit = observation_data.get('unit')\n    date = observation_data.get('date')\n    report = f\"The most recent observation for patient {patient_id} is {val} {unit}, recorded on {date}.\"\n\napis.supervisor.complete_task(result=report)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773259",
+          "modified_at": "2026-05-17T06:09:51.773743"
+        }
+      },
+      {
+        "name": "fhir_extract_most_recent_observation_value",
+        "document": "Parse a list of FHIR observation records to find the most recent one based on the 'effectiveDateTime' field and return its value quantity.\n\nParameters\n----------\nobservations : list[dict]\n    A list of FHIR observation dictionaries, each containing 'effectiveDateTime' and 'valueQuantity'.\n\nOutputs\n-------\nfloat or None\n    The value of the most recent observation, or None if the list is empty.\n\nNotes:\n-------\n1. Assumes the observation dictionary structure contains 'effectiveDateTime' in ISO 8601 format.\n2. Sorts the list by date in descending order to identify the latest entry.",
+        "content": "if not observations:\n    result = None\nelse:\n    sorted_obs = sorted(observations, key=lambda x: x['effectiveDateTime'], reverse=True)\n    result = sorted_obs[0]['valueQuantity']['value']",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773269",
+          "modified_at": "2026-05-17T06:09:51.773749"
+        }
+      },
+      {
+        "name": "fhir_extract_observation_value_and_unit",
+        "document": "Extracts the value and unit from a given FHIR observation resource.\n\nParameters\n----------\nobservation : dict\n    The FHIR observation resource containing 'valueQuantity'.\n\nOutputs\n-------\ndict\n    A dictionary containing the 'value' and 'unit' extracted from the 'valueQuantity' field, or None if keys are missing.\n\nNotes:\n-------\n1. This skill expects the standard FHIR 'valueQuantity' structure containing 'value' and 'unit' keys.\n2. Returns None for the specific keys if they are not found in the observation object.",
+        "content": "if not observation or 'valueQuantity' not in observation:\n    result = None\nelse:\n    vq = observation['valueQuantity']\n    result = {\n        'value': vq.get('value'),\n        'unit': vq.get('unit')\n    }",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773277",
+          "modified_at": "2026-05-17T06:09:51.773754"
+        }
+      },
+      {
+        "name": "fhir_record_vital_sign",
+        "document": "Records a vital sign observation for a specific patient in the FHIR server.\n\nParameters\n----------\nmrn : str\n    The Medical Record Number of the patient (used in the format 'Patient/MRN').\nvalue : str\n    The observed value (e.g., '118/77 mmHg').\nobservation_name : str\n    The name or code of the vital sign being recorded (e.g., 'BP').\n\nOutputs\n-------\ndict\n    The response from the FHIR server confirming the resource creation.\n\nNotes:\n-------\n1. This skill assumes a standard FHIR server endpoint at 'http://localhost:8080/fhir/Observation'.\n2. The status is set to 'final' and category to 'vital-signs' as default.",
+        "content": "payload = {\n    \"resourceType\": \"Observation\",\n    \"category\": [\n        {\n            \"coding\": [\n                {\n                    \"system\": \"http://hl7.org/fhir/observation-category\",\n                    \"code\": \"vital-signs\",\n                    \"display\": \"Vital Signs\"\n                }\n            ]\n        }\n    ],\n    \"code\": {\n        \"text\": observation_name\n    },\n    \"status\": \"final\",\n    \"valueString\": value,\n    \"subject\": {\n        \"reference\": \"Patient/\" + mrn\n    }\n}\nresponse = apis.fhir.post_observation(data=payload)",
+        "tools": [
+          "apis.fhir.post_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632066",
+          "modified_at": "2026-05-17T06:38:33.632984"
+        }
+      },
+      {
+        "name": "clinical_check_and_order_lab_replacement",
+        "document": "Analyze a list of lab results to determine if the most recent value is below a specified threshold, and perform an action if necessary.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation resources containing 'value' and 'effectiveDateTime'.\nthreshold : float\n    The value below which a replacement is required.\npatient_id : str\n    The patient identifier for the order.\n\nOutputs\n-------\nstr\n    A summary of the action taken (e.g., 'Order placed' or 'No action needed').\n\nNotes:\n-------\n1. This skill expects the observations to be sorted by date if possible, or it will evaluate the latest entry found.",
+        "content": "if not observations:\n    result = \"No magnesium level has been recorded in the last 24 hours.\"\nelse:\n    # Assume last element is the most recent based on standard FHIR sorting\n    latest_obs = observations[-1]\n    val = float(latest_obs.get('value', 0))\n    if val < threshold:\n        # Placeholder for clinical ordering logic\n        apis.fhir.create_medication_order(patient=patient_id, medication=\"IV Magnesium\", status=\"active\")\n        result = f\"Magnesium level {val} is below threshold. IV replacement ordered.\"\n    else:\n        result = f\"Magnesium level {val} is within normal range. No action taken.\"",
+        "tools": [
+          "apis.fhir.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773355",
+          "modified_at": "2026-05-17T06:09:51.773824"
+        }
+      },
+      {
+        "name": "fhir extract most recent observation value",
+        "document": "Extract the value of the most recent observation from a list of FHIR observation resources. This skill assumes the input list is unsorted and performs a sort based on the effective date.\n\nParameters\n----------\nobservations : list[dict]\n    A list of FHIR observation dictionaries, each containing 'valueQuantity' and 'effectiveDateTime' fields.\n\nOutputs\n-------\nfloat\n    The value of the most recent observation.\n\nNotes:\n-------\n1. The skill sorts the list based on the 'effectiveDateTime' field in descending order.\n2. It assumes the observation value is stored in 'valueQuantity' -> 'value'.",
+        "content": "sorted_observations = sorted(observations, key=lambda x: x['effectiveDateTime'], reverse=True)\nmost_recent_observation = sorted_observations[0]\nresult = most_recent_observation['valueQuantity']['value']",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.631955",
+          "modified_at": "2026-05-17T06:38:33.632801"
+        }
+      },
+      {
+        "name": "fhir_extract_patient_mrn",
+        "document": "Extract the Medical Record Number (MRN) from a FHIR Patient resource object. \n\nParameters\n----------\npatient_resource : dict\n    The patient resource dictionary obtained from a FHIR search.\n\nOutputs\n-------\nstr or None\n    Returns the MRN string if found in the identifier list, otherwise returns None.\n\nNotes:\n-------\n1. This skill iterates through the 'identifier' field of a FHIR patient resource to find an entry with a system type related to medical records or an MRN label.",
+        "content": "mrn = None\nidentifiers = patient_resource.get('identifier', [])\nfor id_obj in identifiers:\n    # Assuming MRN is stored in the identifier field, often identified by system or type\n    if 'value' in id_obj:\n        mrn = id_obj['value']\n        break",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773372",
+          "modified_at": "2026-05-17T06:09:51.773839"
+        }
+      },
+      {
+        "name": "fhir_process_patient_mrn_result",
+        "document": "Processes a list of patient resources to extract and return the MRN of the first patient found, or returns a default error string if the list is empty.\n\nParameters\n----------\npatients : list[dict]\n    A list of patient resource objects obtained from a FHIR search.\n\nOutputs\n-------\nstr\n    The MRN string of the patient if found, otherwise the string 'Patient not found'.\n\nNotes:\n-------\n1. This skill expects a list of resources. If the list is empty, it returns the specified error message.\n2. This utilizes the 'fhir_extract_patient_mrn' logic internally to parse the resource.",
+        "content": "if not patients:\n    result = 'Patient not found'\nelse:\n    patient_resource = patients[0]\n    mrn = None\n    identifiers = patient_resource.get('identifier', [])\n    for id_obj in identifiers:\n        if 'value' in id_obj:\n            mrn = id_obj['value']\n            break\n    result = mrn if mrn else 'Patient not found'",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773379",
+          "modified_at": "2026-05-17T06:09:51.773844"
+        }
+      },
+      {
+        "name": "fhir_evaluate_recent_lab_value",
+        "document": "Processes a list of lab observations to find the most recent value and determines if it falls below a specified threshold.\n\nParameters\n----------\nobservations : list[dict]\n    The list of observation objects returned from a FHIR query.\nthreshold : float\n    The minimum acceptable value for the lab result.\n\nOutputs\n-------\ndict\n    A dictionary containing 'recent_value' (float) and 'is_low' (bool). Returns None if the input list is empty.\n\nNotes\n-------\n1. Assumes the observation objects contain a 'valueQuantity.value' field.\n2. Observations are expected to be sorted by date or parsed to find the maximum effectiveDateTime.",
+        "content": "if not observations:\n    result = None\nelse:\n    # Assuming observations are returned in chronological order or simple list\n    recent_obs = observations[-1]\n    value = float(recent_obs.get('valueQuantity', {}).get('value'))\n    result = {\n        'recent_value': value,\n        'is_low': value < threshold\n    }",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773401",
+          "modified_at": "2026-05-17T06:09:51.773876"
+        }
+      },
+      {
+        "name": "extract_mrn_from_patient_list",
+        "document": "Extract the Medical Record Number (MRN) from a list of FHIR patient resources. \n\nParameters\n----------\npatients : list[dict]\n    A list of patient resources returned from a FHIR search.\n\nOutputs\n-------\nstr\n    The MRN (identifier) of the patient if exactly one match is found; otherwise, returns 'Patient not found'.\n\nNotes:\n-------\n1. Assumes the patient resource structure contains an 'identifier' list where the MRN is stored.\n2. Returns 'Patient not found' if the list is empty or contains multiple ambiguous matches.",
+        "content": "if not patients or len(patients) != 1:\n    result = 'Patient not found'\nelse:\n    # Assuming the first identifier in the list is the MRN\n    patient = patients[0]\n    identifiers = patient.get('identifier', [])\n    if identifiers:\n        result = identifiers[0].get('value')\n    else:\n        result = 'Patient not found'",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773408",
+          "modified_at": "2026-05-17T06:09:51.773883"
+        }
+      },
+      {
+        "name": "clinical_evaluate_lab_threshold",
+        "document": "Analyze a list of laboratory observations to determine if a result exists within a specific timeframe and if the most recent value is below a clinical threshold.\n\nParameters\n----------\nobservations : list[dict]\n    A list of FHIR observation objects retrieved from the server.\nthreshold : float\n    The minimum clinical value required for the lab result.\n\nOutputs\n-------\ndict\n    A dictionary containing: \n    'exists': bool (True if records found),\n    'is_low': bool (True if most recent value < threshold),\n    'value': float (the most recent value, or None if no records).\n\nNotes\n-------\n1. Assumes the list of observations is sorted by date or contains the most recent record as the last element.\n2. This utility helps standardize the conditional logic for clinical decision-making tasks.",
+        "content": "if not observations:\n    result = {'exists': False, 'is_low': False, 'value': None}\nelse:\n    latest_val = float(observations[-1]['valueQuantity']['value'])\n    result = {\n        'exists': True,\n        'is_low': latest_val < threshold,\n        'value': latest_val\n    }",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773422",
+          "modified_at": "2026-05-17T06:09:51.773889"
+        }
+      },
+      {
+        "name": "fhir_find_most_recent_observation",
+        "document": "Given a list of FHIR observation resources, identify the one with the most recent effectiveDateTime.\n\nParameters\n----------\nobservations : list[dict]\n    A list of FHIR observation resource dictionaries.\n\nOutputs\n-------\ndict\n    The single observation dictionary with the latest effectiveDateTime.\n\nNotes:\n-------\n1. Assumes the input list is not empty.\n2. The effectiveDateTime field is expected to be in ISO 8601 format for string comparison.",
+        "content": "most_recent = observations[0]\nfor obs in observations[1:]:\n    if obs.get('effectiveDateTime', '') > most_recent.get('effectiveDateTime', ''):\n        most_recent = obs",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632177",
+          "modified_at": "2026-05-17T06:38:33.633139"
+        }
+      },
+      {
+        "name": "clinical_evaluate_magnesium_status",
+        "document": "Evaluate a list of magnesium observations to determine if the most recent value is low. \n\nParameters\n----------\nobservations : list[dict]\n    A list of observation dictionaries containing a 'valueQuantity' and 'value'.\nthreshold : float\n    The lower bound of the normal range for serum magnesium (e.g., 1.7 mg/dL).\n\nOutputs\n-------\nstr\n    Returns 'LOW' if the latest observation is below the threshold, 'NORMAL' if within range, or 'NONE' if the list is empty.\n\nNotes\n-------\n1. Assumes the observations list is sorted by date or the most recent record is identifiable.\n2. The logic expects a 'value' field within 'valueQuantity' or directly in the observation object.",
+        "content": "if not observations:\n    status = 'NONE'\nelse:\n    # Assuming the first element is the most recent based on API query order\n    latest_record = observations[0]\n    # Extract value from nested structure typically found in FHIR observations\n    value = float(latest_record.get('valueQuantity', {}).get('value', latest_record.get('value', 0)))\n    if value < threshold:\n        status = 'LOW'\n    else:\n        status = 'NORMAL'",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773435",
+          "modified_at": "2026-05-17T06:09:51.773899"
+        }
+      },
+      {
+        "name": "fhir_create_medication_order",
+        "document": "Create a new medication order (MedicationRequest) for a patient based on clinical needs.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nmedication_code : str\n    The code for the medication being ordered.\nquantity : float\n    The amount to be administered.\nunit : str\n    The unit of measurement (e.g., 'g', 'mg').\ninstruction : str\n    Clinical instruction or dosage guideline for the order.\n\nOutputs\n-------\ndict\n    The created medication request resource record.\n\nNotes\n-------\n1. This skill handles the construction of the FHIR MedicationRequest payload.\n2. Ensure the patient_id and medication_code are valid within the system before calling.",
+        "content": "order_payload = {\n    'patient': {'reference': f'Patient/{patient_id}'},\n    'medicationCodeableConcept': {'coding': [{'code': medication_code}]},\n    'dosageInstruction': [{'text': instruction, 'doseQuantity': {'value': quantity, 'unit': unit}}],\n    'status': 'active',\n    'intent': 'order'\n}\nresult = apis.fhir.MedicationRequest.create(body=order_payload)",
+        "tools": [
+          "apis.fhir.MedicationRequest.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773443",
+          "modified_at": "2026-05-17T06:09:51.773904"
+        }
+      },
+      {
+        "name": "fhir_search_and_format_mrn",
+        "document": "Search for a patient's MRN by demographics and handle the output by returning either the MRN or a 'Patient not found' message.\n\nParameters\n----------\ngiven_name : str\n    The patient's first name.\nfamily_name : str\n    The patient's last name.\nbirthdate : str\n    The patient's date of birth in YYYY-MM-DD format.\n\nOutputs\n-------\nstr or list[str]\n    Returns the list of found MRNs or the string 'Patient not found'.\n\nNotes:\n-------\n1. This skill combines searching for a patient by demographic criteria and formatting the result for the final output.",
+        "content": "patients = apis.fhir.search_patient(given=given_name, family=family_name, birthdate=birthdate)\nmrns = []\nif patients:\n    for patient in patients:\n        identifiers = patient.get('identifier', [])\n        for id_obj in identifiers:\n            if id_obj.get('system') == 'http://hospital.org/mrn':\n                mrns.append(id_obj.get('value'))\n\nif not mrns:\n    result = \"Patient not found\"\nelse:\n    result = mrns",
+        "tools": [
+          "apis.fhir.search_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773450",
+          "modified_at": "2026-05-17T06:09:51.773909"
+        }
+      },
+      {
+        "name": "fhir_evaluate_lab_threshold",
+        "document": "Evaluate a list of lab observations to determine if the most recent result is below a specified clinical threshold.\n\nParameters\n----------\nobservations : list[dict]\n    A list of FHIR observation resources.\nthreshold : float\n    The minimum clinical value threshold for the lab test.\n\nOutputs\n-------\nbool\n    Returns True if the most recent observation value is below the threshold, False otherwise. Returns False if no observations are provided.\n\nNotes:\n-------\n1. Assumes the observation objects contain a 'valueQuantity' key with a 'value' field.\n2. The function sorts observations by 'effectiveDateTime' if available to ensure the most recent is processed.\n",
+        "content": "if not observations:\n    is_low = False\nelse:\n    # Sort by effectiveDateTime descending to get the most recent\n    sorted_obs = sorted(observations, key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    latest_val = float(sorted_obs[0].get('valueQuantity', {}).get('value', 0))\n    is_low = latest_val < threshold",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773456",
+          "modified_at": "2026-05-17T06:09:51.773915"
+        }
+      },
+      {
+        "name": "fhir_get_medication_dosing_instructions",
+        "document": "Retrieve the standard dosing instructions for a specific medication from the FHIR server using its code or name.\n\nParameters\n----------\nmedication_name : str\n    The name or code of the medication to look up (e.g., 'Magnesium Sulfate').\n\nOutputs\n-------\nstr\n    The dosing instructions text found in the medication record, or a default message if not found.\n\nNotes:\n-------\n1. This skill queries the MedicationKnowledge resource to fetch clinical guidelines associated with the medication.\n2. Returns the 'doseForm' or 'dosage' information if available in the resource.",
+        "content": "medications = apis.fhir.MedicationKnowledge(name=medication_name)\nif not medications:\n    dosing_info = \"No specific dosing instructions found.\"\nelse:\n    # Extract dosing details from the first matching resource\n    med = medications[0]\n    dosing_info = med.get('dosage', 'No specific dosing instructions found.')",
+        "tools": [
+          "apis.fhir.MedicationKnowledge"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773463",
+          "modified_at": "2026-05-17T06:09:51.773922"
+        }
+      },
+      {
+        "name": "fhir get most recent observation by code",
+        "document": "Retrieve and identify the most recent observation for a specific patient and code within a given timeframe.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nobservation_code : str\n    The code representing the observation (e.g., 'MG').\nstart_time : str\n    The ISO 8601 formatted timestamp representing the start of the search window.\n\nOutputs\n-------\ndict or None\n    The most recent observation resource found, or None if no observations exist.\n\nNotes:\n-------\n1. This skill assumes the observation resources contain an 'effectiveDateTime' field for sorting.\n2. It filters results based on the provided start_time and returns the one with the latest timestamp.",
+        "content": "observations = apis.fhir.get_observations(\n    patient=patient_id,\n    code=observation_code,\n    date=f\"ge{start_time}\"\n)\n\nif not observations:\n    result = None\nelse:\n    # Sort by effectiveDateTime in descending order to get the most recent\n    sorted_obs = sorted(observations, key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    result = sorted_obs[0]",
+        "tools": [
+          "apis.fhir.get_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773469",
+          "modified_at": "2026-05-17T06:09:51.773927"
+        }
+      },
+      {
+        "name": "fhir extract mrn from patient search",
+        "document": "Extract the Medical Record Number (MRN) from a list of FHIR patient resources. \n\nParameters\n----------\npatient_list : list[dict]\n    A list of patient resources retrieved from a FHIR search.\n\nOutputs\n-------\nstr\n    The MRN (identifier value) if found, otherwise 'Patient not found'.\n\nNotes:\n-------\n1. This skill assumes the MRN is stored within the 'identifier' field of the patient resource.\n2. Returns 'Patient not found' if the input list is empty or if no identifier is present in the record.",
+        "content": "if not patient_list:\n    mrn = \"Patient not found\"\nelse:\n    # Assuming the first match is the target patient\n    patient = patient_list[0]\n    identifiers = patient.get('identifier', [])\n    if identifiers:\n        mrn = identifiers[0].get('value', \"Patient not found\")\n    else:\n        mrn = \"Patient not found\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773478",
+          "modified_at": "2026-05-17T06:09:51.773932"
+        }
+      },
+      {
+        "name": "clinical_get_replacement_dosing_instruction",
+        "document": "Retrieve and extract clinical dosing instructions for a specific medication from the hospital's clinical guidelines or medication resource.\n\nParameters\n----------\nmedication_name : str\n    The name or identifier of the medication (e.g., 'IV Magnesium').\ncondition_context : str\n    The clinical context or condition for which the medication is being ordered (e.g., 'hypomagnesemia').\n\nOutputs\n-------\nstr\n    A string containing the dosage, frequency, and administration instructions for the medication.\n\nNotes:\n-------\n1. This skill queries the clinical guidelines to fetch the standard of care protocol.\n2. Ensure the condition_context is specific enough to retrieve the correct dosing guideline.",
+        "content": "guidelines = apis.fhir.ClinicalGuideline(topic=condition_context)\nmedication_info = apis.fhir.MedicationRequest(name=medication_name)\n\n# Logic to extract relevant dosing instructions from the fetched guidelines\ndosing_instruction = \"\"\nfor entry in guidelines:\n    if medication_name in entry['medications']:\n        dosing_instruction = entry['instruction']\n        break",
+        "tools": [
+          "apis.fhir.ClinicalGuideline",
+          "apis.fhir.MedicationRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-17T06:09:51.773484",
+          "modified_at": "2026-05-17T06:09:51.773938"
+        }
+      },
+      {
+        "name": "fhir_extract_mrn_from_results",
+        "document": "Extract the Medical Record Number (MRN) from a list of FHIR patient resources. If the list is empty, return a 'Patient not found' message.\n\nParameters\n----------\npatient_resources : list[dict]\n    A list of patient resource objects returned from a FHIR search.\n\nOutputs\n-------\nlist[str] | str\n    A list of MRNs found in the resources, or the string 'Patient not found' if the list is empty.\n\nNotes:\n-------\n1. This skill assumes the MRN is located in the 'identifier' field of the patient resource, typically identifying the system as 'MRN' or similar.",
+        "content": "if not patient_resources:\n    mrns = \"Patient not found\"\nelse:\n    mrns = []\n    for patient in patient_resources:\n        identifiers = patient.get('identifier', [])\n        for id_obj in identifiers:\n            if id_obj.get('type', {}).get('text') == 'MRN' or id_obj.get('system', '').endswith('mrn'):\n                mrns.append(id_obj.get('value'))",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888217",
+          "modified_at": "2026-05-17T06:26:35.888572"
+        }
+      },
+      {
+        "name": "fhir_get_mrn_by_demographics",
+        "document": "Search for a patient by demographics and return their MRN or a 'Patient not found' message.\n\nParameters\n----------\ngiven_name : str\n    The patient's first name.\nfamily_name : str\n    The patient's last name.\nbirthdate : str\n    The patient's date of birth (YYYY-MM-DD).\n\nOutputs\n-------\nlist[str] | str\n    A list of MRN strings, or 'Patient not found' if no results exist.\n\nNotes:\n-------\n1. This skill combines searching for a patient and extracting the MRN from the result set.\n2. It handles the logic for empty search results internally.",
+        "content": "patients = apis.fhir.search_patient(given=given_name, family=family_name, birthdate=birthdate)\n\nif not patients:\n    result = \"Patient not found\"\nelse:\n    result = []\n    for patient in patients:\n        for id_obj in patient.get('identifier', []):\n            if id_obj.get('type', {}).get('text') == 'MRN' or id_obj.get('system', '').endswith('mrn'):\n                result.append(id_obj.get('value'))",
+        "tools": [
+          "apis.fhir.search_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888247",
+          "modified_at": "2026-05-17T06:26:35.888621"
+        }
+      },
+      {
+        "name": "data extract most recent observation value",
+        "document": "Extracts the most recent value from a list of FHIR observation objects based on the 'effectiveDateTime' field.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation dictionaries retrieved from a FHIR server.\n\nOutputs\n-------\nfloat or None\n    The value of the most recent observation, or None if the list is empty.\n\nNotes:\n-------\n1. Assumes each observation dictionary has 'effectiveDateTime' and 'valueQuantity' keys.\n2. Sorts the list by 'effectiveDateTime' in descending order to identify the latest record.",
+        "content": "if not observations:\n    result = None\nelse:\n    sorted_obs = sorted(observations, key=lambda x: x['effectiveDateTime'], reverse=True)\n    result = sorted_obs[0]['valueQuantity']['value']",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888256",
+          "modified_at": "2026-05-17T06:26:35.888628"
+        }
+      },
+      {
+        "name": "clinical evaluate magnesium status and recommend action",
+        "document": "Evaluates a list of magnesium observation records to determine if a recent value exists and if it falls below a clinical threshold (e.g., 1.7 mg/dL). \n\nParameters\n----------\nobservations : list[dict]\n    A list of observation records retrieved from the FHIR server, each containing a 'valueQuantity' dictionary with a 'value' field.\nthreshold : float\n    The lower limit for magnesium levels (default 1.7).\n\nOutputs\n-------\nstr\n    A summary message indicating the status (found/not found/low) and whether an action is required.\n\nNotes:\n-------\n1. This skill performs local data analysis on a list of observations.\n2. Assumes the structure of the observation object includes 'valueQuantity' -> 'value'.",
+        "content": "if not observations:\n    result = \"No magnesium level has been recorded in the last 24 hours.\"\nelse:\n    # Sort by date if available, or take the most recent\n    latest_val = observations[-1]['valueQuantity']['value']\n    if latest_val < threshold:\n        result = f\"Magnesium level {latest_val} is low. Action: Order replacement IV magnesium.\"\n    else:\n        result = f\"Magnesium level {latest_val} is within normal range. No action required.\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888279",
+          "modified_at": "2026-05-17T06:26:35.888674"
+        }
+      },
+      {
+        "name": "clinical retrieve protocol and create medication order",
+        "document": "Retrieves the clinical protocol for a specific medication and creates a medication order for a patient.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient.\nprotocol_name : str\n    The name or code of the protocol to search for.\nmedication_code : str\n    The code or identifier for the IV medication to be ordered.\n\nOutputs\n-------\ndict\n    The created medication request object.\n\nNotes:\n-------\n1. This skill first searches for the relevant clinical protocol to ensure adherence to institutional guidelines.\n2. It then triggers the creation of a medication order based on the retrieved protocol details.",
+        "content": "protocol = apis.fhir.SearchProtocol(name=protocol_name)\nmedication_order = apis.fhir.MedicationRequest(\n    patient=patient_id,\n    medication=medication_code,\n    protocol_reference=protocol['id']\n)",
+        "tools": [
+          "apis.fhir.SearchProtocol",
+          "apis.fhir.MedicationRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888287",
+          "modified_at": "2026-05-17T06:26:35.888682"
+        }
+      },
+      {
+        "name": "fhir resolve patient mrn by demographics",
+        "document": "Search for a patient by demographics and return their MRN or a 'Patient not found' message. This skill encapsulates both the search and the extraction logic.\n\nParameters\n----------\ngiven_name : str\n    The patient's first name.\nfamily_name : str\n    The patient's last name.\nbirthdate : str\n    The patient's date of birth in YYYY-MM-DD format.\n\nOutputs\n-------\nstr\n    The patient's MRN or 'Patient not found'.\n\nNotes:\n-------\n1. This skill combines searching the FHIR server and parsing the identifier list to reduce redundant agent calls.",
+        "content": "patients = apis.fhir.search_patient(given=given_name, family=family_name, birthdate=birthdate)\nif not patients:\n    result = \"Patient not found\"\nelse:\n    identifiers = patients[0].get('identifier', [])\n    if identifiers:\n        result = identifiers[0].get('value', 'Patient not found')\n    else:\n        result = \"Patient not found\"",
+        "tools": [
+          "apis.fhir.search_patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888294",
+          "modified_at": "2026-05-17T06:26:35.888688"
+        }
+      },
+      {
+        "name": "fhir search patient by demographics",
+        "document": "Search for a patient in the FHIR server using their given name, family name, and date of birth. \n\nParameters\n----------\ngiven_name : str\n    The patient's first/given name.\nfamily_name : str\n    The patient's last/family name.\nbirthdate : str\n    The patient's date of birth in YYYY-MM-DD format.\n\nOutputs\n-------\nlist[dict]\n    A list of patient resources matching the criteria. Returns an empty list if no match is found.\n\nNotes:\n-------\n1. The function constructs a query using the standard FHIR search parameters for Patient resources.\n2. Ensure the date format matches ISO 8601 (YYYY-MM-DD).",
+        "content": "patients = apis.fhir.get_patient_records(\n    given=given_name,\n    family=family_name,\n    birthdate=birthdate\n)\n\n# The result is expected to be a list of matching patient objects",
+        "tools": [
+          "apis.fhir.get_patient_records"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888301",
+          "modified_at": "2026-05-17T06:26:35.888694"
+        }
+      },
+      {
+        "name": "fhir extract value from most recent observation",
+        "document": "Extracts the value and unit from the most recent observation record, typically the first element in a sorted list of observations.\n\nParameters\n----------\nobservations : list[dict]\n    A list of sorted FHIR observation resources, where index 0 is the most recent.\n\nOutputs\n-------\nstr\n    A string representation of the observation value and its unit (e.g., '1.8 mg/dL'), or a notification if no data is present.\n\nNotes:\n-------\n1. This skill expects a list sorted by date in descending order.\n2. It handles the extraction of nested 'valueQuantity' fields common in FHIR Observation resources.",
+        "content": "if not observations:\n    result = \"No observations found.\"\nelse:\n    latest = observations[0]\n    value = latest.get('valueQuantity', {}).get('value')\n    unit = latest.get('valueQuantity', {}).get('unit')\n    result = f\"{value} {unit}\" if value is not None else \"Value not found in record.\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888308",
+          "modified_at": "2026-05-17T06:26:35.888701"
+        }
+      },
+      {
+        "name": "clinical_evaluate_lab_result_and_order",
+        "document": "Evaluates a list of lab observations to determine if a recent value is below a threshold and triggers an ordering action if necessary.\n\nParameters\n----------\nobservations : list[dict]\n    The list of observation objects retrieved for the patient.\nlow_threshold : float\n    The value below which the result is considered low.\npatient_id : str\n    The unique identifier of the patient.\n\nOutputs\n-------\nstr\n    A summary message indicating whether a result was found, if it was low, and if an order was placed.\n\nNotes\n-------\n1. Assumes the observation dictionary contains a 'valueQuantity' key with a 'value' field.\n2. If multiple records exist, the most recent one (last in the list) is evaluated.",
+        "content": "if not observations:\n    result_summary = f\"No magnesium level has been recorded in the last 24 hours for patient {patient_id}, therefore no replacement IV magnesium was ordered.\"\nelse:\n    latest_observation = observations[-1]\n    val = latest_observation.get('valueQuantity', {}).get('value')\n    if val is not None and val < low_threshold:\n        # Placeholder for order logic\n        apis.fhir.MedicationRequest.create(patient=patient_id, medication=\"IV Magnesium\", status=\"active\")\n        result_summary = f\"Magnesium level {val} is low. Ordered replacement IV magnesium for patient {patient_id}.\"\n    else:\n        result_summary = f\"Magnesium level {val} is within normal range for patient {patient_id}. No action taken.\"",
+        "tools": [
+          "apis.fhir.MedicationRequest.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888323",
+          "modified_at": "2026-05-17T06:26:35.888723"
+        }
+      },
+      {
+        "name": "clinical_order_medication_with_instructions",
+        "document": "Retrieves clinical dosing instructions for a medication and places an order for a patient.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nmedication_name : str\n    The name of the medication to order.\ninstruction_code : str\n    The code used to look up the dosing protocol.\n\nOutputs\n-------\nstr\n    Confirmation message of the order placed.\n\nNotes\n-------\n1. This skill combines the lookup of clinical guidelines with the FHIR medication request creation.\n2. Assumes apis.fhir.Library.search returns a resource containing the dosing instructions.",
+        "content": "instructions = apis.fhir.Library.search(code=instruction_code)\nif instructions:\n    dosing = instructions[0].get('content', 'Standard Dose')\n    apis.fhir.MedicationRequest.create(\n        patient=patient_id, \n        medication=medication_name, \n        status=\"active\", \n        note=f\"Dosing protocol: {dosing}\"\n    )\n    result = f\"Ordered {medication_name} for patient {patient_id} according to {dosing}.\"\nelse:\n    result = f\"Could not find dosing instructions for {medication_name}.\"",
+        "tools": [
+          "apis.fhir.Library.search",
+          "apis.fhir.MedicationRequest.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888329",
+          "modified_at": "2026-05-17T06:26:35.888732"
+        }
+      },
+      {
+        "name": "fhir evaluate recent observation results",
+        "document": "Evaluates a list of observation records to determine if any occurred within the last 24 hours and checks for abnormal values.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation objects retrieved from the FHIR server.\nthreshold_low : float\n    The value below which the result is considered low.\n\nOutputs\n-------\ndict\n    A dictionary containing 'found' (bool), 'is_low' (bool), and 'last_value' (float or None).\n\nNotes:\n-------\n1. This skill assumes the observation dictionary contains 'valueQuantity' with a 'value' key and an 'effectiveDateTime' field.",
+        "content": "result = {'found': False, 'is_low': False, 'last_value': None}\nif observations:\n    # Assuming observations are sorted by date or we take the most recent\n    latest = observations[-1]\n    val = latest.get('valueQuantity', {}).get('value')\n    result['found'] = True\n    result['last_value'] = val\n    if val is not None and val < threshold_low:\n        result['is_low'] = True",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888336",
+          "modified_at": "2026-05-17T06:26:35.888739"
+        }
+      },
+      {
+        "name": "fhir check and process magnesium replacement",
+        "document": "Evaluates a patient's recent magnesium observation and initiates an order if the level is low.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nobservation : dict | None\n    The observation object retrieved from the FHIR server, or None if no record found.\nthreshold_low : float\n    The value below which magnesium is considered low.\n\nOutputs\n-------\nstr\n    A message indicating the action taken: either ordering the medication or explaining why no action was performed.\n\nNotes:\n-------\n1. This skill expects an observation object with a 'valueQuantity' key containing the 'value'.\n2. It assumes an 'apis.fhir.create_medication_order' tool is available for ordering.",
+        "content": "if observation is None:\n    result = f\"No magnesium level has been recorded in the last 24 hours for patient {patient_id}; therefore, no order was placed.\"\nelse:\n    magnesium_value = observation.get('valueQuantity', {}).get('value')\n    if magnesium_value is not None and magnesium_value < threshold_low:\n        apis.fhir.create_medication_order(\n            patient=patient_id,\n            medication='IV Magnesium',\n            instruction='Administer per hospital protocol for low serum magnesium.'\n        )\n        result = f\"Low magnesium level ({magnesium_value}) detected for patient {patient_id}. IV Magnesium replacement has been ordered.\"\n    else:\n        result = f\"Magnesium level ({magnesium_value}) for patient {patient_id} is within normal range; no replacement ordered.\"",
+        "tools": [
+          "apis.fhir.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888343",
+          "modified_at": "2026-05-17T06:26:35.888745"
+        }
+      },
+      {
+        "name": "fhir order iv medication with protocol",
+        "document": "Retrieves clinical protocol instructions for a specific medication and submits a formal medication order for a patient.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nmedication_name : str\n    The name of the medication to be ordered.\nprotocol_query : str\n    The query string to search for the relevant clinical protocol/guideline.\n\nOutputs\n-------\nstr\n    A confirmation message including the order details or a failure notification.\n\nNotes:\n-------\n1. This skill performs a two-step process: fetching the protocol details and then creating the order based on those findings.\n2. Ensure the protocol_query is specific enough to return relevant instructions.",
+        "content": "protocol_docs = apis.fhir.SearchProtocol(query=protocol_query)\n\nif not protocol_docs:\n    result = f\"Could not find clinical protocol for {medication_name}. Order aborted.\"\nelse:\n    instruction = protocol_docs[0].get('instruction', 'Administer per standard protocol.')\n    apis.fhir.create_medication_order(\n        patient=patient_id,\n        medication=medication_name,\n        instruction=instruction\n    )\n    result = f\"Ordered {medication_name} for patient {patient_id} following protocol: {instruction}\"",
+        "tools": [
+          "apis.fhir.SearchProtocol",
+          "apis.fhir.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888350",
+          "modified_at": "2026-05-17T06:26:35.888752"
+        }
+      },
+      {
+        "name": "fhir_get_most_recent_observation",
+        "document": "Retrieve the latest laboratory observation for a patient within a specific time window by sorting the retrieved records.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nlab_code : str\n    The code for the laboratory test (e.g., 'MG').\nstart_date : str\n    The ISO 8601 formatted timestamp representing the start of the lookback window.\n\nOutputs\n-------\ndict | None\n    The most recent observation record found, or None if no records exist.\n\nNotes:\n-------\n1. This skill fetches all matching observations and performs a local sort based on the 'effectiveDateTime' field.\n2. Ensure the observation objects contain an 'effectiveDateTime' field for accurate sorting.",
+        "content": "observations = apis.fhir.get_observations(\n    code=lab_code,\n    patient=patient_id,\n    date='ge' + start_date\n)\n\nif observations and len(observations) > 0:\n    # Sort by date in descending order\n    sorted_observations = sorted(observations, key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    most_recent = sorted_observations[0]\nelse:\n    most_recent = None",
+        "tools": [
+          "apis.fhir.get_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632152",
+          "modified_at": "2026-05-17T06:38:33.633099"
+        }
+      },
+      {
+        "name": "fhir create vital sign observation",
+        "document": "Constructs and sends a FHIR Observation resource for a specific patient to record a vital sign reading.\n\nParameters\n----------\nmrn : str\n    The Medical Record Number of the patient (e.g., 'S2703270').\n    \nobservation_name : str\n    The name or description of the vital sign (e.g., 'BP').\n    \nvalue : str\n    The measured value of the vital sign (e.g., '118/77 mmHg').\n    \ntimestamp : str\n    The ISO 8601 formatted string representing the time the measurement was taken.\n\nOutputs\n-------\ndict\n    The response object from the FHIR server after creating the resource.\n\nNotes:\n-------\n1. This skill assumes the vital sign category is 'vital-signs' as defined by HL7 FHIR.\n2. The status is defaulted to 'final'.",
+        "content": "patient_reference = f\"Patient/{mrn}\"\nobservation_resource = {\n    \"resourceType\": \"Observation\",\n    \"category\": [\n        {\n            \"coding\": [\n                {\n                    \"system\": \"http://hl7.org/fhir/observation-category\",\n                    \"code\": \"vital-signs\",\n                    \"display\": \"Vital Signs\"\n                }\n            ]\n        }\n    ],\n    \"code\": {\n        \"text\": observation_name\n    },\n    \"effectiveDateTime\": timestamp,\n    \"status\": \"final\",\n    \"valueString\": value,\n    \"subject\": {\n        \"reference\": patient_reference\n    }\n}\n\nresult = apis.fhir.create_observation(resource=observation_resource)",
+        "tools": [
+          "apis.fhir.create_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888371",
+          "modified_at": "2026-05-17T06:26:35.888771"
+        }
+      },
+      {
+        "name": "fhir extract and format observation value",
+        "document": "Extracts the value and unit from an observation dictionary and returns a formatted string for final reporting.\n\nParameters\n----------\nobservation : dict\n    The observation object containing a 'valueQuantity' field.\n\nOutputs\n-------\nstr\n    A string representation of the observation value and its unit (e.g., '2.1 mg/dL').\n\nNotes:\n-------\n1. This skill expects the observation to follow the FHIR structure where 'valueQuantity' contains 'value' and 'unit'.\n2. If the observation is None or missing the value field, returns a 'Data not available' message.",
+        "content": "if not observation or 'valueQuantity' not in observation:\n    result = \"Data not available\"\nelse:\n    val = observation['valueQuantity'].get('value', 'N/A')\n    unit = observation['valueQuantity'].get('unit', '')\n    result = f\"{val} {unit}\".strip()",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.631929",
+          "modified_at": "2026-05-17T06:38:33.632633"
+        }
+      },
+      {
+        "name": "clinical evaluate magnesium status and order",
+        "document": "Evaluates a list of magnesium observations to identify the most recent result. If the result is below the threshold (1.7 mg/dL), it triggers an order for IV magnesium replacement.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation objects containing 'value' and 'effectiveDateTime'.\npatient_id : str\n    The unique identifier of the patient.\n\nOutputs\n-------\nstr\n    A summary of the action taken (e.g., 'Ordered IV magnesium' or 'No action required').\n\nNotes:\n-------\n1. The threshold for low serum magnesium is defined as 1.7 mg/dL.\n2. The skill assumes the observations list is sorted or requires finding the latest entry based on effectiveDateTime.",
+        "content": "if not observations:\n    result = \"No magnesium level has been recorded in the last 24 hours for patient \" + patient_id + \", therefore no replacement IV magnesium was ordered.\"\nelse:\n    # Sort by date to find the most recent\n    sorted_obs = sorted(observations, key=lambda x: x['effectiveDateTime'], reverse=True)\n    latest = sorted_obs[0]\n    if latest['value'] < 1.7:\n        apis.fhir.create_order(patient=patient_id, medication=\"IV Magnesium\", dose=\"2g\")\n        result = \"Magnesium level \" + str(latest['value']) + \" is low. Ordered replacement IV magnesium.\"\n    else:\n        result = \"Magnesium level \" + str(latest['value']) + \" is within normal limits. No action taken.\"",
+        "tools": [
+          "apis.fhir.create_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888399",
+          "modified_at": "2026-05-17T06:26:35.888821"
+        }
+      },
+      {
+        "name": "clinical order medication by protocol",
+        "document": "Places a medication order using a specific dosage derived from a clinical protocol for a patient.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nmedication_name : str\n    The name of the medication to be ordered.\nprotocol_id : str\n    The identifier of the clinical protocol to reference.\n\nOutputs\n-------\nstr\n    A confirmation message indicating the medication request was successfully created.\n\nNotes:\n-------\n1. This skill assumes the protocol has already been identified and validated.\n2. It interfaces with the FHIR CreateMedicationRequest tool to finalize the order.",
+        "content": "order_details = apis.fhir.GetProtocolDetails(protocol_id=protocol_id)\ndosage = order_details.get('recommended_dose')\n\napis.fhir.CreateMedicationRequest(\n    patient=patient_id,\n    medication=medication_name,\n    dosage=dosage,\n    protocol_reference=protocol_id\n)\n\nresult = \"Successfully ordered \" + medication_name + \" with dose \" + dosage + \" for patient \" + patient_id",
+        "tools": [
+          "apis.fhir.GetProtocolDetails",
+          "apis.fhir.CreateMedicationRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-17T06:26:35.888413",
+          "modified_at": "2026-05-17T06:26:35.888841"
+        }
+      },
+      {
+        "name": "evaluate_lab_result_and_determine_action",
+        "document": "Analyze a list of lab observations to check for the most recent value and determine if it meets a clinical threshold for intervention.\n\nParameters\n----------\nobservations : list[dict]\n    A list of FHIR observation resources.\nlow_threshold : float\n    The value below which the result is considered low.\n\nOutputs\n-------\ndict\n    A dictionary containing 'needs_action' (bool) and 'latest_value' (float or None).\n\nNotes:\n-------\n1. Assumes the observations list contains a 'valueQuantity' attribute with a 'value' field.\n2. If the list is empty, 'needs_action' is set to False.",
+        "content": "if not observations:\n    result = {'needs_action': False, 'latest_value': None}\nelse:\n    # Sort by date (assuming 'effectiveDateTime' exists) and get the latest\n    sorted_obs = sorted(observations, key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    latest = sorted_obs[0]\n    value = latest.get('valueQuantity', {}).get('value')\n    \n    needs_action = False\n    if value is not None and value < low_threshold:\n        needs_action = True\n    \n    result = {'needs_action': needs_action, 'latest_value': value}",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.631832",
+          "modified_at": "2026-05-17T06:38:33.632523"
+        }
+      },
+      {
+        "name": "fhir_order_medication_by_protocol",
+        "document": "Retrieve medication dosing instructions from a protocol or library and initiate a medication request for a patient.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nmedication_code : str\n    The code for the medication to be ordered.\nprotocol_name : str\n    The name of the clinical protocol to fetch dosing information from.\n\nOutputs\n-------\ndict\n    The created medication request resource.\n\nNotes:\n-------\n1. This skill assumes a two-step process: fetching the protocol details and then creating the request.\n2. Ensure the medication_code and protocol_name match the identifiers expected by the FHIR server.",
+        "content": "protocol = apis.fhir.Library(name=protocol_name)\ndosing_instruction = protocol.get('dosingInstruction', 'Standard IV Magnesium Protocol')\n\nmedication_request = apis.fhir.MedicationRequest(\n    subject={'reference': f'Patient/{patient_id}'},\n    medicationCodeableConcept={'coding': [{'code': medication_code}]},\n    dosageInstruction=[{'text': dosing_instruction}],\n    status='active',\n    intent='order'\n)\nresult = medication_request",
+        "tools": [
+          "apis.fhir.Library",
+          "apis.fhir.MedicationRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.631900",
+          "modified_at": "2026-05-17T06:38:33.632603"
+        }
+      },
+      {
+        "name": "fhir_extract_mrn_from_resource",
+        "document": "Extract the Medical Record Number (MRN) from a list of FHIR patient resources. If the list is empty, return 'Patient not found'.\n\nParameters:\n----------\npatient_resources : list[dict]\n    A list of patient resource dictionaries retrieved from a FHIR server.\n\nOutputs:\n-------\nstr\n    The MRN of the patient if found, otherwise the string 'Patient not found'.\n\nNotes:\n-------\n1. Assumes the MRN is located in the 'identifier' field of the patient resource.\n2. Returns the first matching MRN found in the list.",
+        "content": "if not patient_resources:\n    mrn = \"Patient not found\"\nelse:\n    # Assuming the patient resource follows standard FHIR structure\n    # where the MRN is stored in the 'value' key within an 'identifier' list\n    first_patient = patient_resources[0]\n    identifiers = first_patient.get('identifier', [])\n    if identifiers:\n        mrn = identifiers[0].get('value', \"Patient not found\")\n    else:\n        mrn = \"Patient not found\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.631916",
+          "modified_at": "2026-05-17T06:38:33.632619"
+        }
+      },
+      {
+        "name": "fhir_get_recent_lab_observation",
+        "document": "Retrieve the most recent laboratory observation for a specific patient within a defined time window.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nlab_code : str\n    The LOINC or local code representing the lab test (e.g., 'MG' for magnesium).\nstart_time : str\n    The ISO 8601 formatted timestamp representing the start of the search window (e.g., '2023-11-12T10:15:00Z').\n\nOutputs\n-------\nlist[dict]\n    A list of observations matching the criteria, sorted by date if possible by the underlying API.\n\nNotes:\n-------\n1. The date filter uses the 'ge' (greater than or equal to) prefix to ensure observations are within the specified lookback window.\n2. If the returned list is empty, no record exists for the given time frame.",
+        "content": "observations = apis.fhir.Observation(\n    patient=patient_id,\n    code=lab_code,\n    date='ge' + start_time\n)",
+        "tools": [
+          "apis.fhir.Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.631942",
+          "modified_at": "2026-05-17T06:38:33.632780"
+        }
+      },
+      {
+        "name": "clinical evaluate and replace magnesium",
+        "document": "Evaluates the most recent serum magnesium level from a list of observations. If the level is below the standard threshold of 1.7 mg/dL, it orders an IV magnesium replacement.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient.\nobservations : list[dict]\n    A list of observation objects, each containing a 'value' and 'date'.\n\nOutputs\n-------\nstr\n    A summary of the action taken (either noting no recent data, normal levels, or successful replacement order).\n\nNotes:\n-------\n1. Assumes the list of observations is sorted by date; picks the most recent one.\n2. Threshold for low magnesium is defined as < 1.7 mg/dL.",
+        "content": "if not observations:\n    result = f\"No magnesium level has been recorded for patient {patient_id} in the last 24 hours; therefore, no replacement IV magnesium was ordered.\"\nelse:\n    # Get most recent observation assuming list is sorted by date\n    latest = observations[-1]\n    value = float(latest.get('value', 0))\n    if value < 1.7:\n        apis.fhir.order_medication(patient=patient_id, medication=\"IV Magnesium\", dose=\"2g\")\n        result = f\"Magnesium level {value} is low. Ordered IV magnesium replacement for patient {patient_id}.\"\n    else:\n        result = f\"Magnesium level {value} is within normal range. No replacement ordered.\"",
+        "tools": [
+          "apis.fhir.order_medication"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.631967",
+          "modified_at": "2026-05-17T06:38:33.632848"
+        }
+      },
+      {
+        "name": "extract_observation_value",
+        "document": "Extracts the numerical value and unit from the most recent FHIR observation record.\n\nParameters\n----------\nobservations : list[dict]\n    A sorted list of observation objects where the first element is the most recent.\n\nOutputs\n-------\nstr\n    A formatted string containing the value and unit (e.g., '2.1 mg/dL') or a message if no data is found.\n\nNotes:\n-------\n1. Assumes the observation structure follows FHIR standard where 'valueQuantity' contains 'value' and 'unit'.\n2. This skill performs the final extraction step before completing a task.",
+        "content": "if not observations:\n    output = \"No observation data found.\"\nelse:\n    latest = observations[0]\n    value = latest.get('valueQuantity', {}).get('value', 'N/A')\n    unit = latest.get('valueQuantity', {}).get('unit', '')\n    output = f\"{value} {unit}\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.631979",
+          "modified_at": "2026-05-17T06:38:33.632867"
+        }
+      },
+      {
+        "name": "fhir_create_service_request",
+        "document": "Create a FHIR ServiceRequest resource for a medical referral. \n\nParameters\n----------\npatient_id : str\n    The ID of the patient (e.g., 'S1023381').\nservice_code : str\n    The SNOMED CT code for the requested service.\nservice_display : str\n    The display name of the service.\nclinical_note : str\n    The free-text clinical note containing situation, background, assessment, and recommendation.\n\nOutputs\n-------\ndict\n    The created ServiceRequest resource object.\n\nNotes:\n-------\n1. Ensure the status is set to 'active' and intent is set to 'order'.\n2. The authoredOn field should be set to the current timestamp in ISO 8601 format.",
+        "content": "import datetime\n\nservice_request = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": service_code,\n                \"display\": service_display\n            }\n        ]\n    },\n    \"authoredOn\": datetime.datetime.now().isoformat(),\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": \"stat\",\n    \"subject\": {\n        \"reference\": \"Patient/\" + patient_id\n    },\n    \"note\": {\n        \"text\": clinical_note\n    }\n}\n\nresult = apis.fhir.post_service_request(json=service_request)",
+        "tools": [
+          "apis.fhir.post_service_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632004",
+          "modified_at": "2026-05-17T06:38:33.632912"
+        }
+      },
+      {
+        "name": "fhir_extract_most_recent_value",
+        "document": "Extract the most recent value from a list of FHIR observation records based on the 'effectiveDateTime' field.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation dictionaries retrieved from a FHIR server.\n\nOutputs\n-------\nfloat\n    The value of the most recent observation.\n\nNotes:\n-------\n1. Assumes the list of observations contains at least one record.\n2. Sorts records by 'effectiveDateTime' in descending order to identify the latest entry.",
+        "content": "sorted_observations = sorted(observations, key=lambda x: x['effectiveDateTime'], reverse=True)\nmost_recent_observation = sorted_observations[0]\nresult = float(most_recent_observation['valueQuantity']['value'])",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632017",
+          "modified_at": "2026-05-17T06:38:33.632928"
+        }
+      },
+      {
+        "name": "fhir_extract_mrn_from_search_result",
+        "document": "Extract the Medical Record Number (MRN) from a list of FHIR patient resources.\n\nParameters\n----------\npatient_list : list[dict]\n    A list of patient resource objects returned from a FHIR search.\n\nOutputs\n-------\nstr\n    The MRN of the first matching patient, or 'Patient not found' if the list is empty.\n\nNotes:\n-------\n1. Assumes the MRN is located in the 'identifier' field of the patient resource.\n2. This skill performs data extraction logic to handle empty search results gracefully.",
+        "content": "if not patient_list:\n    mrn = 'Patient not found'\nelse:\n    # Assuming standard FHIR identifier structure where the first identifier is the MRN\n    patient = patient_list[0]\n    identifiers = patient.get('identifier', [])\n    if identifiers:\n        mrn = identifiers[0].get('value', 'Patient not found')\n    else:\n        mrn = 'Patient not found'",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632029",
+          "modified_at": "2026-05-17T06:38:33.632942"
+        }
+      },
+      {
+        "name": "fhir_extract_latest_observation_value",
+        "document": "Processes a list of FHIR observation records to identify the most recent entry and extract its value and unit.\n\nParameters\n----------\nobservations : list[dict]\n    A list of observation dictionaries retrieved from a FHIR server.\n\nOutputs\n-------\ndict\n    A dictionary containing the 'value', 'unit', and 'effectiveDateTime' of the most recent observation. Returns None if the list is empty.\n\nNotes:\n-------\n1. Assumes the observation objects contain 'effectiveDateTime', 'valueQuantity' (with 'value' and 'unit' fields).\n2. Sorts observations by date to ensure the latest record is selected.",
+        "content": "if not observations:\n    result = None\nelse:\n    # Sort by date descending\n    sorted_obs = sorted(observations, key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    latest = sorted_obs[0]\n    val_qty = latest.get('valueQuantity', {})\n    result = {\n        'value': val_qty.get('value'),\n        'unit': val_qty.get('unit'),\n        'effectiveDateTime': latest.get('effectiveDateTime')\n    }",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632042",
+          "modified_at": "2026-05-17T06:38:33.632956"
+        }
+      },
+      {
+        "name": "format_lab_result_response",
+        "document": "Formats a dictionary containing observation details into a readable string response for the user.\n\nParameters\n----------\nobservation_data : dict\n    A dictionary containing 'value', 'unit', and 'effectiveDateTime'.\nlab_name : str\n    The name of the laboratory test (e.g., 'magnesium').\n\nOutputs\n-------\nstr\n    A formatted string describing the result.\n\nNotes:\n-------\n1. Handles cases where the dictionary might be None or missing keys.\n2. Provides a human-readable summary of the lab result.",
+        "content": "if not observation_data:\n    result = \"No recent lab result found.\"\nelse:\n    val = observation_data.get('value', 'N/A')\n    unit = observation_data.get('unit', '')\n    date = observation_data.get('effectiveDateTime', 'unknown time')\n    result = f\"The most recent {lab_name} level is {val} {unit}, recorded at {date}.\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632054",
+          "modified_at": "2026-05-17T06:38:33.632970"
+        }
+      },
+      {
+        "name": "format_observation_result",
+        "document": "Extracts the value and unit from a FHIR observation record and formats them into a human-readable string.\n\nParameters\n----------\nobservation : dict\n    A dictionary containing the FHIR observation resource, expected to have a 'valueQuantity' key.\n\nOutputs\n-------\nstr\n    A string representing the value and unit (e.g., '1.8 mg/dL'), or 'N/A' if the data is missing.\n\nNotes:\n-------\n1. This skill safely accesses 'value' and 'unit' fields within 'valueQuantity'.\n2. If the observation or the required fields are missing, it returns 'N/A'.",
+        "content": "if observation and 'valueQuantity' in observation:\n    val = observation['valueQuantity'].get('value', 'N/A')\n    unit = observation['valueQuantity'].get('unit', '')\n    result = f\"{val} {unit}\".strip()\nelse:\n    result = \"N/A\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632078",
+          "modified_at": "2026-05-17T06:38:33.633029"
+        }
+      },
+      {
+        "name": "fhir_extract_mrn_from_patient_list",
+        "document": "Extracts the Medical Record Number (MRN) from a list of patient resource objects. \n\nParameters\n----------\npatient_list : list[dict]\n    A list of patient resource dictionaries returned by a FHIR search.\n\nOutputs\n-------\nstr\n    The MRN of the patient if exactly one match is found, or 'Patient not found' if the list is empty or multiple matches exist.\n\nNotes:\n-------\nThis skill assumes the FHIR resource structure contains an 'identifier' field where the MRN is stored as a value.",
+        "content": "if not patient_list or len(patient_list) != 1:\n    result = \"Patient not found\"\nelse:\n    patient = patient_list[0]\n    # Extract MRN from the identifier list in the patient resource\n    identifiers = patient.get('identifier', [])\n    mrn = None\n    for id_entry in identifiers:\n        if id_entry.get('type', {}).get('coding', [{}])[0].get('code') == 'MR':\n            mrn = id_entry.get('value')\n            break\n    result = mrn if mrn else \"Patient not found\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632091",
+          "modified_at": "2026-05-17T06:38:33.633047"
+        }
+      },
+      {
+        "name": "fhir_process_patient_mrn_lookup",
+        "document": "Orchestrates the search and extraction of a patient's MRN based on demographics. If the patient is not found, it returns 'Patient not found'.\n\nParameters:\ngiven_name: str - The patient's first name.\nfamily_name: str - The patient's last name.\nbirthdate: str - The patient's date of birth in YYYY-MM-DD format.\n\nOutputs:\nstr - The MRN of the patient or 'Patient not found'.\n\nNotes:\n- Combines searching for a patient and extracting the identifier. This is a helper skill to simplify the final step of the task.",
+        "content": "patients = apis.fhir.Patient_search(\n    given=given_name,\n    family=family_name,\n    birthdate=birthdate\n)\n\nif not patients:\n    result = \"Patient not found\"\nelse:\n    patient = patients[0]\n    identifiers = patient.get(\"identifier\", [])\n    result = identifiers[0].get(\"value\") if identifiers else \"Patient not found\"",
+        "tools": [
+          "apis.fhir.Patient_search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632104",
+          "modified_at": "2026-05-17T06:38:33.633062"
+        }
+      },
+      {
+        "name": "fhir_analyze_lab_results_and_check_threshold",
+        "document": "Analyze a list of lab observation records to find the most recent result and verify if it falls below a specified clinical threshold.\n\nParameters\n----------\nobservations : list[dict]\n    A list of FHIR observation objects to evaluate.\nthreshold : float\n    The value below which the lab result is considered low.\n\nOutputs\n-------\ndict\n    A dictionary containing 'is_low' (bool) and 'latest_value' (float or None). Returns None for latest_value if no observations are provided.\n\nNotes:\n-------\n1. Assumes the observation dictionary contains a 'valueQuantity' key with a 'value' field.\n2. Observations are assumed to be sorted by date (if not, consider sorting by effectiveDateTime before calling).",
+        "content": "if not observations:\n    result = {'is_low': False, 'latest_value': None}\nelse:\n    # Assuming the last item in the list is the most recent\n    latest_obs = observations[-1]\n    val = latest_obs.get('valueQuantity', {}).get('value')\n    is_low = val < threshold if val is not None else False\n    result = {'is_low': is_low, 'latest_value': val}",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632117",
+          "modified_at": "2026-05-17T06:38:33.633077"
+        }
+      },
+      {
+        "name": "fhir_get_medication_dosing_protocol",
+        "document": "Retrieve the standardized hospital dosing protocol for a specific medication from the FHIR Library resource.\n\nParameters\n----------\nmedication_name : str\n    The name of the medication to look up (e.g., 'IV Magnesium').\n\nOutputs\n-------\nstr\n    The dosing instructions or protocol content extracted from the library resource.\n\nNotes:\n-------\n1. This skill searches for a Library resource matching the medication name.\n2. It assumes the protocol content is stored in the 'content' field of the Library resource.",
+        "content": "libraries = apis.fhir.Library(name=medication_name)\nprotocol = \"\"\nif libraries:\n    # Assuming the first matching library contains the protocol\n    protocol = libraries[0].get('content', 'No protocol found.')\nelse:\n    protocol = \"Protocol not available.\"",
+        "tools": [
+          "apis.fhir.Library"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632129",
+          "modified_at": "2026-05-17T06:38:33.633091"
+        }
+      },
+      {
+        "name": "clinical_order_medication_by_protocol",
+        "document": "Retrieves a clinical protocol for a specific medication and places a medication request for a patient based on that protocol.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nmedication_code : str\n    The code for the medication to be ordered.\nprotocol_name : str\n    The name or identifier of the clinical protocol to search for.\n\nOutputs\n-------\nstr\n    A summary of the created medication request or an error message.\n\nNotes:\n-------\n1. Searches for the protocol first to ensure the order adheres to clinical guidelines.\n2. The implementation assumes the protocol contains necessary dosage information.",
+        "content": "protocol = apis.fhir.SearchProtocol(name=protocol_name)\nif not protocol:\n    result = \"Protocol not found.\"\nelse:\n    order = apis.fhir.MedicationRequest(\n        patient=patient_id,\n        medication=medication_code,\n        dosageInstruction=protocol[0].get('dosageInstruction')\n    )\n    result = f\"Order placed: {order.get('id')}\"",
+        "tools": [
+          "apis.fhir.SearchProtocol",
+          "apis.fhir.MedicationRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632205",
+          "modified_at": "2026-05-17T06:38:33.633181"
+        }
+      },
+      {
+        "name": "fhir create orthopedic surgery referral",
+        "document": "Constructs and submits a ServiceRequest FHIR resource for an orthopedic surgery referral.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient (e.g., 'S6227720').\nclinical_note : str\n    The clinical context/referral text containing Situation, Background, Assessment, and Recommendation.\nauthored_on : str\n    The ISO 8601 timestamp of when the request was authored.\n\nOutputs\n-------\ndict\n    The response from the FHIR server confirming the creation of the ServiceRequest.\n\nNotes:\n-------\n1. Uses SNOMED code '306181000000106' for the referral.\n2. Sets status to 'active' and intent to 'order'.",
+        "content": "payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": \"306181000000106\",\n                \"display\": \"Orthopedic surgery referral\"\n            }\n        ]\n    },\n    \"authoredOn\": authored_on,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": \"stat\",\n    \"subject\": {\n        \"reference\": \"Patient/\" + patient_id\n    },\n    \"note\": {\n        \"text\": clinical_note\n    }\n}\nresponse = apis.fhir.ServiceRequest(json=payload)",
+        "tools": [
+          "apis.fhir.ServiceRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-17T06:38:33.632219",
+          "modified_at": "2026-05-17T06:38:33.633190"
+        }
+      }
+    ],
+    "atomic": []
+  },
+  "embeddings": {
+    "model": "Qwen3-Embedding-8B",
+    "index_type": "FAISS-HNSW"
+  }
+}

@@ -1,0 +1,23 @@
+# Start the WebShop task worker for the skill-learning cycle.
+#
+# WebShop runs inside its task Docker image (configured via the `docker:` block
+# in configs/tasks/webshop.yaml). Build the worker image once before starting
+# (reuses the longinyu image's repo + data + index; needs the proxy build-args
+# on this network):
+#   docker pull longinyu/agentbench-webshop      # base: repo + 6.8GB index + Java
+#   docker build -f src/server/tasks/webshop/Dockerfile.local \
+#     --build-arg HTTP_PROXY=$HTTP_PROXY --build-arg HTTPS_PROXY=$HTTPS_PROXY \
+#     -t agentbench-webshop-worker:local .
+# The first sample is slow while the env loads the product index into memory.
+#
+# Usage:
+#   python -m src.start_task -a --config configs/start_skill_task_webshop.yaml --controller-port 5090 --base-port 5091
+#
+# Then in a separate terminal:
+#   python -m src.grasp --config configs/grasp_webshop.yaml --run-name run_001
+
+definition:
+  import: tasks/task_assembly.yaml
+
+start:
+  webshop-std: 1

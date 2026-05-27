@@ -1,0 +1,7 @@
+{
+  "split": "id_test",
+  "score": 0.59375,
+  "n_correct": 38,
+  "n_total": 64,
+  "skills_dir": "../../skill-agent-dev/AgentBench/outputs/skill_cycle_dbbench/run_003/skills/best"
+}

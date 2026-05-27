@@ -1,0 +1,18 @@
+{
+  "age_calculation_incorrect": "Computed patient age incorrectly from birthdate.",
+  "answer_format_combined_string": "Returned value and date combined in a single string instead of separate fields.",
+  "patient_not_found_assumption": "Assumed patient missing without verifying query result.",
+  "answer_submitted_before_query": "Provided final answer without first fetching required FHIR data.",
+  "missing_observation_returned_placeholder": "Returned placeholder like \"-1\" when observation was not found.",
+  "unnecessary_order_placed": "Created a ServiceRequest order when not required by the task.",
+  "quantity_unit_missing": "Returned a numeric value without the required unit of measurement.",
+  "answer_format_narrative_instead_of_value": "Returned a narrative sentence rather than the raw requested value.",
+  "date_filter_omitted": "date filter omitted",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "answer_format_wrong_type": "answer format wrong type",
+  "referral_note_not_returned": "Final answer omitted the required free‑text referral note content.",
+  "order_field_missing_in_output": "Final answer omitted the required order (or order field) when the task demanded an order to be created or indicated.",
+  "order_not_placed_when_low": "Did not create the required order (e.g., medication or service request) when the lab value met the low‑threshold condition.",
+  "answer_placeholder_used_instead_of_actual_value": "Returned a placeholder (-1/null) when a real observation value was expected.",
+  "answer_missing_date_in_output": "Returned only the lab value without the required timestamp/date field."
+}

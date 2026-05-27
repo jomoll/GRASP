@@ -1,0 +1,7 @@
+{
+  "split": "test",
+  "score": 0.4125,
+  "n_correct": 33,
+  "n_total": 80,
+  "skills_dir": "../MedAgentBench-v2/outputs/skill_cycle/run_004/skills/best"
+}

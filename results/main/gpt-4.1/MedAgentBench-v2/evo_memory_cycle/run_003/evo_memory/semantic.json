@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-18T22:20:58.658528",
+  "rules": [
+    "[P1] Do not create medication orders unless the relevant trigger condition (e.g., active opioid order for naloxone) is present.",
+    "[P1] Always verify current active orders before creating a new one.",
+    "[P1] Retrieve and use the most recent relevant lab values or clinical dates (e.g., immunization) before making protocol-driven decisions.",
+    "[P1] Search thoroughly for prior relevant procedures, orders, medications, device actions, observations, or lab values using all protocol-specified codes, synonyms, sources, and within specified time windows before making ordering or clinical decisions.",
+    "[P1] Check elapsed time since last relevant intervention or device placement per protocol before ordering.",
+    "[P1] Take no action if all values are within protocol-defined normal ranges and no intervention is indicated.",
+    "[P1] Do not create removal orders if no active device or procedure exists.",
+    "[P1] Only create, order, or discontinue new procedures, interventions, devices, or medications if no prior, active, or protocol-equivalent orders are found, or if existing ones are outdated per protocol.",
+    "[P1] Recommend ordering missing labs before making protocol decisions.",
+    "[P1] Explicitly handle missing data scenarios: report missing values, state if protocol dictates alternative workflow, and recommend remedial or follow-up actions.",
+    "[P1] Take no action if protocol requirements are already met.",
+    "[P1] After any order change, confirm there is exactly one active order and no duplicates.",
+    "[P1] Discontinue duplicates, keeping only the most recent order."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_1ae6ef893c3f",
+      "text": "[P1] Do not create medication orders unless the relevant trigger condition (e.g., active opioid order for naloxone) is present.",
+      "tags": [
+        "medication-safety",
+        "conditional-ordering",
+        "create",
+        "medication",
+        "orders",
+        "unless",
+        "relevant",
+        "trigger",
+        "condition",
+        "active"
+      ],
+      "shown": 3,
+      "success": 1,
+      "failure": 2,
+      "created_at": "2026-05-18T22:20:27.688754",
+      "updated_at": "2026-05-18T22:20:58.646081"
+    },
+    {
+      "id": "rule_8c3c50959a66",
+      "text": "[P1] Always verify current active orders before creating a new one.",
+      "tags": [
+        "order-management",
+        "protocol-compliance",
+        "duplicate-prevention",
+        "always",
+        "verify",
+        "current",
+        "active",
+        "orders",
+        "before",
+        "creating"
+      ],
+      "shown": 13,
+      "success": 10,
+      "failure": 2,
+      "created_at": "2026-05-18T22:18:41.996475",
+      "updated_at": "2026-05-18T22:20:58.646180"
+    },
+    {
+      "id": "rule_ad37b0c90dc1",
+      "text": "[P1] Retrieve and use the most recent relevant lab values or clinical dates (e.g., immunization) before making protocol-driven decisions.",
+      "tags": [
+        "vaccination",
+        "protocol",
+        "date-comparison",
+        "booster",
+        "retrieve",
+        "most",
+        "recent",
+        "relevant",
+        "values",
+        "clinical"
+      ],
+      "shown": 14,
+      "success": 10,
+      "failure": 4,
+      "created_at": "2026-05-18T22:18:03.477850",
+      "updated_at": "2026-05-18T22:20:58.646459"
+    },
+    {
+      "id": "rule_e8fa39559a94",
+      "text": "[P1] Search thoroughly for prior relevant procedures, orders, medications, device actions, observations, or lab values using all protocol-specified codes, synonyms, sources, and within specified time windows before making ordering or clinical decisions.",
+      "tags": [
+        "lab_retrieval",
+        "protocol_interpretation",
+        "clinical_workflow",
+        "search",
+        "thoroughly",
+        "prior",
+        "relevant",
+        "procedures",
+        "orders",
+        "medications"
+      ],
+      "shown": 11,
+      "success": 7,
+      "failure": 4,
+      "created_at": "2026-05-18T22:17:26.661142",
+      "updated_at": "2026-05-18T22:20:58.646347"
+    },
+    {
+      "id": "rule_d27304939b51",
+      "text": "[P1] Check elapsed time since last relevant intervention or device placement per protocol before ordering.",
+      "tags": [
+        "vaccine",
+        "protocol",
+        "elapsed-time",
+        "order",
+        "check",
+        "elapsed",
+        "time",
+        "since",
+        "last",
+        "relevant"
+      ],
+      "shown": 20,
+      "success": 15,
+      "failure": 5,
+      "created_at": "2026-05-18T22:16:30.149142",
+      "updated_at": "2026-05-18T22:20:58.646661"
+    },
+    {
+      "id": "rule_ed503035bb87",
+      "text": "[P1] Take no action if all values are within protocol-defined normal ranges and no intervention is indicated.",
+      "tags": [
+        "lab_retrieval",
+        "protocol_interpretation",
+        "clinical_workflow",
+        "take",
+        "action",
+        "values",
+        "within",
+        "protocol",
+        "defined",
+        "normal"
+      ],
+      "shown": 18,
+      "success": 13,
+      "failure": 4,
+      "created_at": "2026-05-18T22:17:26.661387",
+      "updated_at": "2026-05-18T22:20:58.646564"
+    },
+    {
+      "id": "rule_324bede8a927",
+      "text": "[P1] Do not create removal orders if no active device or procedure exists.",
+      "tags": [
+        "order-check",
+        "device-management",
+        "procedure-verification",
+        "create",
+        "removal",
+        "orders",
+        "active",
+        "device",
+        "procedure",
+        "exists"
+      ],
+      "shown": 17,
+      "success": 12,
+      "failure": 5,
+      "created_at": "2026-05-18T22:16:42.687675",
+      "updated_at": "2026-05-18T22:20:58.646748"
+    },
+    {
+      "id": "rule_326c85a83594",
+      "text": "[P1] Only create, order, or discontinue new procedures, interventions, devices, or medications if no prior, active, or protocol-equivalent orders are found, or if existing ones are outdated per protocol.",
+      "tags": [
+        "order-verification",
+        "protocol-compliance",
+        "vaccination",
+        "only",
+        "create",
+        "order",
+        "discontinue",
+        "procedures",
+        "interventions",
+        "devices"
+      ],
+      "shown": 37,
+      "success": 27,
+      "failure": 10,
+      "created_at": "2026-05-18T22:12:52.498978",
+      "updated_at": "2026-05-18T22:20:58.646898"
+    },
+    {
+      "id": "rule_349176db32df",
+      "text": "[P1] Recommend ordering missing labs before making protocol decisions.",
+      "tags": [
+        "lab-values",
+        "missing-data",
+        "protocol",
+        "recommend",
+        "ordering",
+        "missing",
+        "labs",
+        "before",
+        "making",
+        "decisions"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-18T22:19:50.619993",
+      "updated_at": "2026-05-18T22:20:58.646982"
+    },
+    {
+      "id": "rule_02fc25f5a1bc",
+      "text": "[P1] Explicitly handle missing data scenarios: report missing values, state if protocol dictates alternative workflow, and recommend remedial or follow-up actions.",
+      "tags": [
+        "protocol",
+        "data-search",
+        "covid-19",
+        "vaccine",
+        "order",
+        "explicitly",
+        "handle",
+        "missing",
+        "data",
+        "scenarios"
+      ],
+      "shown": 92,
+      "success": 67,
+      "failure": 25,
+      "created_at": "2026-05-18T21:51:43.623600",
+      "updated_at": "2026-05-18T22:20:58.647097"
+    },
+    {
+      "id": "rule_a32d7e9078d5",
+      "text": "[P1] Take no action if protocol requirements are already met.",
+      "tags": [
+        "order-verification",
+        "duplicate-check",
+        "take",
+        "action",
+        "protocol",
+        "requirements",
+        "already",
+        "order-management",
+        "protocol-compliance",
+        "error-verification"
+      ],
+      "shown": 91,
+      "success": 65,
+      "failure": 24,
+      "created_at": "2026-05-18T21:53:49.584708",
+      "updated_at": "2026-05-18T22:20:58.647183"
+    },
+    {
+      "id": "rule_ff87db5f2f6b",
+      "text": "[P1] After any order change, confirm there is exactly one active order and no duplicates.",
+      "tags": [
+        "order-management",
+        "deduplication",
+        "protocol-compliance",
+        "after",
+        "order",
+        "change",
+        "confirm",
+        "there",
+        "exactly",
+        "active"
+      ],
+      "shown": 72,
+      "success": 45,
+      "failure": 23,
+      "created_at": "2026-05-18T21:52:35.198832",
+      "updated_at": "2026-05-18T22:20:58.647277"
+    },
+    {
+      "id": "rule_3cafb39131c6",
+      "text": "[P1] Discontinue duplicates, keeping only the most recent order.",
+      "tags": [
+        "order-verification",
+        "duplicate-check",
+        "discontinue",
+        "duplicates",
+        "keeping",
+        "only",
+        "most",
+        "recent",
+        "order",
+        "order-management"
+      ],
+      "shown": 102,
+      "success": 67,
+      "failure": 28,
+      "created_at": "2026-05-18T21:53:49.584640",
+      "updated_at": "2026-05-18T22:20:58.647372"
+    }
+  ]
+}

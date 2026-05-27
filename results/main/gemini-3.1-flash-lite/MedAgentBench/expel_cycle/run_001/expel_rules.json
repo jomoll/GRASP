@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When retrieving time-sensitive data, always sort or manually compare all returned resource dates to identify the most recent entry, rather than assuming the order of the API response.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires a conditional action based on data age (e.g., > 1 year old), explicitly calculate the time difference between the current context time and the retrieved resource's effectiveDateTime before proceeding.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple resources are returned by an API search, process all entries to extract the relevant information rather than relying on the first result or a partial list.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify the completeness of retrieved data by checking the \"total\" field or ensuring all pages of a bundle have been retrieved if the count suggests more data might exist.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires checking the recency of clinical data and performing a conditional action based on that data, first query the relevant resource, then explicitly calculate the time difference between the current date and the record's date before deciding whether to trigger a follow-up action.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify the search results for completeness; if a search returns data, inspect the timestamps to ensure you are using the most current record available in the bundle.",
+    "counter": 2
+  },
+  {
+    "text": "When a task includes specific conditional logic (e.g., \"if X is older than Y, do Z\"), ensure the final response explicitly addresses both parts of the instruction, confirming whether the secondary action was performed or why it was deemed unnecessary.",
+    "counter": 2
+  },
+  {
+    "text": "If a search for clinical data (labs/vitals) returns a resource, always extract the relevant value and the `effectiveDateTime` to provide a complete and accurate answer.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical observations like lab results or vitals, if a specific code (like a mnemonic) yields no results, attempt to search using alternative identifiers such as LOINC codes or standardized clinical terminology before concluding that no data exists.",
+    "counter": 2
+  },
+  {
+    "text": "When performing conditional tasks (e.g., \"if X is older than Y, do Z\"), explicitly calculate the time difference based on the provided current system time and the retrieved resource date before deciding whether to trigger a secondary action.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding a task with a default value (like -1), verify that the search parameters used were exhaustive (e.g., checking for both display names and standardized codes) to ensure the data is truly missing.",
+    "counter": 2
+  },
+  {
+    "text": "When ordering a lab test, ensure all required parameters (such as the specific LOINC code and patient reference) are correctly mapped to the API payload, and verify that the status and intent fields are set to appropriate values (e.g., \"active\" and \"order\").",
+    "counter": 2
+  },
+  {
+    "text": "When multiple records are returned from a search, always identify and select the record with the most recent date/time (e.g., effectiveDateTime) to ensure the clinical assessment is based on the latest available data.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that no action is required, explicitly compare the retrieved lab value against all provided reference ranges or thresholds specified in the task instructions, even if the value appears clinically normal.",
+    "counter": 2
+  },
+  {
+    "text": "When a task involves conditional actions based on data thresholds (e.g., \"if low, then order\"), always explicitly state the logic used to determine if the threshold was met based on the retrieved data.",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving clinical data to answer a question, always identify the most recent record by sorting or comparing the dates provided in the API response before determining if further actions (like ordering a new test) are necessary.",
+    "counter": 2
+  },
+  {
+    "text": "Before performing a POST operation to order a test or medication, explicitly verify the condition (e.g., date elapsed, value threshold) based on the most recent data point retrieved; do not proceed with the order if the criteria are not met.",
+    "counter": 2
+  },
+  {
+    "text": "When a task involves conditional logic based on time (e.g., \"within 1 year\"), calculate the difference between the current date and the record's date precisely before concluding whether to trigger a follow-up action.",
+    "counter": 2
+  },
+  {
+    "text": "If multiple records are returned by an API search, do not assume the first entry is the most recent; always parse the dates of all returned entries to identify the latest record.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical data, if a specific code or identifier does not return results, broaden the search by using higher-level categories (e.g., searching by category=\"laboratory\" instead of a specific LOINC code) to inspect the available data.",
+    "counter": 2
+  }
+]

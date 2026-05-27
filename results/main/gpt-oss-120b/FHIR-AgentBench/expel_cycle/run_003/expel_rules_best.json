@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When determining the last hospital discharge time, first filter Encounter resources to those whose identifiers include the “encounter‑hosp” system (or equivalent hospital‑specific marker) to ensure only hospital stays are considered.",
+    "counter": 2
+  },
+  {
+    "text": "Among the filtered hospital encounters, select the encounter with the most recent period.end value; this represents the latest discharge date regardless of the order in which resources were retrieved.",
+    "counter": 2
+  },
+  {
+    "text": "If a selected hospital encounter lacks an explicit discharge disposition, fall back to using its period.end as the discharge timestamp, but still verify that the encounter is classified as a hospital stay.",
+    "counter": 2
+  },
+  {
+    "text": "Always present the answer in the exact required format – “The final answer is: <ISO‑8601 timestamp>” – and include the full timestamp (including timezone offset) as it appears in the source data.",
+    "counter": 2
+  },
+  {
+    "text": "When answering a question about medications acquired after a specific date, retrieve both **MedicationRequest** and **MedicationAdministration** resources for the patient and filter records using their relevant date fields (e.g., `authoredOn`, `effectiveDateTime`) to ensure the date constraint is applied correctly.",
+    "counter": 2
+  },
+  {
+    "text": "Perform all data filtering and logical checks inside **execute_python_code**; never rely on raw tool output without verification. The Python code should parse dates with `datetime.fromisoformat` (or equivalent) and compare them in a timezone‑naive manner.",
+    "counter": 2
+  },
+  {
+    "text": "If the required date field is missing on a resource, exclude that resource from the analysis rather than assuming a positive result. Explicitly handle empty or malformed dates to avoid false positives.",
+    "counter": 2
+  },
+  {
+    "text": "**“The final answer is: …”** (including the colon and a single space). Provide the answer in a clear, concise statement that directly addresses the question without additional commentary.",
+    "counter": 2
+  },
+  {
+    "text": "Always retrieve and examine **MedicationRequest** resources for the target patient, then filter them by **intentional criteria** (e.g., route of administration, prescription date) before consulting any other resources.",
+    "counter": 2
+  },
+  {
+    "text": "When filtering, compare the **route** field (e.g., `dosageInstruction.route.coding.display`) and the **authoredOn** date using case‑insensitive and whitespace‑tolerant matching; select the earliest prescription that falls within the specified month and year.",
+    "counter": 2
+  },
+  {
+    "text": "Resolve the selected MedicationRequest’s `medicationReference` to the corresponding **Medication** resource to obtain the actual drug name (e.g., `code.coding.display` or `product.ingredient.item.display`), ensuring the reference IDs match exactly.",
+    "counter": 2
+  },
+  {
+    "text": "If no MedicationRequest satisfies all criteria, explicitly state that no matching prescription was found; otherwise, output only the drug name in the final answer line prefixed by “The final answer is:”.",
+    "counter": 2
+  },
+  {
+    "text": "When answering questions about a patient’s last hospital departure, first filter retrieved Encounter resources for those identified as hospital encounters (e.g., identifier.system containing “encounter‑hosp”) before selecting the relevant record.",
+    "counter": 2
+  },
+  {
+    "text": "Determine the most recent departure by selecting the encounter with the latest period.end timestamp among the filtered hospital encounters.",
+    "counter": 2
+  },
+  {
+    "text": "Preserve the original ISO‑8601 datetime format (including timezone offset) from the FHIR data when reporting the answer, and do not modify or re‑format the string.",
+    "counter": 2
+  },
+  {
+    "text": "If no encounter with a discharge or period.end value is found, explicitly state that the departure information is unavailable rather than providing an inferred or guessed answer.",
+    "counter": 2
+  },
+  {
+    "text": "When answering “first prescribed” questions, retrieve all relevant MedicationRequest resources, then sort them by the request’s date/time field (e.g., authoredOn or effectiveDateTime) in ascending order to identify the earliest prescription.",
+    "counter": 2
+  },
+  {
+    "text": "Always filter MedicationRequest records by the desired administration route (e.g., “IV DRIP”), performing case‑insensitive and whitespace‑trimmed matching on the route’s display or code value.",
+    "counter": 2
+  },
+  {
+    "text": "After selecting the correct MedicationRequest, fetch the referenced Medication resource to obtain the drug’s name exactly as stored (use the identifier/value or code/display fields) and return that string without alteration.",
+    "counter": 2
+  },
+  {
+    "text": "If required fields (date, route, medication reference, or medication name) are missing or ambiguous, explicitly state that the information cannot be found rather than guessing, and ensure the final answer follows the required “The final answer is:” format.",
+    "counter": 2
+  }
+]

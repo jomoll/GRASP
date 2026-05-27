@@ -1,0 +1,40 @@
+_resume: true
+agent:
+  module: src.client.agents.HTTPAgent
+  parameters:
+    body:
+      max_tokens: 8192
+      model: gpt-oss-120b
+      temperature: 0.0
+    headers:
+      Authorization: Bearer <REDACTED>
+      Content-Type: application/json
+    prompter:
+      args:
+        agent_role: assistant
+      name: role_content_dict
+    url: <REDACTED>
+cycle:
+  batch_concurrency: 5
+  blind_select: random
+  epochs: 5
+  grpo_eval_n: 36
+  grpo_k: 4
+  max_learned_skills: 10
+  max_proposals: 1
+  run_baseline: true
+  seed: 3
+  update_every: 48
+data:
+  dev: data/medagentbench/split_dev.json
+  full: data/medagentbench/test_data_v2.json
+  id_test: data/medagentbench/split_id_test.json
+  test: data/medagentbench/split_test.json
+  val: data/medagentbench/split_val.json
+output_dir: outputs/ablations/blind_random
+skills:
+  base_dir: skills/base
+task:
+  controller_address: http://localhost:5500/api
+  fhir_api_base: http://localhost:8080/fhir/
+  name: medagentbench-skill

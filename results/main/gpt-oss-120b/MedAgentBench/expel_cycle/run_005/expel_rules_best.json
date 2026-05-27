@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Only place a new lab order if a recent observation exists and its date is older than the specified threshold; if no observation is found, respond with the designated “no data” answer (e.g., [-1]) and do not create an order.",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving observations, always sort the results by the observation’s effectiveDateTime (or issued date) in descending order and select the first entry as the “last” value.",
+    "counter": 2
+  },
+  {
+    "text": "Limit the FINISH payload to the exact answers required by the task; avoid adding explanatory notes or extra fields unless explicitly requested.",
+    "counter": 2
+  },
+  {
+    "text": "each turn must contain exactly one API action or a FINISH command, and the FINISH list must be a valid JSON array of strings.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires a derived value (e.g., age), extract the necessary raw data (such as birthDate) from the retrieved resource, compute the value using the provided current time (rounding down if specified), and return the result as a string inside a FINISH list.",
+    "counter": 2
+  },
+  {
+    "text": "Always check that a Patient search returns at least one entry; if the search yields no matches, respond with FINISH([\"Patient not found\"]).",
+    "counter": 2
+  },
+  {
+    "text": "Prefer the most specific query parameter for patient lookup (e.g., use `identifier` for MRN) to ensure an exact match and avoid ambiguous results.",
+    "counter": 2
+  },
+  {
+    "text": "The FINISH payload must be a JSON‑loadable list of strings with no extra text; format it exactly as `FINISH([\"value1\", \"value2\", ...])`.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for lab observations, always identify and use the most recent result based on the observation’s effectiveDateTime (or issued) before evaluating any conditional logic.",
+    "counter": 2
+  },
+  {
+    "text": "Compare the date of the latest observation to the current task time; if the interval exceeds one year, automatically create a ServiceRequest (or appropriate order) using the specified LOINC code.",
+    "counter": 2
+  },
+  {
+    "text": "If no matching observations are returned, the agent must respond with a FINISH list containing [-1] as the sole element, following the task’s instruction.",
+    "counter": 2
+  },
+  {
+    "text": "The FINISH output must include both the latest lab value (as a string with its unit) and the corresponding date (ISO‑8601) in the order required by the question, ensuring the list is JSON‑loadable.",
+    "counter": 2
+  },
+  {
+    "text": "Separate reasoning from API calls – never embed thought text in the response; output only a single valid action (GET, POST, or FINISH) per turn as required by the response format.",
+    "counter": 2
+  },
+  {
+    "text": "When filtering observations by time, use the correct FHIR date syntax (e.g., `date=ge2023-11-12T10:15:00Z`) and include all mandatory query parameters (`code` and `patient`).",
+    "counter": 2
+  },
+  {
+    "text": "After receiving observation results, explicitly check whether any entry falls within the requested 24‑hour window; if none are found, issue a FINISH response stating that no recent magnesium level exists and no order is placed.",
+    "counter": 2
+  },
+  {
+    "text": "If a low magnesium value is identified, map the numeric range to the appropriate dosing instructions and build a MedicationRequest payload that follows the API schema (including `medicationCodeableConcept`, `authoredOn`, `dosageInstruction` with correct `doseQuantity` and `rateQuantity`, `status`, `intent`, and `subject`).",
+    "counter": 2
+  },
+  {
+    "text": "When selecting the most recent laboratory observation, always choose the Observation with the latest effectiveDateTime (or issued timestamp if effectiveDateTime is missing) for the given patient and code.",
+    "counter": 2
+  },
+  {
+    "text": "If a task specifies a follow‑up lab or service (e.g., “pair this order with a morning serum potassium level”), always create a ServiceRequest (or appropriate order) with the requested date/time, even when no medication is ordered.",
+    "counter": 2
+  },
+  {
+    "text": "For medication dosing instructions that depend on the deviation from a target value, calculate the exact difference between the observed result and the target, then apply the dosing rule (e.g., 10 mEq per 0.1 unit below threshold) to determine the dose.",
+    "counter": 2
+  },
+  {
+    "text": "Before issuing FINISH, ensure that every required action (MedicationRequest, ServiceRequest, etc.) has been successfully posted; if any action is still pending, generate the corresponding POST request first.",
+    "counter": 2
+  }
+]

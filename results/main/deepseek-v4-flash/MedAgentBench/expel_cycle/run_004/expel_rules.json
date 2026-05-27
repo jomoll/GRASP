@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When searching for the most recent lab result, use the `date` parameter with a descending order modifier (e.g., `_sort=-date`) to retrieve the latest observation, rather than filtering by a specific date which may miss results from other dates.",
+    "counter": 2
+  },
+  {
+    "text": "If a lab search returns zero results, do not immediately conclude the lab does not exist; instead, broaden the date range (e.g., remove or extend the date filter) to search for historical results before deciding no data is available.",
+    "counter": 2
+  },
+  {
+    "text": "When a lab value is found and is low, always calculate the exact dosage based on the provided dosing instructions, then create a MedicationRequest with the precise dose, route, and timing; do not skip ordering the medication if the lab is missing.",
+    "counter": 2
+  },
+  {
+    "text": "For paired orders (e.g., a medication and a follow-up lab), after ordering the medication, also create a separate ServiceRequest for the future lab using the correct LOINC code and occurrenceDateTime set to the specified time (e.g., next day at 8am).",
+    "counter": 2
+  },
+  {
+    "text": "When querying for observations within a time range, always specify both the start and end of the range using the `date` parameter with `ge` and `le` prefixes to ensure the results are limited to the desired period.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving observation results, identify the most recent observation by comparing the `effectiveDateTime` values and return the corresponding numeric value, rather than returning the first or any arbitrary value.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires returning a specific unit (e.g., mg/dL), verify that the observation's unit matches the required unit before returning the value; if it does not, perform necessary conversion.",
+    "counter": 2
+  },
+  {
+    "text": "Always include both lower and upper bounds in date range parameters for FHIR searches to avoid retrieving observations outside the intended timeframe, which could lead to incorrect results.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a patient by name, use separate given and family parameters instead of the combined name parameter to ensure precise matching and avoid missing results due to name parsing differences.",
+    "counter": 2
+  },
+  {
+    "text": "If a patient search returns zero results, verify that the query parameters match the patient's exact demographic information as provided in the task before concluding the patient does not exist.",
+    "counter": 2
+  },
+  {
+    "text": "Always prefer using discrete search parameters (e.g., given, family, birthdate) over generic ones (e.g., name) when the task provides structured name and date information, as this reduces ambiguity and improves search accuracy.",
+    "counter": 2
+  },
+  {
+    "text": "When querying for lab observations with a date range, use the FHIR date prefix \"ge\" and \"le\" correctly to specify the start and end of the 24-hour window relative to the current time.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving a bundle with observations, always check the \"total\" field to determine if data exists; if total is 0, output -1 as specified in the task, otherwise extract the most recent observation by sorting by effectiveDateTime descending.",
+    "counter": 2
+  },
+  {
+    "text": "When extracting a numeric lab value from an Observation resource, use the \"valueQuantity.value\" field and ensure the unit is converted to the requested unit (e.g., mg/dL) if needed; if the unit matches, use the value directly.",
+    "counter": 2
+  },
+  {
+    "text": "For tasks requiring the \"most recent\" observation within a time range, use the effectiveDateTime field to compare timestamps and select the latest one, not just the first entry in the bundle.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for lab observations to check the most recent value, use the `date` parameter with a prefix like `ge` (greater than or equal) to retrieve results from a time range, rather than an exact date which may miss records due to timezone or timestamp differences.",
+    "counter": 2
+  },
+  {
+    "text": "If a lab observation search returns no results, do not immediately conclude the value is absent; instead, broaden the date range to search for the most recent observation regardless of date, to ensure you capture any existing record.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires ordering a medication or service based on a lab value, first retrieve the lab value, then calculate the dose or schedule using the provided instructions, and only then place the order(s) using POST requests.",
+    "counter": 2
+  },
+  {
+    "text": "For paired orders (e.g., a replacement medication and a follow-up lab), ensure each order is submitted as a separate API call with the appropriate parameters, and do not finish the task until all required actions are completed.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a patient by name, use discrete parameters \"given\" and \"family\" instead of the generic \"name\" parameter to ensure exact matching and avoid false negatives.",
+    "counter": 2
+  }
+]

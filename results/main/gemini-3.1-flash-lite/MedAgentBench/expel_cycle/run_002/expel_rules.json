@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When a task requires calculating a patient's age, always retrieve the patient's birthDate first, then calculate the difference between the current date and the birthDate, rounding down to the nearest integer.",
+    "counter": 2
+  },
+  {
+    "text": "Before finalizing an answer that involves a calculation, explicitly state the values used (e.g., current date and birth date) to ensure accuracy.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a patient by identifier, verify that the identifier parameter correctly maps to the MRN field in the FHIR resource.",
+    "counter": 2
+  },
+  {
+    "text": "If a task involves multiple steps, such as data retrieval followed by a calculation, ensure the agent performs the calculation in the final thought process before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical data, always include relevant date filters (e.g., using prefix modifiers like 'ge' for 'greater than or equal to') in the initial query to retrieve the most pertinent information and minimize the size of the returned payload.",
+    "counter": 2
+  },
+  {
+    "text": "When a task involves evaluating data against a time-based threshold, explicitly compare the retrieved resource's effective date or timestamp against the current context time before deciding if a follow-up action (like ordering a test) is required.",
+    "counter": 2
+  },
+  {
+    "text": "If a search for a specific clinical value or record returns multiple results, sort or filter them to identify the most recent entry before proceeding with any conditional logic or reporting.",
+    "counter": 2
+  },
+  {
+    "text": "Always confirm the presence and status of required clinical data before concluding a task; if no data is found, explicitly state this in the final response instead of assuming or proceeding with downstream actions.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical observations by code, verify if the code represents a specific standard (like LOINC) and ensure the API supports that specific parameter format before concluding data is missing.",
+    "counter": 2
+  },
+  {
+    "text": "If an initial search by code returns no results, check if the data might be categorized under a broader category (e.g., \"laboratory\" or \"vital-signs\") and retrieve a wider list to filter manually for the relevant code.",
+    "counter": 2
+  },
+  {
+    "text": "Avoid attempting to navigate paginated results using raw internal URLs (like `_getpages`) if the API documentation does not explicitly support those parameters; rely on standard FHIR search parameters instead.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires checking for the \"most recent\" value, ensure the search query is broad enough to capture relevant historical data, then use code-based filtering on the response to identify the latest record by effective date.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a patient by identifier, use the `identifier` parameter in the Patient search API.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires calculating age based on a birth date, extract the `birthDate` from the patient resource and calculate the age relative to the provided current date, rounding down to the nearest integer.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify if the search results contain the required information before calling FINISH; if the information is not present in the initial search result, perform subsequent queries as needed.",
+    "counter": 2
+  },
+  {
+    "text": "If a task specifies a calculation (e.g., age), ensure the logic accounts for the current date provided in the prompt context.",
+    "counter": 2
+  },
+  {
+    "text": "When filtering for temporal data (e.g., \"within the last 24 hours\"), retrieve the complete list of available records first, then manually inspect the `effectiveDateTime` or `issued` fields of each record to identify those that fall within the specified time window.",
+    "counter": 2
+  },
+  {
+    "text": "If a search result contains multiple entries, sort them by their `effectiveDateTime` or `issued` timestamps in descending order to identify the most recent observation.",
+    "counter": 2
+  },
+  {
+    "text": "If no records match the temporal criteria after manual inspection, return -1; do not assume the initial API search result is exhaustive or pre-filtered by the server.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify the `effectiveDateTime` of every returned resource against the provided current reference time to ensure accurate temporal filtering.",
+    "counter": 2
+  }
+]

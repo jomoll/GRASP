@@ -1,0 +1,27 @@
+# grasp — GRASP (ours).
+# Model backend: select with --agent / GRASP_BACKEND, or change agent_preset.
+# See configs/agents/README.md for the available presets.
+output_dir: outputs/grasp
+agent_preset: gptoss
+task:
+  name: medagentbench-v2-skill
+  controller_address: http://localhost:5070/api
+  fhir_api_base: http://localhost:8080/fhir/
+data:
+  full: data/medagentbench/new_patient_tasks.json
+  dev: data/medagentbench/split_dev.json
+  val: data/medagentbench/split_val.json
+  test: data/medagentbench/split_test.json
+  id_test: data/medagentbench/split_id_test.json
+skills:
+  base_dir: skills/base
+cycle:
+  epochs: 5
+  update_every: 48
+  batch_concurrency: 5
+  max_proposals: 1
+  max_learned_skills: 10
+  grpo_k: 4
+  grpo_eval_n: 36
+  run_baseline: true
+  seed: 1

@@ -1,0 +1,59 @@
+default:
+  module: src.server.tasks.webshop.WebShop
+  # WebShop's environment (the `web_agent_site` package, its 6.8GB product index,
+  # and a Lucene/JDK toolchain) is heavy and not pip-installable, so — like the
+  # other heavy benchmarks — the worker runs inside its task image rather than
+  # in-process. We can't reuse longinyu/agentbench-webshop directly: its Python
+  # 3.8 / spacy 3.6 (pydantic v1) stack cannot host agentrl-worker (needs >=3.9,
+  # pydantic v2). Build the py3.9 worker image first (reuses that image's repo +
+  # data + index, no GitHub clone):
+  #   docker build -f src/server/tasks/webshop/Dockerfile.local \
+  #     -t agentbench-webshop-worker:local .
+  # The image bakes in agentrl-worker and sets PYTHONPATH=/usr/src/webshop, so
+  # the command below only needs umask. start_task.py mounts the AgentBench
+  # source in and connects the worker back to the host controller.
+  docker:
+    image: agentbench-webshop-worker:local
+    command: "umask 0;"
+  parameters:
+    concurrency: 64
+    round: 20
+    tools:
+    - type: "function"
+      function:
+        name: "search_action"
+        description: "Use search functionality with specified keywords."
+        parameters:
+          type: "object"
+          properties:
+            keywords:
+              type: "string"
+              description: "The keywords to use in the search function."
+          required:
+            - "keywords"
+          additionalProperties: False
+    - type: "function"
+      function:
+        name: "click_action"
+        description: "Click a button or link with a specified value."
+        parameters:
+          type: "object"
+          properties:
+            value:
+              type: "string"
+              description: "The value to click from the list of available actions."
+          required:
+            - "value"
+          additionalProperties: False
+
+webshop-std:
+  parameters:
+    name: webshop-std
+    start: 0
+    end: 200
+
+webshop-env_train:
+  parameters:
+    name: webshop-env_train
+    start: 1000
+    end: 12000

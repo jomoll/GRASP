@@ -1,0 +1,9 @@
+{
+  "no_data_found_incorrect_assumption": "Agent concluded no data exists without verifying all possible sources or codes, then acted on that assumption",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "answer_format_wrong_type": "answer format wrong type",
+  "incomplete_search_strategy": "Agent performed multiple searches but missed a key resource type or code, failing to find existing data",
+  "incorrect_order_acceptance": "Agent accepted an existing order that did not match the required specification (e.g., wrong frequency) instead of correcting it",
+  "date_filter_omitted": "date filter omitted",
+  "answer_submitted_before_verification": "answer submitted before verification"
+}

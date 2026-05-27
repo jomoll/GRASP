@@ -1,0 +1,20 @@
+{
+  "missing_service_request_creation": "Failed to create the required ServiceRequest order despite the instruction to do so.",
+  "no_fhir_calls_made": "Provided reasoning but performed no FHIR GET/POST actions before finishing.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "unnecessary_service_request_created": "Created a ServiceRequest order when the clinical rule did not require ordering.",
+  "observation_value_not_extracted": "Returned a sentinel value (e.g., -1) instead of extracting the actual observation value from the FHIR response.",
+  "observation_not_found_error_code": "Returned an error code (-1) indicating a missing observation rather than handling the absence properly.",
+  "patient_lookup_failed": "Patient query returned \"Patient not found\" even though the patient exists in the dataset.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "incomplete_workflow": "Assistant stopped without providing a final answer or completing the required actions.",
+  "duplicate_service_request_created": "Created two identical ServiceRequest resources for the same clinical order.",
+  "service_request_missing_required_field": "Created a ServiceRequest but omitted a required field or element needed for a valid order.",
+  "wrong_observation_code_used": "Queried the wrong LOINC code for the required observation, resulting in missing or incorrect data.",
+  "lab_value_threshold_misapplied": "Applied incorrect clinical threshold when interpreting a lab value, leading to a wrong ordering decision.",
+  "patient_age_extraction_error": "Calculated or extracted the patient’s age incorrectly from the Patient resource.",
+  "observation_not_evaluated_before_decision": "Failed to extract or assess the observation value before making a clinical decision, resulting in a default 'no observation' response.",
+  "conditional_logic_not_applied": "Did not apply the required conditional rule (e.g., date comparison) before returning the answer or taking an action.",
+  "service_request_incorrect_order_type": "Created a ServiceRequest for a lab test instead of the required replacement medication order.",
+  "wrong_resource_type_queried": "wrong resource type queried"
+}

@@ -1,0 +1,51 @@
+_resume: true
+agent:
+  module: src.client.agents.HTTPAgent
+  parameters:
+    body:
+      max_tokens: 8192
+      model: deepseek-v4-flash
+      temperature: 0.0
+    headers:
+      Authorization: Bearer <REDACTED>
+      Content-Type: application/json
+    prompter:
+      args:
+        agent_role: assistant
+      name: role_content_dict
+    url: <REDACTED>
+cycle:
+  batch_concurrency: 5
+  epochs: 5
+  run_baseline: true
+  seed: 2
+  update_every: 48
+data:
+  dev: data/medagentbench/split_dev.json
+  full: data/medagentbench/test_data_v2.json
+  id_test: data/medagentbench/split_id_test.json
+  test: data/medagentbench/split_test.json
+  val: data/medagentbench/split_val.json
+expel:
+  max_num_rules: 20
+  use_exemplars: false
+output_dir: outputs/expel_cycle_vllm
+task:
+  controller_address: http://localhost:5050/api
+  fhir_api_base: http://localhost:8080/fhir/
+  name: medagentbench-skill
+updater:
+  module: src.client.agents.HTTPAgent
+  parameters:
+    body:
+      max_tokens: 8192
+      model: deepseek-v4-flash
+      temperature: 0.7
+    headers:
+      Authorization: Bearer <REDACTED>
+      Content-Type: application/json
+    prompter:
+      args:
+        agent_role: assistant
+      name: role_content_dict
+    url: <REDACTED>

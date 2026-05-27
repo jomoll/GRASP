@@ -1,0 +1,12 @@
+{
+  "unnecessary_service_request_created": "Agent created a ServiceRequest order when only a value answer was required.",
+  "missing_fhir_query_before_answer": "Provided reasoning or answer without performing required FHIR query actions.",
+  "patient_not_found_incorrect": "Incorrectly reported patient not found despite patient existing.",
+  "answer_format_wrong_type_string": "Returned a narrative string when a structured list or specific format was expected.",
+  "answer_format_includes_text": "Returned combined value and date in a single string instead of separate elements.",
+  "answer_format_wrong_type_number": "Returned numeric answer as a string instead of the expected numeric type (or wrong format).",
+  "quantity_unit_mismatch_missing": "Returned numeric value without required unit of measurement.",
+  "placeholder_minus_one_returned": "Returned sentinel '-1' placeholder instead of actual observation value/date.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "answer_format_wrong_type": "answer format wrong type"
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Always respond with exactly ONE API action per turn—no explanatory text, reasoning, or additional JSON. The output must match one of the allowed formats (GET url?... or POST url\\n{json_payload} or FINISH([...])).",
+    "counter": 2
+  },
+  {
+    "text": "Query all relevant resources for the target information (e.g., Procedure and MedicationRequest for vaccinations). Use the appropriate search parameters (code, patient, and text filters) to capture records that may be stored in either resource type.",
+    "counter": 2
+  },
+  {
+    "text": "After each GET, locally examine the returned Bundle to determine the most recent relevant entry and compute any required time comparisons before deciding on the next action (e.g., whether a booster is needed).",
+    "counter": 2
+  },
+  {
+    "text": "If no qualifying vaccination record is found, place the booster order with a ServiceRequest that includes the correct CPT code (91320), setting authoredOn and occurrenceDateTime to the current task time and following the required field values.",
+    "counter": 2
+  },
+  {
+    "text": "Before issuing any API call, explicitly list the required data elements and plan the minimal sequence of calls needed to obtain them, ensuring no step is omitted.",
+    "counter": 2
+  },
+  {
+    "text": "After each API response, verify that the expected resources are present (e.g., `total > 0` for a Bundle) and extract the needed values; if data are missing, issue a follow‑up query or report the absence before proceeding to decision logic.",
+    "counter": 2
+  },
+  {
+    "text": "Always adhere to the prescribed response format—output exactly one API action (GET or POST) per turn, with no explanatory text, and use the `FINISH` action only when all required data have been gathered and a final answer is ready.",
+    "counter": 2
+  },
+  {
+    "text": "perform all logical reasoning internally, then translate the next concrete API request into the required syntax; never embed reasoning or commentary in the action string.",
+    "counter": 2
+  },
+  {
+    "text": "Always follow the response format strictly – output exactly ONE API action (GET or POST) per turn with no additional commentary or reasoning text.",
+    "counter": 2
+  },
+  {
+    "text": "Include every parameter marked as required in the API specification when constructing a request; if a required parameter (e.g., date for Procedure search) is not naturally known, supply a permissive value such as a wide date range (e.g., date=ge1900‑01‑01) to satisfy the requirement.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving data (e.g., a Procedure Bundle), parse the response to determine the most recent relevant date and compare it to the current time before deciding whether to place a new order; only issue an order if no prior procedure exists or the latest one is older than the specified threshold.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple CPT or code values are possible, handle them according to the API’s expected syntax—either make separate requests for each code or use the documented multi‑value format—rather than assuming a generic comma‑separated list will be accepted.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that required data is missing, verify that the observation code used in the query (e.g., \"HEARTRATE\") actually exists for the patient by first searching without a code filter or by checking the patient’s available observation codes.",
+    "counter": 2
+  },
+  {
+    "text": "When constructing date‑range queries, ensure the date parameter syntax matches the FHIR server’s expectations (e.g., use proper ISO format and appropriate prefixes like `ge` and `le`).",
+    "counter": 2
+  },
+  {
+    "text": "If an initial query returns no results, broaden the search (e.g., remove the code filter, search across related categories, or use a larger time window) before deciding that the data does not exist.",
+    "counter": 2
+  },
+  {
+    "text": "Summarize outcomes clearly, stating whether data was found, what was missing, and any recommended next steps (such as alternative queries or data sources).",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical resources, include only the parameters that are essential to the query; avoid adding extra filters (e.g., date ranges) that may unintentionally exclude relevant records.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating a new ServiceRequest, always verify whether an existing removal order or related documentation already exists for the patient to prevent duplicate orders.",
+    "counter": 2
+  },
+  {
+    "text": "If a Procedure search returns no results, consider checking complementary resources (e.g., DeviceUseStatement, ServiceRequest) that might indicate the presence of the device or its removal status.",
+    "counter": 2
+  },
+  {
+    "text": "Summarize the reasoning behind the final decision in the FINISH output, stating which resources were examined and why the chosen action (or inaction) is appropriate.",
+    "counter": 2
+  }
+]

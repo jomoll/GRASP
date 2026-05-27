@@ -1,0 +1,13 @@
+{
+  "correct_but_expected_mismatch": "Agent performed correct reasoning and actions but the expected output differs from the reported output",
+  "no_heart_rate_data_found": "Agent searched for heart rate observations but found none, then concluded no data available instead of checking alternative codes or time ranges",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "wrong_dose_frequency_created_new": "Agent found an existing heparin order but with wrong frequency, then created a new order instead of modifying the existing one",
+  "no_active_orders_found_created_new": "Agent searched for active medication orders, found none, and created a new order without verifying the patient or checking for inactive orders",
+  "no_procedure_found_ordered_new": "Agent searched for a procedure with a date filter, found none, and immediately ordered a new one without checking for records outside the filter window",
+  "incomplete_catheter_search": "Agent searched for catheter procedures with a date filter but not the specific code, then searched again but did not complete the verification",
+  "answer_format_wrong_type": "answer format wrong type",
+  "incomplete_naloxone_search": "Agent retrieved medication requests but did not specifically search for naloxone prescriptions to match against opioid orders",
+  "no_opioid_orders_found": "Agent searched for active medication requests and concluded no opioid orders exist without filtering for opioid-specific medications",
+  "multiple_orders_no_discontinue_action": "Found multiple active orders but lacked API to discontinue duplicates, reported situation instead of resolving"
+}

@@ -1,0 +1,16 @@
+{
+  "unnecessary_potassium_order_placed": "Placed a potassium replacement order when the potassium level was not low according to the threshold.",
+  "potassium_threshold_misinterpreted": "Mis‑evaluated potassium observation against clinical threshold, leading to an incorrect ordering decision.",
+  "observation_value_invalid_placeholder": "Returned a placeholder value such as -1 instead of the actual observation value.",
+  "answer_format_wrong_type": "Final answer does not match the expected type or format (e.g., missing unit, wrong structure, extra text).",
+  "missing_observation_fetch_before_answer": "Did not issue the required FHIR Observation query before providing the final answer.",
+  "patient_lookup_failed_missing_match": "Returned \"Patient not found\" despite the patient existing in the FHIR store.",
+  "age_calculation_wrong": "Computed patient age incorrectly from the birthdate.",
+  "quantity_unit_missing": "Returned a numeric value without the required unit (e.g., mg/dL, mmol/L).",
+  "duplicate_service_request_posted": "Posted the same ServiceRequest resource twice instead of a single creation.",
+  "unnecessary_service_request_created": "Created a ServiceRequest (e.g., lab order) that was not required by the instruction.",
+  "no_order_placed_when_result_missing": "Failed to create a required test or treatment order when no recent observation result was found.",
+  "answer_missing_order_information": "Final answer omitted information about an order that was placed as required by the instruction.",
+  "wrong_service_request_created": "Created a ServiceRequest of incorrect type or purpose relative to the instruction.",
+  "no_fhir_action_performed": "Did not execute any FHIR GET/POST actions before providing the final answer."
+}

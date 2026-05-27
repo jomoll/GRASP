@@ -1,0 +1,7 @@
+{
+  "split": "id_test",
+  "score": 0.90625,
+  "n_correct": 58,
+  "n_total": 64,
+  "skills_dir": "transfer_skills/oss-003"
+}

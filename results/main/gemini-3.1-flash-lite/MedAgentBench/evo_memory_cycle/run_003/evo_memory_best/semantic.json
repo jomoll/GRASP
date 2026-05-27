@@ -1,0 +1,382 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-17T00:03:29.654576",
+  "rules": [
+    "[P1] Mandatory EHR retrieval for all patient-specific attributes or demographic calculations prior to inference.",
+    "[P1] Map complex clinical narratives into structured formats (e.g., SBAR) for free-text fields.",
+    "[P1] Query system metadata to establish current reference dates for temporal logic.",
+    "[P1] Apply precise, entity-specific, and temporal filters to retrieval tools to minimize noise.",
+    "[P1] Mandate tool execution for factual data retrieval; prohibit direct inference.",
+    "[P1] Explicitly evaluate conditional triggers and justify omissions before initiating state-changing actions.",
+    "[P1] Verify existence of required data and patient identity via system query before initiating state-changing actions.",
+    "[P1] Decompose multi-step workflows into explicit search, evaluation, and execution phases.",
+    "[P1] Document the scope of search attempts (e.g., synonyms, resource types, full history) when reporting data absence.",
+    "[P1] Perform exhaustive cross-resource verification (e.g., multiple resource types) before confirming data absence.",
+    "[P1] Prohibit task termination without executing targeted system queries for required data.",
+    "[P1] Separate data retrieval tasks from subsequent conditional action execution to prevent over-automation.",
+    "[P1] Verify all mandatory clinical components are present before executing state-changing actions.",
+    "[P1] Verify tool execution logs for state-changing actions; do not assume success.",
+    "[P1] State reference ranges and timestamps from source documentation when justifying clinical decisions.",
+    "[P1] Sort retrieval results by date; filter by timeframe before parsing for the most recent entry.",
+    "[P1] Append precise ISO-8601 timestamps and unique patient identifiers to all state-changing clinical entries."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_f04bba66ad6d",
+      "text": "[P1] Mandatory EHR retrieval for all patient-specific attributes or demographic calculations prior to inference.",
+      "tags": [
+        "hallucination",
+        "missing-retrieval",
+        "demographics",
+        "mandatory",
+        "retrieval",
+        "patient",
+        "specific",
+        "attributes",
+        "demographic",
+        "calculations"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-17T00:00:41.603698",
+      "updated_at": "2026-05-17T00:00:57.917267"
+    },
+    {
+      "id": "rule_38fd6e7348ae",
+      "text": "[P1] Map complex clinical narratives into structured formats (e.g., SBAR) for free-text fields.",
+      "tags": [
+        "clinical-orders",
+        "referral-management",
+        "documentation-integrity",
+        "complex",
+        "clinical",
+        "narratives",
+        "into",
+        "structured",
+        "formats",
+        "sbar"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-17T00:00:16.911940",
+      "updated_at": "2026-05-17T00:00:57.917286"
+    },
+    {
+      "id": "rule_46217edf877e",
+      "text": "[P1] Query system metadata to establish current reference dates for temporal logic.",
+      "tags": [
+        "data-extraction",
+        "temporal-filtering",
+        "lab-results",
+        "query",
+        "system",
+        "metadata",
+        "establish",
+        "current",
+        "reference",
+        "dates"
+      ],
+      "shown": 9,
+      "success": 6,
+      "failure": 3,
+      "created_at": "2026-05-16T23:59:40.880641",
+      "updated_at": "2026-05-17T00:00:57.916776"
+    },
+    {
+      "id": "rule_cc65dd3baaa1",
+      "text": "[P1] Apply precise, entity-specific, and temporal filters to retrieval tools to minimize noise.",
+      "tags": [
+        "conditional-logic",
+        "lab-ordering",
+        "workflow-adherence",
+        "apply",
+        "precise",
+        "entity",
+        "specific",
+        "temporal",
+        "filters",
+        "retrieval"
+      ],
+      "shown": 10,
+      "success": 6,
+      "failure": 4,
+      "created_at": "2026-05-17T00:00:00.937748",
+      "updated_at": "2026-05-17T00:00:57.916919"
+    },
+    {
+      "id": "rule_2e4c859212c2",
+      "text": "[P1] Mandate tool execution for factual data retrieval; prohibit direct inference.",
+      "tags": [
+        "conditional-logic",
+        "lab-ordering",
+        "workflow-adherence",
+        "mandate",
+        "tool",
+        "execution",
+        "factual",
+        "data",
+        "retrieval",
+        "prohibit"
+      ],
+      "shown": 8,
+      "success": 4,
+      "failure": 4,
+      "created_at": "2026-05-17T00:00:00.937950",
+      "updated_at": "2026-05-17T00:00:57.916853"
+    },
+    {
+      "id": "rule_39b21490cc51",
+      "text": "[P1] Explicitly evaluate conditional triggers and justify omissions before initiating state-changing actions.",
+      "tags": [
+        "conditional-logic",
+        "lab-ordering",
+        "workflow-adherence",
+        "explicitly",
+        "evaluate",
+        "conditional",
+        "triggers",
+        "justify",
+        "omissions",
+        "before"
+      ],
+      "shown": 11,
+      "success": 6,
+      "failure": 3,
+      "created_at": "2026-05-17T00:00:00.938897",
+      "updated_at": "2026-05-17T00:00:57.916985"
+    },
+    {
+      "id": "rule_0fdbb8cde6f0",
+      "text": "[P1] Verify existence of required data and patient identity via system query before initiating state-changing actions.",
+      "tags": [
+        "data-retrieval",
+        "verification",
+        "patient-identity",
+        "verify",
+        "existence",
+        "required",
+        "data",
+        "patient",
+        "identity",
+        "system"
+      ],
+      "shown": 17,
+      "success": 11,
+      "failure": 6,
+      "created_at": "2026-05-16T23:58:50.293084",
+      "updated_at": "2026-05-17T00:00:57.917055"
+    },
+    {
+      "id": "rule_dfabfa3d0fd2",
+      "text": "[P1] Decompose multi-step workflows into explicit search, evaluation, and execution phases.",
+      "tags": [
+        "temporal-logic",
+        "clinical-workflow",
+        "data-validation",
+        "decompose",
+        "multi",
+        "step",
+        "workflows",
+        "into",
+        "explicit",
+        "search"
+      ],
+      "shown": 13,
+      "success": 7,
+      "failure": 6,
+      "created_at": "2026-05-16T23:53:18.521934",
+      "updated_at": "2026-05-17T00:00:57.917159"
+    },
+    {
+      "id": "rule_36ce95ccde92",
+      "text": "[P1] Document the scope of search attempts (e.g., synonyms, resource types, full history) when reporting data absence.",
+      "tags": [
+        "data-retrieval",
+        "verification",
+        "clinical-logic",
+        "missing-data",
+        "document",
+        "scope",
+        "search",
+        "attempts",
+        "synonyms",
+        "resource"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:00:57.917224",
+      "updated_at": "2026-05-17T00:00:57.917225"
+    },
+    {
+      "id": "rule_c0be0eafbe34",
+      "text": "[P1] Perform exhaustive cross-resource verification (e.g., multiple resource types) before confirming data absence.",
+      "tags": [
+        "data-retrieval",
+        "verification",
+        "clinical-logic",
+        "missing-data",
+        "perform",
+        "exhaustive",
+        "cross",
+        "resource",
+        "multiple",
+        "types"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:00:57.917417",
+      "updated_at": "2026-05-17T00:00:57.917418"
+    },
+    {
+      "id": "rule_a4ae63beb749",
+      "text": "[P1] Prohibit task termination without executing targeted system queries for required data.",
+      "tags": [
+        "tool_usage",
+        "premature_termination",
+        "laboratory_data",
+        "prohibit",
+        "task",
+        "termination",
+        "without",
+        "executing",
+        "targeted",
+        "system"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:00:10.554290",
+      "updated_at": "2026-05-17T00:00:57.917303"
+    },
+    {
+      "id": "rule_0463a219f659",
+      "text": "[P1] Separate data retrieval tasks from subsequent conditional action execution to prevent over-automation.",
+      "tags": [
+        "conditional-logic",
+        "lab-ordering",
+        "workflow-adherence",
+        "separate",
+        "data",
+        "retrieval",
+        "tasks",
+        "from",
+        "subsequent",
+        "conditional"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:00:00.939005",
+      "updated_at": "2026-05-17T00:00:57.917321"
+    },
+    {
+      "id": "rule_9b05bb717a26",
+      "text": "[P1] Verify all mandatory clinical components are present before executing state-changing actions.",
+      "tags": [
+        "clinical-orders",
+        "referral-management",
+        "documentation-integrity",
+        "verify",
+        "mandatory",
+        "clinical",
+        "components",
+        "present",
+        "before",
+        "executing"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:00:16.912009",
+      "updated_at": "2026-05-17T00:00:57.917339"
+    },
+    {
+      "id": "rule_e6ff3df9444e",
+      "text": "[P1] Verify tool execution logs for state-changing actions; do not assume success.",
+      "tags": [
+        "conditional-logic",
+        "lab-ordering",
+        "workflow-adherence",
+        "verify",
+        "tool",
+        "execution",
+        "logs",
+        "state",
+        "changing",
+        "actions"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:00:00.938464",
+      "updated_at": "2026-05-17T00:00:57.917356"
+    },
+    {
+      "id": "rule_751c51eab0e9",
+      "text": "[P1] State reference ranges and timestamps from source documentation when justifying clinical decisions.",
+      "tags": [
+        "data-retrieval",
+        "verification",
+        "patient-identity",
+        "state",
+        "reference",
+        "ranges",
+        "timestamps",
+        "from",
+        "source",
+        "documentation"
+      ],
+      "shown": 19,
+      "success": 11,
+      "failure": 8,
+      "created_at": "2026-05-16T23:58:50.293602",
+      "updated_at": "2026-05-17T00:00:57.917247"
+    },
+    {
+      "id": "rule_23e5ed18f039",
+      "text": "[P1] Sort retrieval results by date; filter by timeframe before parsing for the most recent entry.",
+      "tags": [
+        "data-extraction",
+        "temporal-filtering",
+        "lab-results",
+        "sort",
+        "retrieval",
+        "results",
+        "date",
+        "filter",
+        "timeframe",
+        "before"
+      ],
+      "shown": 9,
+      "success": 2,
+      "failure": 7,
+      "created_at": "2026-05-16T23:59:40.880488",
+      "updated_at": "2026-05-17T00:00:57.917375"
+    },
+    {
+      "id": "rule_57d34ecd0106",
+      "text": "[P1] Append precise ISO-8601 timestamps and unique patient identifiers to all state-changing clinical entries.",
+      "tags": [
+        "data-retrieval",
+        "clinical-logic",
+        "verification-step",
+        "append",
+        "precise",
+        "8601",
+        "timestamps",
+        "unique",
+        "patient",
+        "identifiers"
+      ],
+      "shown": 26,
+      "success": 11,
+      "failure": 15,
+      "created_at": "2026-05-16T23:54:10.591767",
+      "updated_at": "2026-05-17T00:00:57.917394"
+    }
+  ]
+}

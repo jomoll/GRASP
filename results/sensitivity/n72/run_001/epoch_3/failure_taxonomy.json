@@ -1,0 +1,16 @@
+{
+  "answer_format_wrong_type": "answer format wrong type",
+  "answer_placeholder_returned": "Agent returned a placeholder value like \"-1\" instead of the actual requested data.",
+  "date_filter_omitted": "date filter omitted",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "no_fhir_action_performed": "Agent gave reasoning but did not issue any FHIR GET/POST action before finishing.",
+  "answer_contains_unnecessary_order_details": "Agent included order creation details in the final answer, which were not expected in the response.",
+  "observation_not_retrieved": "Agent failed to query the Observation resource before attempting to answer the question.",
+  "unnecessary_service_request_created": "Agent created a ServiceRequest (order) when only data retrieval was required.",
+  "answer_missing_lab_evaluation": "Agent assumed no replacement needed without evaluating the retrieved lab value against the threshold.",
+  "patient_mrn_not_extracted": "Agent failed to extract and return the patient's MRN from the Patient resource, returning a placeholder instead.",
+  "answer_missing_order_decision": "Agent returned only the lab value without providing the required ordering decision or order details.",
+  "order_without_returned_resource": "Agent created an order (e.g., ServiceRequest) but returned an empty answer instead of the expected order details.",
+  "date_condition_not_evaluated": "Agent returned the lab value/date without applying the conditional date comparison specified in the instruction.",
+  "wrong_order_resource_type": "Agent used an incorrect FHIR resource type for the therapeutic order (e.g., ServiceRequest instead of MedicationRequest)."
+}

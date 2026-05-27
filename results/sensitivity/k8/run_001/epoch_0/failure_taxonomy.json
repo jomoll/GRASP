@@ -1,0 +1,12 @@
+{
+  "answer_format_explanatory_sentence": "Returned a full explanatory sentence instead of the concise value/date format required by the task.",
+  "answer_type_string_instead_of_quantity": "Returned a plain string describing a quantity rather than a numeric value with proper unit handling.",
+  "missing_fhir_action_before_answer": "Provided reasoning or a final answer without first performing the required FHIR API call(s).",
+  "answer_includes_unrequested_order_info": "Returned an answer that includes order details that were not requested in the final response format.",
+  "answer_format_wrong_type": "Returned the answer as a list (or other structure) instead of the expected single string format.",
+  "placeholder_minus_one_returned": "Returned a sentinel value of -1 when no observation was found, instead of handling the missing data properly.",
+  "answer_type_string_instead_of_integer": "Returned the age as a string instead of the expected integer type.",
+  "quantity_unit_missing": "Returned a numeric lab value without the required unit (e.g., mg/dL, mmol/L).",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "unnecessary_order_placed": "Placed an order resource even though the task only required retrieving information and did not request an order."
+}

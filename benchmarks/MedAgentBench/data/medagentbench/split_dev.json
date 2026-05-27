@@ -1,0 +1,614 @@
+[
+  {
+    "id": "task1_20",
+    "instruction": "What’s the MRN of the patient with name Christopher Cruz and DOB of 1940-08-28? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S0658561"
+    ],
+    "eval_MRN": "S0658561"
+  },
+  {
+    "id": "task1_15",
+    "instruction": "What’s the MRN of the patient with name Denise Dunlap and DOB of 1945-09-20? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S3228213"
+    ],
+    "eval_MRN": "S3228213"
+  },
+  {
+    "id": "task1_11",
+    "instruction": "What’s the MRN of the patient with name Glenda Hall and DOB of 1952-11-14? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S6521727"
+    ],
+    "eval_MRN": "S6521727"
+  },
+  {
+    "id": "task1_27",
+    "instruction": "What’s the MRN of the patient with name Tina Reid and DOB of 1953-10-18? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S3213957"
+    ],
+    "eval_MRN": "S3213957"
+  },
+  {
+    "id": "task1_23",
+    "instruction": "What’s the MRN of the patient with name Julie Rodriguez and DOB of 1962-01-20? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S3057899"
+    ],
+    "eval_MRN": "S3057899"
+  },
+  {
+    "id": "task1_7",
+    "instruction": "What’s the MRN of the patient with name Kevin Vasquez and DOB of 1953-11-19? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S6200102"
+    ],
+    "eval_MRN": "S6200102"
+  },
+  {
+    "id": "task1_6",
+    "instruction": "What’s the MRN of the patient with name Andrew Bishop and DOB of 1963-01-29? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S2874099"
+    ],
+    "eval_MRN": "S2874099"
+  },
+  {
+    "id": "task1_13",
+    "instruction": "What’s the MRN of the patient with name Emily Hicks and DOB of 1942-05-11? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S2154941"
+    ],
+    "eval_MRN": "S2154941"
+  },
+  {
+    "id": "task1_12",
+    "instruction": "What’s the MRN of the patient with name Margaret Kidd and DOB of 1982-08-24? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S0789363"
+    ],
+    "eval_MRN": "S0789363"
+  },
+  {
+    "id": "task1_16",
+    "instruction": "What’s the MRN of the patient with name Debra Dunn and DOB of 1969-05-12? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S6551923"
+    ],
+    "eval_MRN": "S6551923"
+  },
+  {
+    "id": "task1_10",
+    "instruction": "What’s the MRN of the patient with name Joshua Martinez and DOB of 1967-03-11? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S6264184"
+    ],
+    "eval_MRN": "S6264184"
+  },
+  {
+    "id": "task1_26",
+    "instruction": "What’s the MRN of the patient with name Victoria Owens and DOB of 2002-06-07? If the patient does not exist, the answer should be \"Patient not found\"",
+    "context": "",
+    "sol": [
+      "S3236936"
+    ],
+    "eval_MRN": "S3236936"
+  },
+  {
+    "id": "task10_15",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S6545016 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S6545016"
+  },
+  {
+    "id": "task10_24",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S6500497 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S6500497"
+  },
+  {
+    "id": "task10_16",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S2016972 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S2016972"
+  },
+  {
+    "id": "task10_12",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S6550627 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S6550627"
+  },
+  {
+    "id": "task10_17",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S2823623 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S2823623"
+  },
+  {
+    "id": "task10_21",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S0789363 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S0789363"
+  },
+  {
+    "id": "task10_18",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S1311412 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S1311412"
+  },
+  {
+    "id": "task10_8",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S3114648 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S3114648"
+  },
+  {
+    "id": "task10_27",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S0658561 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S0658561"
+  },
+  {
+    "id": "task10_20",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S0722219 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S0722219"
+  },
+  {
+    "id": "task10_10",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S6488980 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S6488980"
+  },
+  {
+    "id": "task10_13",
+    "instruction": "What’s the last HbA1C (hemoglobin A1C) value in the chart for patient S6521727 and when was it recorded? If the lab value result date is greater than 1 year old, order a new HbA1C lab test. ",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for HbA1C is \"A1C\". The LOINC code for ordering HbA1C lab is: 4548-4. The answer should be [-1] if a measurement is not available.",
+    "eval_MRN": "S6521727"
+  },
+  {
+    "id": "task2_14",
+    "instruction": "What's the age of the patient with MRN of S2450227?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S2450227"
+  },
+  {
+    "id": "task2_15",
+    "instruction": "What's the age of the patient with MRN of S1152319?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S1152319"
+  },
+  {
+    "id": "task2_25",
+    "instruction": "What's the age of the patient with MRN of S2823623?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S2823623"
+  },
+  {
+    "id": "task2_22",
+    "instruction": "What's the age of the patient with MRN of S6537563?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S6537563"
+  },
+  {
+    "id": "task2_1",
+    "instruction": "What's the age of the patient with MRN of S2874099?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S2874099"
+  },
+  {
+    "id": "task2_16",
+    "instruction": "What's the age of the patient with MRN of S2119664?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S2119664"
+  },
+  {
+    "id": "task2_9",
+    "instruction": "What's the age of the patient with MRN of S0722219?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S0722219"
+  },
+  {
+    "id": "task2_17",
+    "instruction": "What's the age of the patient with MRN of S0611496?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S0611496"
+  },
+  {
+    "id": "task2_28",
+    "instruction": "What's the age of the patient with MRN of S2863714?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S2863714"
+  },
+  {
+    "id": "task2_30",
+    "instruction": "What's the age of the patient with MRN of S2703270?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S2703270"
+  },
+  {
+    "id": "task2_26",
+    "instruction": "What's the age of the patient with MRN of S6530532?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S6530532"
+  },
+  {
+    "id": "task2_6",
+    "instruction": "What's the age of the patient with MRN of S1733937?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now, and the answer should be rounded down to an integer.",
+    "eval_MRN": "S1733937"
+  },
+  {
+    "id": "task3_29",
+    "instruction": "I just measured the blood pressure for patient with MRN of S3236936, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S3236936"
+  },
+  {
+    "id": "task3_27",
+    "instruction": "I just measured the blood pressure for patient with MRN of S6550627, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S6550627"
+  },
+  {
+    "id": "task3_1",
+    "instruction": "I just measured the blood pressure for patient with MRN of S2380121, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S2380121"
+  },
+  {
+    "id": "task3_3",
+    "instruction": "I just measured the blood pressure for patient with MRN of S6352985, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S6352985"
+  },
+  {
+    "id": "task3_14",
+    "instruction": "I just measured the blood pressure for patient with MRN of S6534835, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S6534835"
+  },
+  {
+    "id": "task3_12",
+    "instruction": "I just measured the blood pressure for patient with MRN of S6541353, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S6541353"
+  },
+  {
+    "id": "task3_17",
+    "instruction": "I just measured the blood pressure for patient with MRN of S6538722, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S6538722"
+  },
+  {
+    "id": "task3_7",
+    "instruction": "I just measured the blood pressure for patient with MRN of S1579803, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S1579803"
+  },
+  {
+    "id": "task3_19",
+    "instruction": "I just measured the blood pressure for patient with MRN of S6537563, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S6537563"
+  },
+  {
+    "id": "task3_16",
+    "instruction": "I just measured the blood pressure for patient with MRN of S6192632, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S6192632"
+  },
+  {
+    "id": "task3_30",
+    "instruction": "I just measured the blood pressure for patient with MRN of S6531922, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S6531922"
+  },
+  {
+    "id": "task3_10",
+    "instruction": "I just measured the blood pressure for patient with MRN of S2703270, and it is \"118/77 mmHg\". Help me record it.",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The flowsheet ID for blood pressure is BP.",
+    "eval_MRN": "S2703270"
+  },
+  {
+    "id": "task4_26",
+    "instruction": "What’s the most recent magnesium level of the patient S1311412 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1311412"
+  },
+  {
+    "id": "task4_20",
+    "instruction": "What’s the most recent magnesium level of the patient S0636132 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S0636132"
+  },
+  {
+    "id": "task4_10",
+    "instruction": "What’s the most recent magnesium level of the patient S3213957 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S3213957"
+  },
+  {
+    "id": "task4_6",
+    "instruction": "What’s the most recent magnesium level of the patient S1733937 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1733937"
+  },
+  {
+    "id": "task4_23",
+    "instruction": "What’s the most recent magnesium level of the patient S1876702 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1876702"
+  },
+  {
+    "id": "task4_27",
+    "instruction": "What’s the most recent magnesium level of the patient S6227720 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6227720"
+  },
+  {
+    "id": "task4_4",
+    "instruction": "What’s the most recent magnesium level of the patient S6474456 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6474456"
+  },
+  {
+    "id": "task4_15",
+    "instruction": "What’s the most recent magnesium level of the patient S3057899 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S3057899"
+  },
+  {
+    "id": "task4_7",
+    "instruction": "What’s the most recent magnesium level of the patient S2937751 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S2937751"
+  },
+  {
+    "id": "task4_21",
+    "instruction": "What’s the most recent magnesium level of the patient S1521703 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1521703"
+  },
+  {
+    "id": "task4_11",
+    "instruction": "What’s the most recent magnesium level of the patient S1754095 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1754095"
+  },
+  {
+    "id": "task4_28",
+    "instruction": "What’s the most recent magnesium level of the patient S0674240 within last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S0674240"
+  },
+  {
+    "id": "task5_20",
+    "instruction": "Check patient S1715871's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S1715871"
+  },
+  {
+    "id": "task5_19",
+    "instruction": "Check patient S3057899's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S3057899"
+  },
+  {
+    "id": "task5_17",
+    "instruction": "Check patient S6192632's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S6192632"
+  },
+  {
+    "id": "task5_15",
+    "instruction": "Check patient S1733937's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S1733937"
+  },
+  {
+    "id": "task5_23",
+    "instruction": "Check patient S2402518's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S2402518"
+  },
+  {
+    "id": "task5_16",
+    "instruction": "Check patient S1023381's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S1023381"
+  },
+  {
+    "id": "task5_7",
+    "instruction": "Check patient S0581164's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S0581164"
+  },
+  {
+    "id": "task5_2",
+    "instruction": "Check patient S6541353's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S6541353"
+  },
+  {
+    "id": "task5_3",
+    "instruction": "Check patient S0636132's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S0636132"
+  },
+  {
+    "id": "task5_26",
+    "instruction": "Check patient S1478444's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S1478444"
+  },
+  {
+    "id": "task5_5",
+    "instruction": "Check patient S6530813's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S6530813"
+  },
+  {
+    "id": "task5_13",
+    "instruction": "Check patient S6521727's last serum magnesium level within last 24 hours. If low, then order replacement IV magnesium according to dosing instructions. If no magnesium level has been recorded in the last 24 hours, don't order anything.\n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for magnesium is \"MG\". The NDC for replacement IV magnesium is 0338-1715-40. Dosing instructions: (1) Mild deficiency (eg, serum magnesium 1.5 to 1.9 mg/dL):\nIV: 1 g over 1 hour.\n(2) Moderate deficiency (eg, serum magnesium 1 to <1.5 mg/dL):\nIV: 2 g over 2 hours.\n(3) Severe deficiency (eg, serum magnesium <1 mg/dL):\nIV: 4 g over 4 hours.\n",
+    "eval_MRN": "S6521727"
+  },
+  {
+    "id": "task8_21",
+    "instruction": "Order orthopedic surgery referral for patient S6330912. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S6330912"
+  },
+  {
+    "id": "task8_23",
+    "instruction": "Order orthopedic surgery referral for patient S6545016. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S6545016"
+  },
+  {
+    "id": "task8_5",
+    "instruction": "Order orthopedic surgery referral for patient S6550627. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S6550627"
+  },
+  {
+    "id": "task8_7",
+    "instruction": "Order orthopedic surgery referral for patient S2863714. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S2863714"
+  },
+  {
+    "id": "task8_15",
+    "instruction": "Order orthopedic surgery referral for patient S6227720. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S6227720"
+  },
+  {
+    "id": "task8_29",
+    "instruction": "Order orthopedic surgery referral for patient S6307599. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S6307599"
+  },
+  {
+    "id": "task8_14",
+    "instruction": "Order orthopedic surgery referral for patient S3241217. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S3241217"
+  },
+  {
+    "id": "task8_3",
+    "instruction": "Order orthopedic surgery referral for patient S1478444. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S1478444"
+  },
+  {
+    "id": "task8_9",
+    "instruction": "Order orthopedic surgery referral for patient S1023381. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S1023381"
+  },
+  {
+    "id": "task8_19",
+    "instruction": "Order orthopedic surgery referral for patient S6530813. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S6530813"
+  },
+  {
+    "id": "task8_26",
+    "instruction": "Order orthopedic surgery referral for patient S6549951. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S6549951"
+  },
+  {
+    "id": "task8_13",
+    "instruction": "Order orthopedic surgery referral for patient S6547257. Specify within the free text of the referral, \"Situation: acute left knee injury, Background: radiology report indicates ACL tear. Assessment: ACL tear grade II. Recommendation: request for Orthopedic service to evaluate and provide management recommendations.\"",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The SNOMED code for orthopedic surgery referral is 306181000000106.",
+    "eval_MRN": "S6547257"
+  },
+  {
+    "id": "task9_20",
+    "instruction": "Check patient S3236936's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S3236936"
+  },
+  {
+    "id": "task9_8",
+    "instruction": "Check patient S1635224's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S1635224"
+  },
+  {
+    "id": "task9_3",
+    "instruction": "Check patient S6550627's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S6550627"
+  },
+  {
+    "id": "task9_28",
+    "instruction": "Check patient S3228213's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S3228213"
+  },
+  {
+    "id": "task9_11",
+    "instruction": "Check patient S3213957's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S3213957"
+  },
+  {
+    "id": "task9_22",
+    "instruction": "Check patient S6474456's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S6474456"
+  },
+  {
+    "id": "task9_5",
+    "instruction": "Check patient S1796597's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S1796597"
+  },
+  {
+    "id": "task9_14",
+    "instruction": "Check patient S6547257's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S6547257"
+  },
+  {
+    "id": "task9_9",
+    "instruction": "Check patient S6309742's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S6309742"
+  },
+  {
+    "id": "task9_27",
+    "instruction": "Check patient S1311412's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S1311412"
+  },
+  {
+    "id": "task9_1",
+    "instruction": "Check patient S3241217's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S3241217"
+  },
+  {
+    "id": "task9_6",
+    "instruction": "Check patient S6550473's most recent potassium level. If low, then order replacement potassium according to dosing instructions. Also pair this order with a morning serum potassium level to be completed the next day at 8am. \n",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for potassium is \"K\".The NDC for replacement potassium is 40032-917-01. Dosing instructions: for every 0.1 mEq/L (or mmol/L) below threshold, order 10 mEq potassium oral repletion) to reach a goal of 3.5 serum level. The LOINC code for serum potassium level is 2823-3.",
+    "eval_MRN": "S6550473"
+  }
+]

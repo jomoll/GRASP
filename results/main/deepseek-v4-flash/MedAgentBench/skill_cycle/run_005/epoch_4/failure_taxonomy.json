@@ -1,0 +1,16 @@
+{
+  "no_observation_found_returned_minus_one": "Returned -1 when no observation was found, but expected a different sentinel or empty response",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "age_value_mismatch": "Returned an age value that does not match the expected age for the patient",
+  "correct_actions_but_answer_mismatch": "Actions appear procedurally correct but final answer text does not match expected answer",
+  "patient_not_found_but_expected_found": "Returned 'Patient not found' when the patient actually exists in the system",
+  "date_filter_omitted": "date filter omitted",
+  "fhir_resource_wrong_field_extracted": "fhir resource wrong field extracted",
+  "answer_format_wrong_type": "answer format wrong type",
+  "subject_reference_missing_patient_prefix": "Posted Observation with subject.reference as bare MRN instead of 'Patient/MRN'",
+  "missing_follow_up_lab_order": "Agent correctly determined no replacement needed but failed to order the paired morning serum potassium lab as instructed",
+  "ordered_replacement_when_not_needed": "Agent ordered a potassium replacement with zero dose when level was not low, instead of omitting the replacement order",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "answer_submitted_before_verification": "answer submitted before verification"
+}

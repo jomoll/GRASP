@@ -1,0 +1,21 @@
+{
+  "date_filter_omitted": "date filter omitted",
+  "answer_format_wrong_type": "answer format wrong type",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "unnecessary_service_request_created": "Created and reported a ServiceRequest (order) when the task only asked for the existing lab value, adding an unwanted order.",
+  "observation_query_wrong_patient_reference": "Used an incorrect patient reference format in the Observation query (e.g., 'Patient/ID' instead of just the ID).",
+  "answer_missing_no_output": "The agent failed to produce a final answer (no FINISH output) after performing actions.",
+  "answer_invalid_placeholder_used": "Returned a sentinel placeholder value (e.g., \"-1\") instead of the actual required answer.",
+  "age_computation_incorrect": "Calculated the patient's age incorrectly, yielding the wrong numeric age.",
+  "patient_lookup_incorrect_not_found": "Returned 'Patient not found' when the patient actually exists, indicating a failed lookup or wrong query handling.",
+  "condition_check_missing": "Did not evaluate or apply the conditional logic specified in the instruction (e.g., date comparison).",
+  "date_filter_incorrect": "Applied an incorrect or improperly formatted date filter when querying observations.",
+  "missing_replacement_order": "Did not create the required replacement medication order when the lab value was low.",
+  "low_lab_value_not_triggering_order": "Failed to order replacement therapy when the lab value was below the threshold.",
+  "replacement_order_wrong_resource_type": "Created an order using the wrong FHIR resource type (e.g., ServiceRequest instead of MedicationRequest).",
+  "patient_lookup_missing_before_observation_query": "Attempted to query observations without first resolving the patient identifier via a Patient lookup.",
+  "service_request_note_not_array": "The ServiceRequest 'note' element is provided as an object instead of an array, violating the expected FHIR structure.",
+  "answer_missing_order_confirmation": "Final answer omits confirmation that an order was placed when the instruction required it.",
+  "answer_content_mismatch": "The content of the final answer does not match the expected narrative or required details (e.g., missing required fields, wrong phrasing).",
+  "patient_lookup_missing_before_order": "Created an order without first resolving the patient’s internal FHIR ID via a Patient lookup."
+}

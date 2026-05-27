@@ -1,0 +1,834 @@
+[
+  {
+    "id": 124,
+    "description": "The movie 'The King of Staten Island' was nominated for the Best Supporting Actress in a Motion Picture award at the 2020 Golden Globe Awards.",
+    "type": "INSERT",
+    "answer": "[('857d5e31bfd6ea5933f7ff276855be70',)]"
+  },
+  {
+    "id": 105,
+    "description": "The film titled 'New Movie' will be added to the Filmography table with the lead actor role and a note of '-' for the year 2019.",
+    "type": "INSERT",
+    "answer": "[('ae2213ddbcb907c43fd757035b363328',)]"
+  },
+  {
+    "id": 106,
+    "description": "The Grand River Bridge, a Steel Truss Bridge located in Tulsa at 36°8′28″N 96°0′21″W, was built in 1960 and listed on 2005-06-30 in Mayes County.",
+    "type": "INSERT",
+    "answer": "[('7f94ae2d334b9fa11f45c28a78a0ada8',)]"
+  },
+  {
+    "id": 167,
+    "description": "The 'Football Cup Phases and Rounds' table is being updated with the details of the fourth round of the first phase, which includes 16 clubs that were winners from the previous round, 24 clubs remaining, and 16 clubs involved. There are no new entries this round and no leagues entering at this round.",
+    "type": "INSERT",
+    "answer": "[('b6c2286b87032389a5a06f14b839e59c',)]"
+  },
+  {
+    "id": 182,
+    "description": "Insert 2015 EuroBasket statistics into Basketball Tournament Stats table with 8 games played, 9.1 points per game, 7.2 rebounds per game, and 1.9 assists per game.",
+    "type": "INSERT",
+    "answer": "[('423a38360a4f78624783200c46f02edc',)]"
+  },
+  {
+    "id": 119,
+    "description": "The Rangers team's home stadium is the Ibrox Stadium, which is located in Glasgow.",
+    "type": "INSERT",
+    "answer": "[('3745c5ef28397490cd0c48afc27e110b',)]"
+  },
+  {
+    "id": 179,
+    "description": "Insert data on the Serbian Election Results table with values for Party, Votes, %, Seats, and +/– including Democratic Party, 150000, 4.0, 10, and 0.",
+    "type": "INSERT",
+    "answer": "[('185af2ea784b9f19b4b36c4ef3c8fbde',)]"
+  },
+  {
+    "id": 143,
+    "description": "Insert into acting credits for the film 'The Social Network' with the year 2010 for a student role that was uncredited.",
+    "type": "INSERT",
+    "answer": "[('dc81d6c55867643a927f02ad8709a87e',)]"
+  },
+  {
+    "id": 190,
+    "description": "The winner of the music talent show 'Colourblind' held on 29 July 2002 was Darius Danesh. He secured the first position and the third runner-up position was also awarded to him. These details have been added to the table 'Music Talent Show Winners and Runners-up' with the respective values of '1' and '1'.",
+    "type": "INSERT",
+    "answer": "[('3e4f720fd8098b673c24367eb1ad7454',)]"
+  },
+  {
+    "id": 120,
+    "description": "To record the activation of smooth muscle cells, the data of 'Cell type', 'Organ/system', 'Activators ligands --> Gq-GPCRs', and 'Effects' were inserted into 'Smooth Muscle Cell Activation Table' with the information of platelets in the circulatory system being activated by the ligand prostaglandin E2, which inhibits aggregation.",
+    "type": "INSERT",
+    "answer": "[('359c47faa3ef06797d66536b72cf5a18',)]"
+  },
+  {
+    "id": 100,
+    "description": "Add ('2019', 'Aoharu Ride', 'Kou Mabuchi') to the 'Table of Year, Title, and Role' table through INSERT INTO command.",
+    "type": "INSERT",
+    "answer": "[('03b2eddd4fe471e0f29fc9e907fd5a5d',)]"
+  },
+  {
+    "id": 195,
+    "description": "In 2023, the athlete won the first place in the Half Marathon event at the Commonwealth Games held in Birmingham, United Kingdom.",
+    "type": "INSERT",
+    "answer": "[('ab5eade5b02dbab781dc86ef7955187f',)]"
+  },
+  {
+    "id": 157,
+    "description": "The Berjaya Times Square Tower A in Kuala Lumpur, Malaysia is a skyscraper and stands at 203 metres (666ft). It is used as a hotel, office, and retail space.",
+    "type": "INSERT",
+    "answer": "[('d91747b1b86cc9c6dce44f234558114e',)]"
+  },
+  {
+    "id": 193,
+    "description": "Add the following record to the 'Library Locations' table: Oregon City Library located at 606 John Adams Street in Oregon City, first opened in 1867 and currently opened in 2021.",
+    "type": "INSERT",
+    "answer": "[('4ed4df8f12755af8057399b96beae74f',)]"
+  },
+  {
+    "id": 153,
+    "description": "Insert into the table named venue table with columns named name, location and type, values 'Västerportshallen', 'Helsingborg', 'Indoor sports arena'.",
+    "type": "INSERT",
+    "answer": "[('49f548828d52e74dc8cc4996e4d2eb5d',)]"
+  },
+  {
+    "id": 189,
+    "description": "A SQL query is used to insert data into the table 'Episode Events', including the columns Episode Number, Air Date, Event 1, Event 2, Event 3, and Event 4. The values being inserted are 17, 20 July 2008, Pendulum, The Wall, Hang Tough, and Powerball.",
+    "type": "INSERT",
+    "answer": "[('d613141f116779c12d02ff32a47ce463',)]"
+  },
+  {
+    "id": 125,
+    "description": "The Newcastle Northstars club has added 19-year-old Mia Garcia, a right-handed female forward, to their list of hockey players.",
+    "type": "INSERT",
+    "answer": "[('512226ba65d6f2edaab4791993c9b3be',)]"
+  },
+  {
+    "id": 171,
+    "description": "A record of an actor's appearance in the variety show on SBS in 2021 is to be inserted into the ActorAppearances table with the values of their role as a guest and notes indicating it is their first appearance on the show.",
+    "type": "INSERT",
+    "answer": "[('fcdf02561ad367fb2aa27f1ccff32deb',)]"
+  },
+  {
+    "id": 184,
+    "description": "The player Albert Pujols was picked 31st in the 2001 draft by the team St. Louis Cardinals to play first base.",
+    "type": "INSERT",
+    "answer": "[('00189c1adbb8342f0a9a73ab7b4079bf',)]"
+  },
+  {
+    "id": 177,
+    "description": "Insert into table 'Athlete Results' with values '2012', 'Olympic Games', 'London, UK', 'Pole vault', '12th', '5.50 m'.",
+    "type": "INSERT",
+    "answer": "[('a22d1c7f3f5fa58bf0c4d23542746b30',)]"
+  },
+  {
+    "id": 164,
+    "description": "Insert into the table of local authorities in Merseyside the data for Formby Range, which has a civil parish status, a population of 4,567, belongs to Sefton district, and is a former local authority of Formby Urban District.",
+    "type": "INSERT",
+    "answer": "[('2e08df49e665b7a7958a888fdb659d93',)]"
+  },
+  {
+    "id": 129,
+    "description": "The data for Truro RFC's ground, town/village, and previous season ranking have been inserted into the rugby_teams table with values St Clements Hill, Truro, and 8th, respectively.",
+    "type": "INSERT",
+    "answer": "[('286996ab6f7836b1e50dbc1de9bebf10',)]"
+  },
+  {
+    "id": 127,
+    "description": "The athlete achieved 4th position in the World Championships held in Beijing, China in 2015 with a jump of 5.90 m. The achievement has been recorded in the Athletic Achievements database with the relevant information.",
+    "type": "INSERT",
+    "answer": "[('f2aa0adb80b62bdd2923583889ca64e8',)]"
+  },
+  {
+    "id": 188,
+    "description": "Add a new record to the 'Theatre Performances' table with values '2006' for Year, 'The History Boys' for Title, 'Dakin' for Role, and 'National Theatre' for Notes.",
+    "type": "INSERT",
+    "answer": "[('dcc0c30fd770bb49c76fb3c2ec7ebc1e',)]"
+  },
+  {
+    "id": 197,
+    "description": "A transfer was made in 2018 for Andrés Iniesta to Vissel Kobe for a fee of $30 million, and the details were recorded in the transfers table by inserting the values '8', 'MF', 'Andrés Iniesta', 'Vissel Kobe', 'Transfer fee: $30 million', and 'In 2018'.",
+    "type": "INSERT",
+    "answer": "[('0ce50a75936b75e1febab616b3735565',)]"
+  },
+  {
+    "id": 104,
+    "description": "Insert into Politicians (Name, Attended, Notability) values ('Kamala Harris', '1989', 'Senator of California (2017-2021), Vice President of the United States (2021-present)').",
+    "type": "INSERT",
+    "answer": "[('15d5cf9a5f866cfc817841a0910c025a',)]"
+  },
+  {
+    "id": 154,
+    "description": "The league standings table has been updated with Cruzeiro's poor performance, as they currently stand in 12th position with only 2 points from 9 games played, losing 9 games and having a negative goal difference of 18.",
+    "type": "INSERT",
+    "answer": "[('63fb9fc08e18f06a3985e8065f0c5ac2',)]"
+  },
+  {
+    "id": 175,
+    "description": "Usain Bolt won a bronze medal in Track and Field at the Men's 4x100m Relay event on 19 August and it was inserted into the Olympic_Medalists table.",
+    "type": "INSERT",
+    "answer": "[('2ac516ffbd50ad53e7997d6e24381df6',)]"
+  },
+  {
+    "id": 111,
+    "description": "Insert the name, attended period, and notability of Jane Smith into the database table.",
+    "type": "INSERT",
+    "answer": "[('efba0242971152e7ca3af47fd212d5c3',)]"
+  },
+  {
+    "id": 169,
+    "description": "Add David Lee to the Greek-lettered legislators table with the Original chapter being Kappa Xi and Notability being Member of the Michigan House of Representatives.",
+    "type": "INSERT",
+    "answer": "[('21009ca1992d739d438c6194280c4de3',)]"
+  },
+  {
+    "id": 186,
+    "description": "Simone Biles won a gold medal in Women's Artistic Individual All-Around gymnastics and was added to the Medalists table with her name, sport and event.",
+    "type": "INSERT",
+    "answer": "[('966b9c128089478e523bf8860e06e9a2',)]"
+  },
+  {
+    "id": 113,
+    "description": "Insert data into table `Ethnic Population Table` to show the number of Chinese Indonesian ethnicity people, which is 2.832 million, accounts for 1.20% of the total population in North Sumatra, Riau, Riau Islands, West Kalimantan, Jakarta, and Bangka-Belitung Islands.",
+    "type": "INSERT",
+    "answer": "[('5e94e71135c60d6683f5a37a144fad85',)]"
+  },
+  {
+    "id": 117,
+    "description": "On November 11, Dallas scored 2 and Detroit scored 4 in the Hockey_Game_Scores. Detroit's record was 7-8-2.",
+    "type": "INSERT",
+    "answer": "[('81d6d11ea306eed6a6f78ae7ae76f99a',)]"
+  },
+  {
+    "id": 128,
+    "description": "Insert 'Jane Smith' into Alumni with values of 'Theo' for School, 'PhD' for Degree, '2010' for Year, and 'Theology professor' for Description.",
+    "type": "INSERT",
+    "answer": "[('bef1f022c99d77f48548d8f3a1b21b02',)]"
+  },
+  {
+    "id": 131,
+    "description": "The Indiana High School Football Teams table will have a new record with the values: Homestead for School, Spartans for Mascot, Southwest Allen County Schools for School Corp., 2,600 for Size, 6A (6A) for IHSAA Class (Football), 1971 for Year Joined, and none (new school) for Other Conferences.",
+    "type": "INSERT",
+    "answer": "[('3125ae3a959845e0c2d0b89d6a2a8711',)]"
+  },
+  {
+    "id": 135,
+    "description": "In the table Athlete_results, a row is inserted with the values '2008' for Year, 'Olympic Games' for Competition, 'Beijing, China' for Venue, '1st' for Position, '800 metres' for Event, and '-' for Notes.",
+    "type": "INSERT",
+    "answer": "[('c1d746ff1a9b23942d78adc96772fba2',)]"
+  },
+  {
+    "id": 194,
+    "description": "The movie Mad Max: Fury Road was directed by George Miller and starring Tom Hardy and Charlize Theron. The genre of the movie is action and additional information can be found on its official website and IMDb. The data was inserted into the Movie_Info table with the following values: Title = 'Mad Max: Fury Road', Director = 'George Miller', Cast = 'Tom Hardy, Charlize Theron', Genre = 'Action', Notes = 'Official site, IMDb'.",
+    "type": "INSERT",
+    "answer": "[('e4e72271d8faf27dab4f97f55b821858',)]"
+  },
+  {
+    "id": 103,
+    "description": "The record of the 2019 Tony Awards nominees for Best Musical category includes Hamilton, who was nominated but did not win the award. The information was stored in the 'awards' table through the code: INSERT INTO awards (Year, Award, Category, Nominee, Result) VALUES ('2019', 'Tony Awards', 'Best Musical', 'Hamilton', 'Nominated')",
+    "type": "INSERT",
+    "answer": "[('5b503b5d6b92c6ee708f415d09bc31ca',)]"
+  },
+  {
+    "id": 114,
+    "description": "Add the row for the actor's acting role for the TV series 'Vikings' in the table 'Acting Roles' with the following details: the year is 2012-2013, the title is 'Vikings', the role is 'Rollo', and the notes indicate that it's a main role and the actor appeared in 16 episodes.",
+    "type": "INSERT",
+    "answer": "[('315997c113ea46d8fef69bbd7d68b9a8',)]"
+  },
+  {
+    "id": 181,
+    "description": "Insert 'Les Miserables' play, performed in 1990 at Palace Theatre in London West End, into `Actress Credits` table with the role of Fantine played by the actress and additional notes.",
+    "type": "INSERT",
+    "answer": "[('ba2be294999fb2d441ad66538bcc09aa',)]"
+  },
+  {
+    "id": 255,
+    "description": "In the 'Religious Composition by Year' database, update the percentage of Muslims to 6.8% for the year 2021.",
+    "type": "UPDATE",
+    "answer": "[('fd7e65407012e50f7cf3f6edee9a6062',)]"
+  },
+  {
+    "id": 235,
+    "description": "Set the coach to 'Bob Huggins' and the school to 'West Virginia' in the basketball_coaches table for the year 2022-23.",
+    "type": "UPDATE",
+    "answer": "[('a391727f5c975bda23b448b2d12bf2eb',)]"
+  },
+  {
+    "id": 262,
+    "description": "Update the 'Papal Encyclicals Table' by changing the 'Title (Latin)' to 'Updated latin title', 'Title (English translation)' to 'Updated english title', and 'Subject' to 'Updated subject' for No. 42.",
+    "type": "UPDATE",
+    "answer": "[('9a2910f6cd8c7e9a8e174f29fcd1787c',)]"
+  },
+  {
+    "id": 232,
+    "description": "Change the venue of athlete's results to Eugene, United States for the 100 m hurdles event in the USA Outdoor Championships held in 2006.",
+    "type": "UPDATE",
+    "answer": "[('5fa60bcd273b6348911aba7fee2e01e4',)]"
+  },
+  {
+    "id": 259,
+    "description": "Set shared elements to 2 for Germany in the Country Element Comparison table.",
+    "type": "UPDATE",
+    "answer": "[('f51f4c3590782434eeafabeb827582d8',)]"
+  },
+  {
+    "id": 248,
+    "description": "Japan's Olympic Medal Table has been updated with 2 Gold, 5 Silver, 4 Bronze and a total of 11 medals.",
+    "type": "UPDATE",
+    "answer": "[('15bfbd3dbe8b591afe92e0623dc64112',)]"
+  },
+  {
+    "id": 249,
+    "description": "Set the diameter of the Haughton meteorite crater to 25.5 kilometers in the Meteorite Crater Table.",
+    "type": "UPDATE",
+    "answer": "[('5ea50803d57b23f68c3a354a3280cda2',)]"
+  },
+  {
+    "id": 208,
+    "description": "Set the nationality of Ian Thorpe in the performance table to 'United Kingdom'.",
+    "type": "UPDATE",
+    "answer": "[('7f70dc0bf22e895608dce0a006773d84',)]"
+  },
+  {
+    "id": 281,
+    "description": "Change the state of Monogram_Town_State to 'Arizona' where Monogram is 'T'",
+    "type": "UPDATE",
+    "answer": "[('a5d93dcef2c929a016cffb804e8da612',)]"
+  },
+  {
+    "id": 220,
+    "description": "Update the tournament results for the Australian Open in 2006 to 'QF', 2007 to 'SF', 2008 to 'F', 2009 to 'A', 2011 to 'A', and 2012 to 'A' in the 'Tournament Results by Year' table.",
+    "type": "UPDATE",
+    "answer": "[('d83fc782bab16a0cc6bd4cdfd95ea9a0',)]"
+  },
+  {
+    "id": 219,
+    "description": "Update the note for John Smith in the College Alumni Information database to reflect that he is a successful investment banker with senior positions at top firms and is currently the CEO of a multinational financial services company.",
+    "type": "UPDATE",
+    "answer": "[('1fc4a13f5461683c14885a4cb91302d2',)]"
+  },
+  {
+    "id": 214,
+    "description": "In the `Miss World Winners` table, update the `Represented` column to 'Taiwan' where the value in the `Year` column is equal to '2015'.",
+    "type": "UPDATE",
+    "answer": "[('71abed9c1695263cfb257870b23b5951',)]"
+  },
+  {
+    "id": 206,
+    "description": "Change the rank of Montreal-Pierre Elliott Trudeau International Airport to 19 in the Airport Traffic Data table.",
+    "type": "UPDATE",
+    "answer": "[('80a95235674eabcad84ee692903a2a33',)]"
+  },
+  {
+    "id": 211,
+    "description": "Update the NBA Playoff History table for the Los Angeles Clippers to indicate that their last series win in the NBA playoffs was in the 2021 Western Semifinals, they currently have a losing streak of 1 series, and their most recent series loss was to the 2020 Denver Nuggets.",
+    "type": "UPDATE",
+    "answer": "[('58d4fc8c1e09ba0385674096dffc5c4a',)]"
+  },
+  {
+    "id": 293,
+    "description": "Change the values of Unknown's Pos and Name columns to 'FW' and 'Yuji Senuma' respectively, WHERE the No column is equal to '20'.",
+    "type": "UPDATE",
+    "answer": "[('23ad0b50709f6a89edb5fb1e07b1fe69',)]"
+  },
+  {
+    "id": 265,
+    "description": "The rugby team of Harvard was updated in `Rugby Teams and Their Accomplishments` by setting 'Champion' to '1 ( 2020 )' and 'Semifinalist' to '1 ( 2020 )'.",
+    "type": "UPDATE",
+    "answer": "[('c9ec2f56ab76791be794f772c8435aaa',)]"
+  },
+  {
+    "id": 287,
+    "description": "Change the position of draft picks in round 3 to Defensive Back.",
+    "type": "UPDATE",
+    "answer": "[('9f0b928a353c1e2c0d8a290f71aecae9',)]"
+  },
+  {
+    "id": 228,
+    "description": "The judges and assistants for the talent show's 'Groups' category have been updated to include Simon Cowell as both a judge and assistant. The update was made to the talent_show_judges table.",
+    "type": "UPDATE",
+    "answer": "[('39fc95462719ce9ac0d1855cc75376a9',)]"
+  },
+  {
+    "id": 246,
+    "description": "FC Cincinnati's Champions League Qualification History has been updated with Last Champions League Qualification as '2022-23', Method of Qualification as '2022 U.S. Open Cup', and Length of drought as '1 season'.",
+    "type": "UPDATE",
+    "answer": "[('1f1251d303ec8106a6770a4032cdf735',)]"
+  },
+  {
+    "id": 251,
+    "description": "Set the 'Notes' column to NULL in the 'movie_production' table where the 'Title' is 'Ala Vaikunthapurramuloo'.",
+    "type": "UPDATE",
+    "answer": "[('0ae5f103cbb6019645cb7c78d6081b8a',)]"
+  },
+  {
+    "id": 297,
+    "description": "Update the 2030 Central European Jamboree's theme to 'Unity'.",
+    "type": "UPDATE",
+    "answer": "[('8c50aa730fb772a4ab935adea2b5c4cc',)]"
+  },
+  {
+    "id": 254,
+    "description": "Set the 'Runs' attribute to 200 in the 'CricketPlayers' table for the player with the name 'Tom Smith'.",
+    "type": "UPDATE",
+    "answer": "[('ecdaa35620313e628cfccabfe7077e10',)]"
+  },
+  {
+    "id": 274,
+    "description": "Update the points to 18 in the Formula One Results table where the year is 2010 and the entrant is Red Bull Racing.",
+    "type": "UPDATE",
+    "answer": "[('88ce7eaacda0d4447797db74b985b311',)]"
+  },
+  {
+    "id": 288,
+    "description": "Update the year of ARIA Music Awards received by Gabriella Cilmi to 2010 in the Awards table.",
+    "type": "UPDATE",
+    "answer": "[('9003c2b25559dda93baa5dc125644a14',)]"
+  },
+  {
+    "id": 268,
+    "description": "Change the title and role of the radio jockey for the year 2019 to 'Radio City 91.1' in the database table 'roles_and_titles'.",
+    "type": "UPDATE",
+    "answer": "[('b3bea64c8651058003deb3da9cf293e8',)]"
+  },
+  {
+    "id": 271,
+    "description": "Change the 'School/Club Team' of Kyle Lowry in 'Toronto Raptors Players' to 'Cardinal Dougherty HS'.",
+    "type": "UPDATE",
+    "answer": "[('36b0750fed36fbfdf6e2ccdb04a8cb86',)]"
+  },
+  {
+    "id": 231,
+    "description": "Update the FS value to 11 for the competitor with rank 24 in the Figure Skating Competitors table.",
+    "type": "UPDATE",
+    "answer": "[('6fdbb3a9fa82e959841434090fc6ef5a',)]"
+  },
+  {
+    "id": 217,
+    "description": "The transfer fee for Neymar Jr. to Football Team Transfers has been updated to €250m.",
+    "type": "UPDATE",
+    "answer": "[('2e453672ce93cc7d66ce13dd7bfe5f70',)]"
+  },
+  {
+    "id": 233,
+    "description": "Change Lawrence Peckham's position to 2nd place in the high jump event at the 1984 Olympic Games.",
+    "type": "UPDATE",
+    "answer": "[('d51a079047ed3858c0c7e3b8f7bc8586',)]"
+  },
+  {
+    "id": 218,
+    "description": "Update the Midlands Region in the 'Irish Counties and Cities' table for County Kildare.",
+    "type": "UPDATE",
+    "answer": "[('59953e57110d3a12dcaeed23e0e1bb92',)]"
+  },
+  {
+    "id": 258,
+    "description": "Update the athlete's performance data in the 'athlete_performance' table for the '3000 m' event where the athlete finished in '2nd' position. Set the year to '1998', competition to 'Commonwealth Games', venue to 'Kuala Lumpur, Malaysia', position to '1st', and notes to '8:37.92'.",
+    "type": "UPDATE",
+    "answer": "[('147c911fdf1711a2fd97118f804f4d72',)]"
+  },
+  {
+    "id": 282,
+    "description": "Update the racing career table to set the series to 'Formula Two', races to '2', wins to '1', podiums to '2', points to '45', and final placing to '1st' where the season is '2017'.",
+    "type": "UPDATE",
+    "answer": "[('43a2f703c941a810133f81b8076e5ad7',)]"
+  },
+  {
+    "id": 250,
+    "description": "Change the Cuvée to 'Brut Réserve' for the Wine_Houses where the House is 'Pol Roger'",
+    "type": "UPDATE",
+    "answer": "[('d1153a14d43fc911bf5477ec19a6518a',)]"
+  },
+  {
+    "id": 263,
+    "description": "Set the 'Year Listed' of 'Windsor Castle' in the 'Historic England Listed Buildings' to 1992.",
+    "type": "UPDATE",
+    "answer": "[('aa6c20c9b138d2b53df547d4ead80be4',)]"
+  },
+  {
+    "id": 283,
+    "description": "The voting results for Saskatchewan show that 205000 people voted yes, representing 45.0% of the total votes, and 250000 people voted no, representing 55.0% of the total votes. The database will be updated accordingly with the following statement: UPDATE voting_results SET `Voted Yes` = '205000', `Percent Yes` = '45.0', `Voted No` = '250000', `Percent No` = '55.0' WHERE Jurisdiction = 'Saskatchewan';",
+    "type": "UPDATE",
+    "answer": "[('a9d13eaebc6ac190aedfb39c1b17418b',)]"
+  },
+  {
+    "id": 299,
+    "description": "Modify the capacity of the 'Princeton Tigers' team in the 'Team Information' table to '45,000'.",
+    "type": "UPDATE",
+    "answer": "[('99c46996d7dd6d2d5c8d13d622c8ac62',)]"
+  },
+  {
+    "id": 240,
+    "description": "Change the elevation of Mount Whitney to '14,494 ft 4,418.8 m' in the 'Mountain Peaks' table.",
+    "type": "UPDATE",
+    "answer": "[('cbc7abc2012d9d1036837967722d6af6',)]"
+  },
+  {
+    "id": 291,
+    "description": "Great Britain's bronze count in the Olympic Medal Table is updated to 5 and their total count is incremented by 1.",
+    "type": "UPDATE",
+    "answer": "[('5cf55dc8105e934e68f9ebd92bd30778',)]"
+  },
+  {
+    "id": 272,
+    "description": "Update the fastest lap in the Australian Formula 3 Championship 2008 standings to James Winslow for Round 10, Race 1.",
+    "type": "UPDATE",
+    "answer": "[('199c53dba2f4f45afc3184581f627422',)]"
+  },
+  {
+    "id": 227,
+    "description": "Update the 'Last series win in NBA Playoffs' to '2020 NBA Finals', set 'Losing streak' to '0', and clear 'Series losses - teams' fields for the 'Toronto Raptors' in the 'NBA Playoff History' table.",
+    "type": "UPDATE",
+    "answer": "[('813ca44e6cadbb77bccb38fc385bca8a',)]"
+  },
+  {
+    "id": 98,
+    "description": "What is the average total of player hale irwin, who had a t52 finish?",
+    "type": "aggregation-AVG",
+    "answer": [
+      "293.0"
+    ]
+  },
+  {
+    "id": 96,
+    "description": "what is the average number of gold medals won by china, japan, and north korea?",
+    "type": "aggregation-AVG",
+    "answer": [
+      "7"
+    ]
+  },
+  {
+    "id": 95,
+    "description": "What is the average year that the Belanger Motors had an Offenhauser l4 engine?",
+    "type": "aggregation-AVG",
+    "answer": [
+      "1956.0"
+    ]
+  },
+  {
+    "id": 88,
+    "description": "What is the latest season where he had 1 podium? ",
+    "type": "aggregation-MAX",
+    "answer": [
+      "2009.0"
+    ]
+  },
+  {
+    "id": 84,
+    "description": "What is the highest overall number one(s)?",
+    "type": "aggregation-MAX",
+    "answer": [
+      "3.0"
+    ]
+  },
+  {
+    "id": 86,
+    "description": "What is the highest amount of points for rank 95?",
+    "type": "aggregation-MAX",
+    "answer": [
+      "Đeravica"
+    ]
+  },
+  {
+    "id": 85,
+    "description": "what year was the last pylon in germany built?",
+    "type": "aggregation-MAX",
+    "answer": [
+      "1970"
+    ]
+  },
+  {
+    "id": 82,
+    "description": "When did the oldest airline start operations?",
+    "type": "aggregation-MIN",
+    "answer": [
+      "1941.0"
+    ]
+  },
+  {
+    "id": 81,
+    "description": "what year was the first title released?",
+    "type": "aggregation-MIN",
+    "answer": [
+      "2004"
+    ]
+  },
+  {
+    "id": 83,
+    "description": "What is the fewest number of games played?",
+    "type": "aggregation-MIN",
+    "answer": [
+      "34.0"
+    ]
+  },
+  {
+    "id": 76,
+    "description": "What is the earliest any of these players were born?",
+    "type": "aggregation-MIN",
+    "answer": [
+      "1976.0"
+    ]
+  },
+  {
+    "id": 69,
+    "description": "Name the total number of rr2 pts for won being 11",
+    "type": "aggregation-SUM",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 72,
+    "description": "what is the total number of medals between south korea, north korea, sweden, and brazil?",
+    "type": "aggregation-SUM",
+    "answer": [
+      "150"
+    ]
+  },
+  {
+    "id": 68,
+    "description": "What is the total pick # for the D position from a team from Chilliwack Bruins?",
+    "type": "aggregation-SUM",
+    "answer": [
+      "167.0"
+    ]
+  },
+  {
+    "id": 73,
+    "description": "add up the total number of goals scored by chipperfield and viduka.",
+    "type": "aggregation-SUM",
+    "answer": [
+      "5"
+    ]
+  },
+  {
+    "id": 48,
+    "description": "What was the score against Portland in game numbers under 20?",
+    "type": "comparison",
+    "answer": [
+      "L 97–98 (OT)"
+    ]
+  },
+  {
+    "id": 99,
+    "description": "was the daily mean for july higher or lower than the daily mean for the year?",
+    "type": "comparison",
+    "answer": [
+      "higher"
+    ]
+  },
+  {
+    "id": 41,
+    "description": "What is the US cash box before 1978 with a US billboard of 35?",
+    "type": "comparison",
+    "answer": [
+      "18.0"
+    ]
+  },
+  {
+    "id": 46,
+    "description": "What is Round, when Winner is \"Ivanovic\", when Year is less than 2008, and when Tournament is \"Paris\"?",
+    "type": "comparison",
+    "answer": [
+      "QF"
+    ]
+  },
+  {
+    "id": 37,
+    "description": "what is the name of the episode whose director is Michael Pressman and the number of that episode in that season is less than 10.0? ",
+    "type": "comparison",
+    "answer": [
+      "House of Cards"
+    ]
+  },
+  {
+    "id": 49,
+    "description": "Which November has a Game smaller than 16, and Points larger than 22?",
+    "type": "comparison",
+    "answer": [
+      "none"
+    ]
+  },
+  {
+    "id": 38,
+    "description": "What is the year of the first appearance of the Black Knights, who had less than 1 finals appearances?",
+    "type": "comparison",
+    "answer": [
+      "0.0"
+    ]
+  },
+  {
+    "id": 40,
+    "description": "which nation won gold but did not win silver?",
+    "type": "comparison",
+    "answer": [
+      "United States"
+    ]
+  },
+  {
+    "id": 33,
+    "description": "how many surfaces are grass?",
+    "type": "counting",
+    "answer": [
+      "2"
+    ]
+  },
+  {
+    "id": 32,
+    "description": "How many episodes aired Saturday, July 11, 2009",
+    "type": "counting",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 22,
+    "description": "how many games did the badgers play in october?",
+    "type": "counting",
+    "answer": [
+      "4"
+    ]
+  },
+  {
+    "id": 28,
+    "description": "what is the total number of participants between norway and france?",
+    "type": "counting",
+    "answer": [
+      "7"
+    ]
+  },
+  {
+    "id": 23,
+    "description": "what is the total number of websites listed?",
+    "type": "counting",
+    "answer": [
+      "17"
+    ]
+  },
+  {
+    "id": 18,
+    "description": "How many home losses occured when PF 13?",
+    "type": "counting",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 20,
+    "description": "Name the total number of represents for clary sermina delgado cid",
+    "type": "counting",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 0,
+    "description": "What are the Notes when the Method is decision?",
+    "type": "other",
+    "answer": [
+      "Women +60kg Bronze"
+    ]
+  },
+  {
+    "id": 1,
+    "description": "What in 2007 has a 2008 of sf, and a 2010 of f?",
+    "type": "other",
+    "answer": [
+      "F"
+    ]
+  },
+  {
+    "id": 8,
+    "description": "what was the number of apps for spartak nizhy novgorod?",
+    "type": "other",
+    "answer": [
+      "36"
+    ]
+  },
+  {
+    "id": 13,
+    "description": "what team took first place in 2008?",
+    "type": "other",
+    "answer": [
+      "Cairns Saints"
+    ]
+  },
+  {
+    "id": 12,
+    "description": "list the only coach that won promotion to the first tier.",
+    "type": "other",
+    "answer": [
+      "Ole Mørk"
+    ]
+  },
+  {
+    "id": 14,
+    "description": "did dallas or ottawa win the december 9, 1993 game?",
+    "type": "other",
+    "answer": [
+      "Dallas"
+    ]
+  },
+  {
+    "id": 2,
+    "description": "what was the total number of medals won by united states?",
+    "type": "other",
+    "answer": [
+      "2"
+    ]
+  },
+  {
+    "id": 64,
+    "description": "who came first john f. williams or william a. mann?",
+    "type": "ranking",
+    "answer": [
+      "William A. Mann"
+    ]
+  },
+  {
+    "id": 67,
+    "description": "which area under the satellite cities has the most in population?",
+    "type": "ranking",
+    "answer": [
+      "Taishan"
+    ]
+  },
+  {
+    "id": 53,
+    "description": "which island has the most area, tiree or kasos?",
+    "type": "ranking",
+    "answer": [
+      "Tiree"
+    ]
+  },
+  {
+    "id": 51,
+    "description": "Name the least matches for runs being 276",
+    "type": "ranking",
+    "answer": [
+      "12.0"
+    ]
+  },
+  {
+    "id": 65,
+    "description": "What band is the highest and has a System of gsm-450?",
+    "type": "ranking",
+    "answer": [
+      "450.0"
+    ]
+  },
+  {
+    "id": 63,
+    "description": "Name the least int yards when sacks is 11.5",
+    "type": "ranking",
+    "answer": [
+      "41.0"
+    ]
+  },
+  {
+    "id": 57,
+    "description": "What is the earliest game with a score of 99-89?",
+    "type": "ranking",
+    "answer": [
+      "13.0"
+    ]
+  }
+]

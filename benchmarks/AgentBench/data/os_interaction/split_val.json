@@ -1,0 +1,226 @@
+[
+  {
+    "id": "std-001-stock-00006",
+    "description": "Stock logs are shown in /usr/stock.log. The last two columns are stock index and count. Find the stock index with the highest count of transactions (combined purchases and sales)."
+  },
+  {
+    "id": "std-001-stock-00000",
+    "description": "Stock logs are shown in /usr/stock.log. The last two columns are stock index and count. Tell me how many times Alice sold a stock."
+  },
+  {
+    "id": "std-001-stock-00005",
+    "description": "Stock logs are shown in /usr/stock.log. The last two columns are stock index and count. Identify the most active traders (buyers/sellers) based on the count of their transactions."
+  },
+  {
+    "id": "std-002-environment-00000",
+    "description": "Tell me how many files can be executed in PATH."
+  },
+  {
+    "id": "std-002-environment-00001",
+    "description": "Tell me how many files can be executed directly no matter where my work dir is."
+  },
+  {
+    "id": "std-003-ac-00000",
+    "description": "Tell me the number of CPUs."
+  },
+  {
+    "id": "std-003-ac-00003",
+    "description": "Tell me whether npm is installed or not. If it is installed, return 'yes'. If it is not installed, return 'no'"
+  },
+  {
+    "id": "std-003-ac-00004",
+    "description": "Tell me whether npm is installed or not. If it is installed, return 'yes'. If it is not installed, return 'no'"
+  },
+  {
+    "id": "std-004-Q30-00000",
+    "description": "How many default paths are looked for when I execute an executable on this computer? (Regardless of whether the path exists or not.)"
+  },
+  {
+    "id": "std-004-Q30-00001",
+    "description": "How many default paths are looked for when I execute an executable on this computer? (Only existing and valid directories)"
+  },
+  {
+    "id": "std-004-N4-00000",
+    "description": "execute ~/test and get the output."
+  },
+  {
+    "id": "std-004-Q09-00000",
+    "description": "What is the total number of files in the /var directory? (recursively)"
+  },
+  {
+    "id": "std-004-N11-00000",
+    "description": "How many hidden files, which do not contain the character u, are in /usr? (not recursively)"
+  },
+  {
+    "id": "std-004-Q47-00000",
+    "description": "Move the file MyPersonalComputer.config to current directory. And tell me the path of the file before copying."
+  },
+  {
+    "id": "std-004-N41-00003",
+    "description": "If a regular file named \"workspace\" exists in /working (recursively)? If so, output \"yes\", otherwise output \"no\" (with out quotes)."
+  },
+  {
+    "id": "std-004-N41-00002",
+    "description": "If a regular file named \"workspace\" exists in /working (recursively)? If so, output \"yes\", otherwise output \"no\" (with out quotes)."
+  },
+  {
+    "id": "std-005-new-00001",
+    "description": "I would like to implement the following function: entering the \"count\" command will counts the number of regular files in a directory and its subdirectories(recursively), and displays the total count. If there is a link or something, count it separately. For example, I can enter \"count /usr/local\" to get the number of regular files in /usr/local recursively. If there are 5 regular files in that, the output is \"5\"."
+  },
+  {
+    "id": "std-005-new-00002",
+    "description": "I would like to implement a command line tool called \"date-format\" that can format a given date string based on the provided format string. For example, if I enter command date-format 2023-5-1 '%Y/%m/%d', the output will be 2023/05/01."
+  },
+  {
+    "id": "std-005-new-00004",
+    "description": "How many files whose name starts with letter exist in /usr?"
+  },
+  {
+    "id": "std-005-new-00005",
+    "description": "How much disk space is being used by /usr and all of its contents? Tell me in human-readable format."
+  },
+  {
+    "id": "std-007-bootstrap-00043",
+    "description": "You need to calculate the number of files and directories in the current user's home directory (excluding hidden files and directories) and multiply that by the number of non-empty text files (*.txt) within the current user's home directory.\n\nNote: You can assume that there are only ASCII characters in text files (*.txt).\n\nTo solve the problem, follow these steps:\n\n1. Calculate the number of (non-hidden) files and directories in the current user's home directory.\n2. Calculate the non-empty text files (*.txt) only in the current user's home directory.\n3. Multiply the result of step 1 with step 2.\n4. Output the final result."
+  },
+  {
+    "id": "std-007-bootstrap-00086",
+    "description": "As a student, your task is to determine how many lines of code (LOC) are written in the C programming language within a given directory structure. This directory structure contains multiple subdirectories and files with different programming languages.\n\nYou need to count the number of lines in all .c files present in the given directory and its subdirectories; your answer must be an integer.\n\nNote: You are only allowed to use the Linux command line and its utilities; you cannot use any other scripts or software to perform this task."
+  },
+  {
+    "id": "std-007-bootstrap-00017",
+    "description": "As a student, you must calculate the total number of bytes used by all the \".txt\" files in a given directory. This directory is created and filled with files using an initialization script. To solve this problem, you need to use the Linux command line tools in your Ubuntu operating system. After calculating the total number of bytes, submit your answer as an integer value."
+  },
+  {
+    "id": "std-007-bootstrap-00042",
+    "description": "As a student, you need to determine the total occupied storage space by all the `.txt` files in a given directory to understand how much storage the text files are consuming. You will be given a directory named \"files_directory\" with several files of various extensions. Your task is to calculate the total size in kilobytes (KB) of all `.txt` files in the \"files_directory\" directory and return the result as an integer."
+  },
+  {
+    "id": "std-007-bootstrap-00013",
+    "description": "You are given a folder named \"log_folder\" containing log files from a server. These log files are named in the format \"log_YYYY-MM-DD.txt\" (for example, \"log_2022-10-01.txt\"). Your task is to find out the number of log files in the \"log_folder\" that were created exactly 30 days or more ago from the current date."
+  },
+  {
+    "id": "std-007-bootstrap-00022",
+    "description": "In this problem, you are asked to calculate the total size (in kilobytes) of all regular files in a given directory in your Ubuntu operating system. The directory will be named 'test_directory' and will be located in the home folder. The directory will contain multiple regular files and subdirectories. You only have to calculate the size of regular files in the \"test_directory\" and ignore the files inside subdirectories.\n\nTo summarize, you must perform the following tasks:\n\n1. Navigate to the 'test_directory' located in your home folder.\n2. Calculate the total size (in kilobytes) of all regular files in the 'test_directory' (ignoring the files inside subdirectories)."
+  },
+  {
+    "id": "std-007-bootstrap-00060",
+    "description": "As a Linux user, you are required to find the total number of lines that contain a specific word or string across multiple files in a given directory (excluding subdirectories). You will use the word \"linux\" to search within the files. Your answer should be provided as an integer count of the number of lines containing the target word."
+  },
+  {
+    "id": "std-007-bootstrap-00081",
+    "description": "As a student, your task is to find the total number of files and directories in a given directory, excluding its subdirectories. Use the Linux command line to accomplish this task and submit your answer as an integer."
+  },
+  {
+    "id": "std-007-bootstrap-00023",
+    "description": "You are given a directory called \"reports\". Inside the directory \"reports\", there are many text files, each containing one line with an integer value. You need to calculate the sum of all integer values from all these text files, and output the result as an integer.\n\nIn summary, your task is to:\n\n1. Enter the \"reports\" directory.\n2. Read all the text files inside the \"reports\" directory.\n3. Calculate the sum of integer values inside each text file.\n4. Output the final sum as an integer."
+  },
+  {
+    "id": "std-007-bootstrap-00053",
+    "description": "As a student, you are given a directory named `log_files` containing log files from multiple servers. The log files are named as \"server1.log\", \"server2.log\", etc. Each log file contains a list of errors observed on that server.\n\nThe error messages have a specific format: a timestamp followed by an error code and error message, separated by colons. For example:\n\n```\n2022-02-28T10:30:23Z:ERR0001:Permission denied.\n2022-02-28T10:31:42Z:ERR0003:Failed to connect to the database.\n```\n\nYour task is to calculate the total number of errors with the error code 'ERR0003' found in all log files present in the `log_files` directory. \n\nThe answer must be an integer representing the total count of the 'ERR0003' error code in all log files."
+  },
+  {
+    "id": "std-007-bootstrap-00040",
+    "description": "A company stores their employee information in the form of text files in a folder called 'employees'. Each employee has a file named {employee_id}.txt, and each file contains numbered tasks assigned to the respective employee. The tasks are labeled as either 'urgent' or 'normal', and the label is followed by a colon and a positive integer denoting the time it takes to complete the task (in minutes).\n\nThe folder 'employees' contains the following six files: 101.txt, 102.txt, 103.txt, 104.txt, 105.txt, and 106.txt. Your task is to find the total amount of time, in minutes, needed to complete all urgent tasks assigned to all employees. The final result should be a single integer, which is the sum of urgent task times.\n\nExample of task list in an employee's file:\n```\nurgent:30\nnormal:10\nurgent:20\nnormal:15\n```"
+  },
+  {
+    "id": "std-007-bootstrap-00082",
+    "description": "As a student, you have been assigned a task to analyze the files in a directory and provide useful statistics. Your goal is to determine the total number of lines contained in all the \".txt\" files in the \"/home/student/files\" directory and its subdirectories.\n\nPlease provide your answer in the form of an integer, representing the sum of lines present in all \".txt\" files."
+  },
+  {
+    "id": "std-007-bootstrap-00035",
+    "description": "As a student, you are given a directory that contains several subdirectories. Each subdirectory contains a few text files. Your task is to find the total number of lines in all text files combined, and submit it as the answer. It is crucial to ensure you only count the lines from text files (.txt) and ignore other file types. Use the built-in Linux commands to achieve this."
+  },
+  {
+    "id": "std-007-bootstrap-00079",
+    "description": "As a student, you have been given a directory called \"logs\" containing multiple files. Each file contains lines representing status messages and logged events. You need to analyze these log files and answer the following question:\n\nHow many times the keyword \"ERROR\" appears across all the files in the \"logs\" directory?\n\nIn order to accomplish this task, you must create a single command line solution that processes the log files and returns the total count of occurrences of the keyword \"ERROR\" in the \"logs\" directory. Remember, the output must only contain a single integer representing the count of occurrences."
+  },
+  {
+    "id": "std-007-bootstrap-00012",
+    "description": "In this problem, you are required to determine the total number of files and directories present in a given directory, as well as the total size (in kilobytes) of those files and directories within that given directory. The answer should be a single integer representing the summation of the total number of files, directories, and their total combined size in kilobytes. \n\nFor example, if there are 10 files and 5 directories, and the total combined size of those files and directories is 500 KB, the output would be 515."
+  },
+  {
+    "id": "std-007-bootstrap-00085",
+    "description": "As a Linux user, you are required to find the total number of unique characters in a given log file. The file does not have any newline characters. The purpose of this problem is to identify your understanding of file management and text processing using command line.\n\n**Instructions:**\n\n1. In your Linux (Ubuntu) operating system initialize a file called `logfile.txt`.\n\n2. Count and print the number of unique characters in the `logfile.txt` file. The result must be an integer."
+  },
+  {
+    "id": "std-007-bootstrap-00078",
+    "description": "As a student using the Linux operating system (Ubuntu), your task is to count the total number of files and directories in a given directory tree (including the root directory). The given directory contains a mix of files and directories, including hidden ones (those starting with a period, .).\n\nYour challenge is to create and execute a bash script that will calculate the total file count and then output that count as a single integer. You should ignore symbolic links, sockets, and other file types in your count."
+  },
+  {
+    "id": "std-007-bootstrap-00076",
+    "description": "You have just joined a Linux system administration team, and one of the tasks assigned to you is to analyze and store log files generated by various applications. You should do the following:\n\n1. Write an initialization script that will create a directory named \"log_files\" and will generate 10 log files (log1.log to log10.log) within this directory. Each log file should contain between 5-10 lines with randomly generated timestamps followed by a log message (e.g., \"2022-03-02 15:30:45 Connection established\").\n2. Write a code snippet that, when executed, calculates the total number of lines across all log files in the \"log_files\" directory. Return this number (an integer) as the final output."
+  },
+  {
+    "id": "std-007-bootstrap-00029",
+    "description": "As a student, you are given a task to determine the number of directories, subdirectories and files in a specific directory. You need to write a shell script that will return the exact number of directories, subdirectories and files, excluding the parent directory and the current directory. The final answer should be a single integer (the sum of all directories, subdirectories, and files).\n\nTo ensure that everyone is working with the same directory structure, an initialization script has been provided. Execute this script to create the necessary directory structure and files for the problem.\n\nNote: The problem should be solved using the Linux operating system."
+  },
+  {
+    "id": "std-007-bootstrap-00083",
+    "description": "You are given a directory named 'log_files' which contains multiple log files. Each log file is named in the format 'log_server_X_YYYY-MM-DD.txt' where X is an integer server ID (between 1 and 100) and YYYY-MM-DD is the date. The content of each log file contains different integers, one integer per line. Your task is to find the sum of the integers present on the log files whose server ID is a prime number and was created within the last 7 days.\n\nWrite a bash script to calculate the required sum of integers and output the result."
+  },
+  {
+    "id": "std-007-bootstrap-00008",
+    "description": "In this problem, the students should calculate the total number of files and directories (recursive) in a given directory. The directory will be created and populated with files and directories by the initialization script. During the initialization, a specific environment variable `TARGET_DIR` will be set pointing to the created directory, which should be used by the students in their command.\n\nYou need to find the total number of files and directories (recursive) in the directory pointed by `TARGET_DIR`. Use the command line to achieve this and submit your answer as an integer. "
+  },
+  {
+    "id": "std-007-bootstrap-00024",
+    "description": "You are given a directory named 'logs' in your Linux operating system, which contains multiple log files for various days. Each log file has a specific naming format such as \"YYYY-MM-DD.log\". Your task is to count the total number of log files for a particular month provided to you in the format 'YYYY-MM' and return the count as an integer.\n\nFollow these steps:\n\n1. In your Linux (ubuntu) operating system, run the initialization bash script to create the \"logs\" directory with sample log files.\n2. Write a bash script that takes the 'YYYY-MM' as input, counts the total number of log files for that particular month, and returns the count as an integer."
+  },
+  {
+    "id": "std-007-bootstrap-00073",
+    "description": "In this task, you are required to calculate the total number of lines of code (LOC) written in Python (.py) files in a given directory and its subdirectories. The directory will be provided through the initialization script and will contain several Python files and subdirectories with Python files. Note that the directory and file structure may change with each new experiment. Your task is to interact with the Linux shell and find the total LOC in all Python files within the directory and its subdirectories."
+  },
+  {
+    "id": "std-007-bootstrap-00046",
+    "description": "The objective of this problem is to calculate the total number of occurrences of a specific word in the files inside a given directory. You will need to navigate through the Linux operating system, use shell commands and produce a single integer as output.\n\nHere is the detailed question description:\n\n1. You are given a directory named \"assignment\" in your home directory (`~/assignment/`).\n2. Inside the \"assignment\" directory, there are multiple files - both text and non-text.\n3. Your task is to find the total number of occurrences of the word \"Linux\" (case insensitive) in all the text files within this directory."
+  },
+  {
+    "id": "std-007-bootstrap-00037",
+    "description": "As a student, you are tasked with determining the number of directories and subdirectories in a given directory tree, specifically in the `/var/log` directory on an Ubuntu Linux operating system. Your task must be performed entirely through the command line using provided Linux tools.\n\nYou are required to write a shell script that will count the number of directories, both direct and nested, in the `/var/log` directory and output the total number in the form of an integer."
+  },
+  {
+    "id": "std-007-bootstrap-00070",
+    "description": "As a Linux system administrator, you are required to find out the total number of files within a given directory including all its subdirectories. The directory structure will be provided in the initialization bash script. You need to write a bash script that counts the total number of files and returns the answer as an integer."
+  },
+  {
+    "id": "std-007-bootstrap-00010",
+    "description": "In this problem, you are required to count the total number of lines and the total number of words in all '*.txt' files in your current working directory. The output should be an integer value which calculates the sum of the total number of lines and the total number of words as a single integer.\n\nNote: Make sure to consider only '*.txt' files in the current working directory and ignore files in subdirectories."
+  },
+  {
+    "id": "std-007-bootstrap-00048",
+    "description": "As a student, you are to find the total number of lines in all the \".txt\" files that contains the word \"Linux\" in a specific directory (called \"experiment\") and its subdirectories. Create this directory with some \".txt\" files, and ensure that some of the files contain the word \"Linux\". Your final output should be the integer representing the total number of lines containing \"Linux\" in all .txt files."
+  },
+  {
+    "id": "std-007-bootstrap-00015",
+    "description": "You have been given the responsibility to manage a list of files with specific naming conventions in your Linux operating system. To do this effectively, you need to perform the following tasks:\n\n1. Create a directory named \"file_analysis\" in the home directory.\n2. Inside the \"file_analysis\" directory, generate 100 text files named \"file-number.txt,\" where the number is replaced with their corresponding index in the range "
+  },
+  {
+    "id": "std-007-bootstrap-00068",
+    "description": "As a Linux student, you are tasked with calculating the total size of all `.txt` files within a specified directory and its subdirectories. The answer should be in kilobytes (KB) and rounded down to the nearest integer value. Assume that all directories and files have read permissions."
+  },
+  {
+    "id": "std-007-bootstrap-00058",
+    "description": "As a student, you need to find out the total number of unique file types (based on their extensions) in a given directory and its subdirectories in your Linux (ubuntu) operating system. The answer should be an integer representing the total count of unique file types.\n\nPlease note:\n\n1. Only consider files with extensions and ignore files without extensions.\n2. File extensions are case-insensitive (e.g., .txt and .TXT are the same type).\n3. Do not include directories in the count."
+  },
+  {
+    "id": "std-007-bootstrap-00005",
+    "description": "You are given a Linux file system with two directories named \"dir1\" and \"dir2\". Both directories contain a set of text files. Your task is to write a bash script to count the total number of lines in all the text files that reside in both \"dir1\" and \"dir2\". Please only consider the files with '.txt' extension."
+  },
+  {
+    "id": "std-007-bootstrap-00033",
+    "description": "As a student, you are requested to find the total number of files and directories inside a specific directory, including its subdirectories. The output should be an integer representing the total count without any extra information. The given directory will be named \"project_directory\"."
+  },
+  {
+    "id": "std-007-bootstrap-00077",
+    "description": "For this problem, you need to determine the total number of lines, words, and characters in all text files within a specific directory and its subdirectories in the Linux operating system. You will perform this task using the 'find' and 'wc' commands in the shell.\n\nGiven a directory path \"/home/user/project\", determine the total number of:\n\n1. Lines (L)\n2. Words (W)\n3. Characters (C)\n\nin all text files (*.txt) within the given directory and its subdirectories. Your final answer should be in the format: L + W + C."
+  },
+  {
+    "id": "std-007-bootstrap-00044",
+    "description": "As a student, you have been given the task of finding the total number of lines, within a specified set of text files, that contain a specific word. You will write a script using Linux (Ubuntu) shell commands to achieve this task. The specific word and the text files will be provided through an initialization script."
+  },
+  {
+    "id": "std-007-bootstrap-00045",
+    "description": "As a student, you are requested to find out the total number of lines containing a specific word in all the \".txt\" files within a given directory. You will be given the word \"Linux\" and a directory named \"files-dir\" containing some \".txt\" files with random content. The output should be a single integer representing the total count of lines containing the word \"Linux\" in all the \".txt\" files."
+  }
+]

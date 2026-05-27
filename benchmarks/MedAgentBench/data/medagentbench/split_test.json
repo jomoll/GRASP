@@ -1,0 +1,362 @@
+[
+  {
+    "id": "task6_1",
+    "instruction": "What is the average CBG of the patient S6307599 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6307599"
+  },
+  {
+    "id": "task6_2",
+    "instruction": "What is the average CBG of the patient S6539215 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6539215"
+  },
+  {
+    "id": "task6_3",
+    "instruction": "What is the average CBG of the patient S2863714 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S2863714"
+  },
+  {
+    "id": "task6_4",
+    "instruction": "What is the average CBG of the patient S6541609 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6541609"
+  },
+  {
+    "id": "task6_5",
+    "instruction": "What is the average CBG of the patient S6541353 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6541353"
+  },
+  {
+    "id": "task6_6",
+    "instruction": "What is the average CBG of the patient S3070524 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S3070524"
+  },
+  {
+    "id": "task6_7",
+    "instruction": "What is the average CBG of the patient S1152319 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1152319"
+  },
+  {
+    "id": "task6_8",
+    "instruction": "What is the average CBG of the patient S2450227 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S2450227"
+  },
+  {
+    "id": "task6_9",
+    "instruction": "What is the average CBG of the patient S6538722 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6538722"
+  },
+  {
+    "id": "task6_10",
+    "instruction": "What is the average CBG of the patient S6268253 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6268253"
+  },
+  {
+    "id": "task6_11",
+    "instruction": "What is the average CBG of the patient S6540602 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6540602"
+  },
+  {
+    "id": "task6_12",
+    "instruction": "What is the average CBG of the patient S6222362 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6222362"
+  },
+  {
+    "id": "task6_13",
+    "instruction": "What is the average CBG of the patient S2075210 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S2075210"
+  },
+  {
+    "id": "task6_14",
+    "instruction": "What is the average CBG of the patient S3032536 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S3032536"
+  },
+  {
+    "id": "task6_15",
+    "instruction": "What is the average CBG of the patient S1777769 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1777769"
+  },
+  {
+    "id": "task6_16",
+    "instruction": "What is the average CBG of the patient S6549951 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6549951"
+  },
+  {
+    "id": "task6_17",
+    "instruction": "What is the average CBG of the patient S1311412 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1311412"
+  },
+  {
+    "id": "task6_18",
+    "instruction": "What is the average CBG of the patient S1478444 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1478444"
+  },
+  {
+    "id": "task6_19",
+    "instruction": "What is the average CBG of the patient S2197736 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S2197736"
+  },
+  {
+    "id": "task6_20",
+    "instruction": "What is the average CBG of the patient S6426560 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6426560"
+  },
+  {
+    "id": "task6_21",
+    "instruction": "What is the average CBG of the patient S6488980 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6488980"
+  },
+  {
+    "id": "task6_22",
+    "instruction": "What is the average CBG of the patient S6530813 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6530813"
+  },
+  {
+    "id": "task6_23",
+    "instruction": "What is the average CBG of the patient S0674240 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S0674240"
+  },
+  {
+    "id": "task6_24",
+    "instruction": "What is the average CBG of the patient S0581164 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S0581164"
+  },
+  {
+    "id": "task6_25",
+    "instruction": "What is the average CBG of the patient S1754095 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S1754095"
+  },
+  {
+    "id": "task6_26",
+    "instruction": "What is the average CBG of the patient S3228213 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S3228213"
+  },
+  {
+    "id": "task6_27",
+    "instruction": "What is the average CBG of the patient S2402518 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S2402518"
+  },
+  {
+    "id": "task6_28",
+    "instruction": "What is the average CBG of the patient S6542579 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6542579"
+  },
+  {
+    "id": "task6_29",
+    "instruction": "What is the average CBG of the patient S6330912 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S6330912"
+  },
+  {
+    "id": "task6_30",
+    "instruction": "What is the average CBG of the patient S3241217 over the last 24 hours?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\". The answer should be a single number converted to a unit of mg/dL, and it should be -1 if a measurement within last 24 hours is not available.",
+    "eval_MRN": "S3241217"
+  },
+  {
+    "id": "task7_1",
+    "instruction": "What is the most recent CBG of the patient S2823623?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S2823623"
+  },
+  {
+    "id": "task7_2",
+    "instruction": "What is the most recent CBG of the patient S2197736?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S2197736"
+  },
+  {
+    "id": "task7_3",
+    "instruction": "What is the most recent CBG of the patient S6265496?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6265496"
+  },
+  {
+    "id": "task7_4",
+    "instruction": "What is the most recent CBG of the patient S6530532?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6530532"
+  },
+  {
+    "id": "task7_5",
+    "instruction": "What is the most recent CBG of the patient S6542579?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6542579"
+  },
+  {
+    "id": "task7_6",
+    "instruction": "What is the most recent CBG of the patient S0611496?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S0611496"
+  },
+  {
+    "id": "task7_7",
+    "instruction": "What is the most recent CBG of the patient S3084624?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S3084624"
+  },
+  {
+    "id": "task7_8",
+    "instruction": "What is the most recent CBG of the patient S6307599?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6307599"
+  },
+  {
+    "id": "task7_9",
+    "instruction": "What is the most recent CBG of the patient S2748981?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S2748981"
+  },
+  {
+    "id": "task7_10",
+    "instruction": "What is the most recent CBG of the patient S0674240?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S0674240"
+  },
+  {
+    "id": "task7_11",
+    "instruction": "What is the most recent CBG of the patient S0658561?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S0658561"
+  },
+  {
+    "id": "task7_12",
+    "instruction": "What is the most recent CBG of the patient S1891852?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S1891852"
+  },
+  {
+    "id": "task7_13",
+    "instruction": "What is the most recent CBG of the patient S3213957?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S3213957"
+  },
+  {
+    "id": "task7_14",
+    "instruction": "What is the most recent CBG of the patient S6539215?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6539215"
+  },
+  {
+    "id": "task7_15",
+    "instruction": "What is the most recent CBG of the patient S6550473?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6550473"
+  },
+  {
+    "id": "task7_16",
+    "instruction": "What is the most recent CBG of the patient S6547257?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6547257"
+  },
+  {
+    "id": "task7_17",
+    "instruction": "What is the most recent CBG of the patient S1353305?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S1353305"
+  },
+  {
+    "id": "task7_18",
+    "instruction": "What is the most recent CBG of the patient S6521727?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6521727"
+  },
+  {
+    "id": "task7_19",
+    "instruction": "What is the most recent CBG of the patient S6426560?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6426560"
+  },
+  {
+    "id": "task7_20",
+    "instruction": "What is the most recent CBG of the patient S2380121?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S2380121"
+  },
+  {
+    "id": "task7_21",
+    "instruction": "What is the most recent CBG of the patient S2874099?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S2874099"
+  },
+  {
+    "id": "task7_22",
+    "instruction": "What is the most recent CBG of the patient S6474456?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6474456"
+  },
+  {
+    "id": "task7_23",
+    "instruction": "What is the most recent CBG of the patient S6550627?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6550627"
+  },
+  {
+    "id": "task7_24",
+    "instruction": "What is the most recent CBG of the patient S2075210?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S2075210"
+  },
+  {
+    "id": "task7_25",
+    "instruction": "What is the most recent CBG of the patient S0789363?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S0789363"
+  },
+  {
+    "id": "task7_26",
+    "instruction": "What is the most recent CBG of the patient S2199765?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S2199765"
+  },
+  {
+    "id": "task7_27",
+    "instruction": "What is the most recent CBG of the patient S1698248?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S1698248"
+  },
+  {
+    "id": "task7_28",
+    "instruction": "What is the most recent CBG of the patient S6534835?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6534835"
+  },
+  {
+    "id": "task7_29",
+    "instruction": "What is the most recent CBG of the patient S1374652?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S1374652"
+  },
+  {
+    "id": "task7_30",
+    "instruction": "What is the most recent CBG of the patient S6531922?",
+    "context": "It's 2023-11-13T10:15:00+00:00 now. The code for CBG is \"GLU\"",
+    "eval_MRN": "S6531922"
+  }
+]

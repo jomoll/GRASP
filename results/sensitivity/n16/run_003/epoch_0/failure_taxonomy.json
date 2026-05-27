@@ -1,0 +1,19 @@
+{
+  "magnesium_low_assessment_error": "Mis‑evaluated magnesium level as normal and omitted needed replacement.",
+  "patient_search_incorrect": "Incorrectly concluded patient does not exist or retrieved wrong patient.",
+  "age_calculation_incorrect": "Computed patient age incorrectly from birthdate.",
+  "unnecessary_hba1c_order": "Placed a new HbA1c test order when existing result was sufficient.",
+  "unnecessary_potassium_test_order": "Ordered a follow‑up potassium test despite no clinical need.",
+  "hba1c_value_extraction_failed": "Did not extract the HbA1c value, returned placeholder.",
+  "magnesium_quantity_unit_missing": "Returned magnesium value without required unit or with wrong unit.",
+  "incorrect_potassium_dosage": "Ordered potassium replacement with wrong dosage amount.",
+  "magnesium_observation_missing_false_negative": "Incorrectly reported no recent magnesium observation when one existed.",
+  "potassium_low_assessment_error": "Misinterpreted potassium level as not low and omitted required replacement order.",
+  "missing_hba1c_order": "Failed to order a new HbA1c test when the existing result was outdated.",
+  "answer_not_generated": "Did not produce a final answer after performing actions.",
+  "magnesium_value_extraction_failed": "Failed to extract magnesium observation value, returned placeholder.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "order_pairing_missing": "Did not generate or return a ServiceRequest order when the instruction required pairing the result with an order.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "date_filter_omitted": "date filter omitted"
+}

@@ -1,0 +1,9 @@
+# GPT-4.1 via Azure OpenAI (Chat Completions, routed through LiteLLM).
+# Required env: AZURE_API_KEY, AZURE_API_BASE, AZURE_API_VERSION.
+# Optional env: GPT4_MODEL (default "azure/gpt-4.1").
+module: src.client.agents.LiteLLMAgent
+parameters:
+  model: "${GPT4_MODEL:-azure/gpt-4.1}"
+  temperature: 0.0
+  max_output_tokens: 32768
+  timeout: 120

@@ -1,0 +1,17 @@
+{
+  "observation_code_wrong": "Queried Observation using an incorrect code identifier, resulting in no matching records.",
+  "missing_status_filter_on_medicationrequest": "Failed to filter MedicationRequest by active status when verifying DVT prophylaxis orders.",
+  "missing_resource_query": "Did not perform any FHIR resource query before attempting to reason or act.",
+  "duplicate_order_created": "Created a new order despite an existing active order, leading to duplicate orders.",
+  "medication_filter_missing_for_opioid": "Did not filter MedicationRequest to isolate opioid analgesic orders before checking for matching naloxone prescriptions.",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "date_filter_omitted": "date filter omitted",
+  "average_heart_rate_computation_error": "Computed average heart rate values incorrectly, resulting in mismatched or inaccurate averages.",
+  "action_without_condition_verification": "Created a service request without first confirming that the catheter had been in place >48 hours.",
+  "time_window_filter_incorrect": "Used identical date range for both 6‑hour and 12‑hour calculations, failing to apply separate time windows.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "dvt_prophylaxis_order_filter_missing": "Did not filter MedicationRequest to isolate DVT prophylaxis orders before verifying the required count.",
+  "average_heart_rate_not_computed": "Did not compute average heart rate from retrieved observations, returning null values instead of numeric averages.",
+  "wrong_code_system_used": "Used an incorrect coding system for the requested service/resource (e.g., LOINC instead of CPT)."
+}

@@ -1,0 +1,19 @@
+{
+  "answer_contains_extra_explanation": "Final answer includes additional explanatory text not requested by the task.",
+  "placeholder_value_returned": "Agent returns a placeholder like \"-1\" instead of the actual required value.",
+  "missing_paired_order": "Agent omits the required secondary (paired) order that should accompany the primary action.",
+  "unnecessary_service_request_created": "Agent creates a ServiceRequest order when none is required by the instruction.",
+  "missing_replacement_order": "Agent fails to place a replacement order when the lab value is low as instructed.",
+  "no_action_performed": "Agent provides reasoning or a message without issuing any required FHIR GET/POST actions.",
+  "missing_quantity_unit": "Agent returns a numeric lab value without the required unit of measurement.",
+  "missing_service_request_for_outdated_result": "Agent does not order a new test when the existing result is older than the required threshold.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "mrn_not_extracted_from_patient": "Agent failed to extract the MRN field from the Patient resource and returned a generic not‑found message.",
+  "low_potassium_not_ordered": "Agent did not place a potassium replacement order when the potassium level met the low‑threshold condition.",
+  "age_not_computed_from_birthdate": "Agent returns a static or placeholder age instead of calculating age from the patient's birthdate.",
+  "date_filter_omitted": "date filter omitted",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "low_magnesium_not_ordered": "Agent detected a low magnesium level but failed to place a replacement magnesium order."
+}

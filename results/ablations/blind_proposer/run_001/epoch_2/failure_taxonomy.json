@@ -1,0 +1,19 @@
+{
+  "conditional_order_not_created": "Failed to create an order when the condition required it.",
+  "multiple_answer_items_returned": "Returned multiple separate strings instead of a single combined answer.",
+  "answer_format_sentence_returned": "Provided a full sentence answer rather than the required raw value.",
+  "answer_format_combined_value": "Returned value and date combined in a single string.",
+  "no_fhir_action_performed": "Did not execute any FHIR GET/POST actions before answering.",
+  "age_value_without_unit": "Returned age number without specifying 'years' unit.",
+  "quantity_unit_missing": "Returned numeric value without the required unit.",
+  "answer_format_wrong_type": "Returned answer as a list instead of plain string.",
+  "unnecessary_service_request_created": "Ordered a new test when not required by the condition.",
+  "placeholder_minus_one_returned": "Returned sentinel '-1' placeholder instead of actual result.",
+  "threshold_evaluation_missing": "Returned raw lab value without applying the low‑threshold decision logic required by the instruction.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "date_format_mismatch": "Returned a date string that does not match the required ISO datetime format (missing time component).",
+  "patient_not_found_misinterpreted": "Answered \"Patient not found\" despite the patient existing, indicating failure to correctly interpret the patient lookup result.",
+  "observation_missing_but_exists": "Returned a 'no recent observation' message when a valid observation exists, failing to provide the required value.",
+  "fhir_resource_wrong_field_extracted": "fhir resource wrong field extracted",
+  "age_value_with_unit_returned": "Returned the patient's age as a string that includes the unit (e.g., \"60 years\") instead of a plain numeric value."
+}

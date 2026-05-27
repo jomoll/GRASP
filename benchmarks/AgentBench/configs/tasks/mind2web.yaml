@@ -1,0 +1,39 @@
+default:
+  module: src.server.tasks.mind2web.Mind2Web
+  docker:
+    image: longinyu/agentbench-mind2web
+    command: python -m pip install --disable-pip-version-check --timeout 60 --retries 10 agentrl-worker;
+  parameters:
+    concurrency: 10
+    data:
+      data_path: "."
+      cache_path: "./data/mind2web/.cache/data"
+      score_file: /root/work/data/scores_all_data.pkl
+    train:
+      neg_ratio: 0.2
+      num_candidates: 5
+      max_context_len: 512
+    model:
+      mode: "multichoice"
+      name: flan-t5-base
+      model_name_or_path: "/root/models/flan-t5-base"
+      max_seq_length: 2048
+    eval:
+      topk: 10
+    seed: 123
+    llm_prompt: data/mind2web/prompt/llm_prompt_cot.json
+
+m2w-dev:
+  parameters:
+    name: "m2w-dev"
+    data:
+      test_split_files:
+        test_domain: /root/work/data/data_dev/*.json
+
+m2w-std:
+  parameters:
+    name: "m2w-std"
+    range_max: 612
+    data:
+      test_split_files:
+        test_domain: /root/work/data/test_domain/*.json

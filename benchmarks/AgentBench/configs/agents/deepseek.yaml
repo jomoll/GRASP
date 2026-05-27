@@ -1,0 +1,17 @@
+# DeepSeek V4 Flash, self-hosted behind an OpenAI-compatible endpoint.
+# Required env: DEEPSEEK_API_BASE.
+# Optional env: DEEPSEEK_API_KEY (default "EMPTY"), DEEPSEEK_MODEL (default "deepseek-v4-flash").
+module: src.client.agents.HTTPAgent
+parameters:
+  url: "${DEEPSEEK_API_BASE}/chat/completions"
+  headers:
+    Authorization: "Bearer ${DEEPSEEK_API_KEY:-EMPTY}"
+    Content-Type: "application/json"
+  body:
+    model: "${DEEPSEEK_MODEL:-deepseek-v4-flash}"
+    temperature: 0.0
+    max_tokens: 8192
+  prompter:
+    name: role_content_dict
+    args:
+      agent_role: "assistant"

@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Always select the most recent relevant observation when multiple results are available for a lab or vital sign.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the response answers all components of the task, including both reporting results and taking additional required actions.",
+    "counter": 2
+  },
+  {
+    "text": "If the most recent result does not meet recency or validity requirements specified in the task, proceed with the required follow-up action.",
+    "counter": 2
+  },
+  {
+    "text": "FINISH output should always include the final, most up-to-date value and its associated timestamp, or indicate “-1” if no value is available.",
+    "counter": 2
+  },
+  {
+    "text": "Always check if additional actions are required based on the result and task instructions before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "If a measurement or result is unavailable, return the specified placeholder or follow task-directed output conventions.",
+    "counter": 2
+  },
+  {
+    "text": "Compare relevant dates with current time to determine if follow-up actions (such as ordering tests) are needed.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure answers and decisions are based on both retrieved data and explicit task requirements.",
+    "counter": 2
+  },
+  {
+    "text": "Always ensure all parts of a multi-step task are addressed before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "If required data is not found, check if a subsequent action (such as ordering a new test) is necessary before completing the task.",
+    "counter": 2
+  },
+  {
+    "text": "Carefully read task instructions to determine if further API actions are required based on the data retrieved.",
+    "counter": 2
+  },
+  {
+    "text": "Only call FINISH when all conditional logic in the task has been fully considered and acted upon.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple observations are returned, always identify the most recent result within the required time window by comparing timestamps.",
+    "counter": 2
+  },
+  {
+    "text": "Use task-specific criteria (such as value ranges and definitions for “low” or “normal”) to determine the correct clinical action.",
+    "counter": 2
+  },
+  {
+    "text": "If no observation meets the criteria for the required time window, report that no relevant result is available and do not proceed with further actions.",
+    "counter": 2
+  },
+  {
+    "text": "Clearly state in the final output both the observed value and the corresponding action or inaction, based on the decision logic.",
+    "counter": 2
+  },
+  {
+    "text": "Always check for additional task requirements after retrieving data, such as time constraints or follow-up actions, before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "Return structured answers that include all requested information and ensure follow-up actions are addressed if criteria are met.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple relevant observations exist, select the most recent one based on the provided dates.",
+    "counter": 2
+  },
+  {
+    "text": "If no relevant data is found or available, explicitly indicate this in the answer as required by the task instructions.",
+    "counter": 2
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "answer_format_string_instead_of_integer": "Returned the age as a string instead of the expected integer type.",
+  "date_filter_misformatted": "Used an incorrect or incomplete date filter syntax for retrieving observations within the last 24 hours.",
+  "missing_patient_lookup_action": "Provided reasoning but never executed the required Patient lookup request.",
+  "answer_format_extra_text_instead_of_list": "Included explanatory text in the answer rather than providing a plain list of required items.",
+  "patient_not_found_incorrect_assumption": "Returned 'Patient not found' despite patient existing in the system.",
+  "unnecessary_hba1c_order_created": "Created a ServiceRequest for HbA1c when ordering was not required by the task logic.",
+  "missing_fhir_query_action": "Did not perform any FHIR request before producing the final answer.",
+  "quantity_unit_mismatch_missing": "Returned a numeric value without the required unit of measurement.",
+  "answer_format_sentence_instead_of_list": "Provided the answer as a full sentence rather than the expected list format.",
+  "answer_format_combined_string_instead_of_list": "Returned a single combined string rather than separate list elements for value and date.",
+  "observation_parsing_failed_returned_placeholder": "Returned placeholder '-1' instead of extracting the actual observation value.",
+  "date_filter_omitted": "date filter omitted",
+  "answer_missing_created_order": "Final answer omitted the order that was created during the trace.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "wrong_resource_type_created": "Created a resource of the wrong FHIR type for the intended action (e.g., Observation instead of ServiceRequest).",
+  "answer_includes_value_despite_order": "Returned the lab value and date even after creating a new order, contrary to the expected output which should only confirm the order."
+}

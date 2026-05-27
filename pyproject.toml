@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# Distribution name on PyPI ("grasp" is taken). The import package is still
+# `grasp` (see [tool.setuptools.packages.find]): `pip install grasp-skills`
+# then `import grasp`.
+name = "grasp-skills"
+version = "0.1.0"
+description = "GRASP — self-improvement via a regression-gated skill library learned from an agent's own failure traces"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Johannes Moll" },
+    { name = "Jean-Philippe Corbeil" },
+    { name = "Jiazhen Pan" },
+    { name = "Martin Hadamitzky" },
+    { name = "Daniel Rueckert" },
+    { name = "Lisa Adams" },
+    { name = "Keno Bressem" },
+]
+keywords = ["llm-agents", "self-improvement", "skill-learning", "benchmark"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Science/Research",
+]
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/jomoll/GRASP"
+Repository = "https://github.com/jomoll/GRASP"
+
+[tool.setuptools.packages.find]
+include = ["grasp*"]

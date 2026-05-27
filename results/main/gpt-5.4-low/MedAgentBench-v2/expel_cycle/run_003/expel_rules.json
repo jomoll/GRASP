@@ -1,0 +1,82 @@
+[
+  {
+    "text": "For medication-order verification tasks, search broadly enough to capture all potentially relevant active orders before deciding none exist; do not rely on a single narrow category if duplicates could appear in other medication categories.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires keeping exactly one order, inspect returned medication details and timestamps to identify matching or duplicate therapies and determine the newest order before taking action.",
+    "counter": 2
+  },
+  {
+    "text": "Do not claim a chart state was fully verified unless the available queries actually checked all relevant resources and constraints needed for that conclusion.",
+    "counter": 2
+  },
+  {
+    "text": "Before planning to discontinue, modify, or clean up duplicates, confirm the available API supports that action; if it does not, avoid promising unsupported changes and state the limitation clearly.",
+    "counter": 2
+  },
+  {
+    "text": "Use the most direct resource and task-specific search parameters first; avoid broad paginated searches unless targeted queries fail and are truly necessary.",
+    "counter": 2
+  },
+  {
+    "text": "Before placing an order that depends on prior clinical evidence, verify the triggering condition from the data and state the exact evidence used.",
+    "counter": 2
+  },
+  {
+    "text": "When a primary search returns no results, use the instructed fallback criteria exactly (such as matching text/code hints) instead of exploring unrelated filters or categories.",
+    "counter": 2
+  },
+  {
+    "text": "Stop searching once you have enough confirmed information to answer the question or act safely; do not continue low-yield queries that do not improve the decision.",
+    "counter": 2
+  },
+  {
+    "text": "Do not state that a condition has been verified after an intervention unless you re-check the record or the API response itself proves the final state.",
+    "counter": 2
+  },
+  {
+    "text": "When a task defines duplicates broadly, search and reason over the full relevant class of orders, not just the exact named item or a narrow subtype.",
+    "counter": 2
+  },
+  {
+    "text": "Before planning corrective actions, confirm the available API supports the needed operation; if discontinue/update is unavailable, avoid claiming completion of that step.",
+    "counter": 2
+  },
+  {
+    "text": "In the final response, describe only what was actually checked and changed, using wording that matches the task’s exact success criterion.",
+    "counter": 2
+  },
+  {
+    "text": "After creating, updating, or discontinuing records to satisfy a target count, explicitly confirm the final state meets the requested condition (for example, exactly one active order remains).",
+    "counter": 2
+  },
+  {
+    "text": "Base the final answer on both the retrieved data and any write action performed, summarizing the verification result rather than only describing the action taken.",
+    "counter": 2
+  },
+  {
+    "text": "When a task specifies a precise end condition, mirror that wording in the completion message to show the requirement was fully checked and satisfied.",
+    "counter": 2
+  },
+  {
+    "text": "Emit exactly one valid API action per turn, matching the required response format with no extra text or concatenated actions.",
+    "counter": 2
+  },
+  {
+    "text": "Resolve the patient first, then use the confirmed patient identifier/reference format expected by downstream searches and writes.",
+    "counter": 2
+  },
+  {
+    "text": "Do not declare a task impossible before exhausting the available retrieval steps and confirming what the API can or cannot do from the provided schema.",
+    "counter": 2
+  },
+  {
+    "text": "When fixing or verifying orders, base the decision on actual returned data from the relevant resource search before creating, modifying, or concluding completion.",
+    "counter": 2
+  },
+  {
+    "text": "After making an API call, wait for the returned data before deciding, summarizing, or taking the next action.",
+    "counter": 2
+  }
+]

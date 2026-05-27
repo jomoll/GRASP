@@ -1,0 +1,7 @@
+{
+  "skills": "best",
+  "score": 0.6,
+  "n_correct": 12,
+  "n_total": 20,
+  "test_split": "data/alfworld/split_test.json"
+}

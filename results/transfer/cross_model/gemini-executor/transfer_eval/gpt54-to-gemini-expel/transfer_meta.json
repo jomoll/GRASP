@@ -1,0 +1,10 @@
+{
+  "method": "expel",
+  "library_path": null,
+  "memory_dir": null,
+  "splits": [
+    "test",
+    "id_test"
+  ],
+  "run_name": "gpt54-to-gemini-expel"
+}

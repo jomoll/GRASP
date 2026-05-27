@@ -1,0 +1,13 @@
+{
+  "missing_medicationrequest_subject_reference": "missing medicationrequest subject reference",
+  "answer_format_wrong_type": "answer format wrong type",
+  "age_calculation_incorrect": "Agent computed age incorrectly from patient birth date",
+  "patient_not_found_incorrectly": "Agent returned 'Patient not found' when patient actually exists in the system",
+  "correct_behavior_no_failure": "correct behavior no failure",
+  "observation_subject_reference_invalid": "Agent used patient ID string instead of proper FHIR reference format for subject",
+  "no_observation_found_returned_minus_one": "Agent returned -1 when no observation was found instead of a proper not-found message",
+  "no_observation_found_premature_stop": "Agent stopped with 'no observation found' when observation existed but date filter was too narrow",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "date_filter_omitted": "date filter omitted"
+}

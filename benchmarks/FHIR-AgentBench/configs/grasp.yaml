@@ -1,0 +1,51 @@
+# grasp — GRASP (ours).
+# Model backend: select with --agent / GRASP_BACKEND, or change agent_preset.
+# See configs/agents/README.md for the available presets.
+output_dir: outputs/grasp
+agent_preset: gptoss
+agent:
+  strategy: multi_turn_code_resource
+  model: azure/gpt-4.1
+  timeout: 60
+  max_retries: 1
+  verbose: false
+  enable_cache: true
+  sample_timeout: 300
+updater:
+  model: azure/gpt-4.1
+  temperature: 0.7
+  max_tokens: 128000
+  timeout: 240
+  max_retries: 2
+eval:
+  model: azure/gpt-4.1
+  timeout: 60
+  max_retries: 1
+data:
+  csv: final_dataset/questions_answers_sql_fhir.csv
+  dev_splits:
+  - train
+  val_splits:
+  - valid
+  test_splits:
+  - test
+  dev_limit: 120
+  val_limit: 80
+  test_limit: 80
+skills:
+  base_dir: skills/base
+cycle:
+  epochs: 5
+  update_every: 60
+  batch_concurrency: 8
+  max_proposals: 1
+  max_learned_skills: 10
+  grpo_k: 2
+  grpo_eval_n: 30
+  run_baseline: true
+  seed: 1
+  non_learnable_labels:
+  - timeout
+  - runner_error
+  - service_unavailable
+  - sample_timeout

@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-16T14:57:04.076136",
+  "rules": [
+    "[P1] When asked for a patient identifier (e.g., MRN) given name and DOB, query the patient directory and finish with FINISH([identifier]).",
+    "[P1] Parse complex vital‑sign strings (e.g., blood pressure) into components for decision logic.",
+    "[P1] Use FINISH([...]) only for JSON array responses (e.g., order IDs); output raw values or plain text otherwise, and never include narrative text outside FINISH.",
+    "[P1] Do not fabricate, guess, or use placeholder data; use only retrieved information and omit explanatory or reasoning text.",
+    "[P1] Verify patient existence via GET using MRN (or name/DOB) before any operation; if not found, output the exact phrase Patient not found without any FINISH or JSON wrapper.",
+    "[P1] Compare measurements against explicit clinical thresholds; if within normal range, return FINISH([]) and do not create orders.",
+    "[P1] When creating referrals or posting new observations, embed any required free‑text verbatim in the POST request and finish with FINISH([]) only.",
+    "[P1] Only create conditional orders (medication and/or labs) when the primary clinical trigger is satisfied.",
+    "[P1] First GET the patient by identifier, then GET the observation, evaluate its timestamp, and conditionally POST a lab order before FINISH.",
+    "[P1] Include appropriate query filters (e.g., test name, time range) in GET requests.",
+    "[P1] Never embed reasoning or instructions inside the action payload.",
+    "[P1] Output exactly one action per turn using the defined JSON schema; no explanatory text.",
+    "[P1] When multiple API calls are required, chain them across successive turns."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_b045a0e972c7",
+      "text": "[P1] When asked for a patient identifier (e.g., MRN) given name and DOB, query the patient directory and finish with FINISH([identifier]).",
+      "tags": [
+        "patient_lookup",
+        "mrn_retrieval",
+        "successful",
+        "when",
+        "asked",
+        "patient",
+        "identifier",
+        "given",
+        "name",
+        "query"
+      ],
+      "shown": 1,
+      "success": 0,
+      "failure": 1,
+      "created_at": "2026-05-16T14:51:20.595528",
+      "updated_at": "2026-05-16T14:52:56.999772"
+    },
+    {
+      "id": "rule_0b8e02d12aaf",
+      "text": "[P1] Parse complex vital‑sign strings (e.g., blood pressure) into components for decision logic.",
+      "tags": [
+        "observation_retrieval",
+        "date_comparison",
+        "conditional_ordering",
+        "parse",
+        "complex",
+        "vital",
+        "sign",
+        "strings",
+        "blood",
+        "pressure"
+      ],
+      "shown": 13,
+      "success": 11,
+      "failure": 2,
+      "created_at": "2026-05-16T14:29:54.913044",
+      "updated_at": "2026-05-16T14:52:56.999737"
+    },
+    {
+      "id": "rule_e2946bf5ff93",
+      "text": "[P1] Use FINISH([...]) only for JSON array responses (e.g., order IDs); output raw values or plain text otherwise, and never include narrative text outside FINISH.",
+      "tags": [
+        "observation_retrieval",
+        "date_comparison",
+        "conditional_ordering",
+        "finish",
+        "only",
+        "json",
+        "array",
+        "responses",
+        "order",
+        "output"
+      ],
+      "shown": 13,
+      "success": 10,
+      "failure": 3,
+      "created_at": "2026-05-16T14:29:54.912958",
+      "updated_at": "2026-05-16T14:52:56.999399"
+    },
+    {
+      "id": "rule_a89c953d6714",
+      "text": "[P1] Do not fabricate, guess, or use placeholder data; use only retrieved information and omit explanatory or reasoning text.",
+      "tags": [
+        "lab_retrieval",
+        "order_placement",
+        "output_formatting",
+        "temporal_check",
+        "fabricate",
+        "guess",
+        "placeholder",
+        "data",
+        "only",
+        "retrieved"
+      ],
+      "shown": 26,
+      "success": 23,
+      "failure": 2,
+      "created_at": "2026-05-16T14:18:23.938986",
+      "updated_at": "2026-05-16T14:52:56.999433"
+    },
+    {
+      "id": "rule_e419f953c59c",
+      "text": "[P1] Verify patient existence via GET using MRN (or name/DOB) before any operation; if not found, output the exact phrase Patient not found without any FINISH or JSON wrapper.",
+      "tags": [
+        "patient_lookup",
+        "response_format",
+        "verify",
+        "patient",
+        "existence",
+        "using",
+        "name",
+        "before",
+        "operation",
+        "found"
+      ],
+      "shown": 12,
+      "success": 8,
+      "failure": 4,
+      "created_at": "2026-05-16T14:41:45.309725",
+      "updated_at": "2026-05-16T14:52:56.999322"
+    },
+    {
+      "id": "rule_a13add7aadd3",
+      "text": "[P1] Compare measurements against explicit clinical thresholds; if within normal range, return FINISH([]) and do not create orders.",
+      "tags": [
+        "lab_retrieval",
+        "order_placement",
+        "output_formatting",
+        "temporal_check",
+        "compare",
+        "measurements",
+        "against",
+        "explicit",
+        "clinical",
+        "thresholds"
+      ],
+      "shown": 34,
+      "success": 27,
+      "failure": 6,
+      "created_at": "2026-05-16T14:18:23.938780",
+      "updated_at": "2026-05-16T14:52:56.999615"
+    },
+    {
+      "id": "rule_f5033568c888",
+      "text": "[P1] When creating referrals or posting new observations, embed any required free‑text verbatim in the POST request and finish with FINISH([]) only.",
+      "tags": [
+        "observation_retrieval",
+        "date_comparison",
+        "conditional_ordering",
+        "when",
+        "creating",
+        "referrals",
+        "posting",
+        "observations",
+        "embed",
+        "required"
+      ],
+      "shown": 34,
+      "success": 25,
+      "failure": 9,
+      "created_at": "2026-05-16T14:29:54.913006",
+      "updated_at": "2026-05-16T14:52:56.999701"
+    },
+    {
+      "id": "rule_7dc96fed14a2",
+      "text": "[P1] Only create conditional orders (medication and/or labs) when the primary clinical trigger is satisfied.",
+      "tags": [
+        "lab-retrieval",
+        "conditional-order",
+        "no-action",
+        "only",
+        "create",
+        "conditional",
+        "orders",
+        "medication",
+        "labs",
+        "when"
+      ],
+      "shown": 23,
+      "success": 15,
+      "failure": 8,
+      "created_at": "2026-05-16T14:37:52.832247",
+      "updated_at": "2026-05-16T14:52:56.999645"
+    },
+    {
+      "id": "rule_62edff98f8b3",
+      "text": "[P1] First GET the patient by identifier, then GET the observation, evaluate its timestamp, and conditionally POST a lab order before FINISH.",
+      "tags": [
+        "action_format",
+        "multi_step_logic",
+        "timestamp_validation",
+        "first",
+        "patient",
+        "identifier",
+        "then",
+        "observation",
+        "evaluate",
+        "timestamp"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-16T14:52:56.999581",
+      "updated_at": "2026-05-16T14:52:56.999582"
+    },
+    {
+      "id": "rule_d3e74b68ebd3",
+      "text": "[P1] Include appropriate query filters (e.g., test name, time range) in GET requests.",
+      "tags": [
+        "observation-retrieval",
+        "lab-value",
+        "placeholder-error",
+        "include",
+        "appropriate",
+        "query",
+        "filters",
+        "test",
+        "name",
+        "time"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-16T14:34:51.237198",
+      "updated_at": "2026-05-16T14:52:56.999361"
+    },
+    {
+      "id": "rule_d274ae7d13de",
+      "text": "[P1] Never embed reasoning or instructions inside the action payload.",
+      "tags": [
+        "action_format",
+        "multi_step_logic",
+        "timestamp_validation",
+        "never",
+        "embed",
+        "reasoning",
+        "instructions",
+        "inside",
+        "action",
+        "payload"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-16T14:52:56.999478",
+      "updated_at": "2026-05-16T14:52:56.999479"
+    },
+    {
+      "id": "rule_ca56c5747bbb",
+      "text": "[P1] Output exactly one action per turn using the defined JSON schema; no explanatory text.",
+      "tags": [
+        "action_format",
+        "multi_step_logic",
+        "timestamp_validation",
+        "output",
+        "exactly",
+        "action",
+        "turn",
+        "using",
+        "defined",
+        "json"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-16T14:52:56.999512",
+      "updated_at": "2026-05-16T14:52:56.999512"
+    },
+    {
+      "id": "rule_32d2a19b1fda",
+      "text": "[P1] When multiple API calls are required, chain them across successive turns.",
+      "tags": [
+        "action_format",
+        "multi_step_logic",
+        "timestamp_validation",
+        "when",
+        "multiple",
+        "calls",
+        "required",
+        "chain",
+        "them",
+        "across"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-16T14:52:56.999543",
+      "updated_at": "2026-05-16T14:52:56.999544"
+    }
+  ]
+}

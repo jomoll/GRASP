@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Carefully review the medication list to accurately identify all relevant medications based on the clinical criteria provided.",
+    "counter": 2
+  },
+  {
+    "text": "Do not assume absence of a medication without thoroughly checking all medication records for matches, including possible variations in names or formulations.",
+    "counter": 2
+  },
+  {
+    "text": "Only conclude a task is complete after verifying all conditions or actions specified in the instruction, including checks for required matching orders or prescriptions.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for medications, ensure to include all relevant active orders and consider possible spelling, synonym, or code variations for target drugs.",
+    "counter": 2
+  },
+  {
+    "text": "Always review all relevant active orders before creating a new one to avoid unnecessary duplication.",
+    "counter": 2
+  },
+  {
+    "text": "Discontinue or resolve any duplicate or outdated orders as specified before completing the task.",
+    "counter": 2
+  },
+  {
+    "text": "When creating orders, ensure the medication, dose, route, frequency, and indication exactly match the required specifications.",
+    "counter": 2
+  },
+  {
+    "text": "Confirm that exactly one active order remains when required, and clearly state this outcome in the final summary.",
+    "counter": 2
+  },
+  {
+    "text": "Always thoroughly analyze all existing relevant orders before creating a new one to ensure none already fulfill the requirement.",
+    "counter": 2
+  },
+  {
+    "text": "Carefully match medication names, routes, dosages, and schedules to identify relevant or duplicate orders, rather than relying solely on exact text matches.",
+    "counter": 2
+  },
+  {
+    "text": "If the task requires discontinuing duplicate orders, ensure to identify and discontinue all but the newest relevant order, not just create a new one.",
+    "counter": 2
+  },
+  {
+    "text": "Summarize the final order state clearly, including the number of active, duplicate, or discontinued orders, to confirm the task requirements are fully met.",
+    "counter": 2
+  },
+  {
+    "text": "When constructing FHIR resource payloads, ensure patient references use the correct format (e.g., \"Patient/<id>\") as specified in the API documentation.",
+    "counter": 2
+  },
+  {
+    "text": "Always use the precise display name and coding for vaccines or medications as provided in official sources to maintain clarity and accuracy.",
+    "counter": 2
+  },
+  {
+    "text": "If no prior record is found for a procedure or medication, clearly state this in the response and proceed with the appropriate action.",
+    "counter": 2
+  },
+  {
+    "text": "Verify that all required fields in the API request payload are present and correctly populated before submission.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify whether the target medication (and its class, if relevant) is present before concluding no action is needed.",
+    "counter": 2
+  },
+  {
+    "text": "If the required medication or class is absent, automatically proceed to create the order as specified rather than just recommend action.",
+    "counter": 2
+  },
+  {
+    "text": "When asked to maintain exactly one active order, ensure the FINISH response reflects both the action taken and the resulting state (e.g., \"now exactly one active order\").",
+    "counter": 2
+  },
+  {
+    "text": "Carefully interpret \"duplicate\" to include all clinically relevant medications as specified, not just exact text matches.",
+    "counter": 2
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When searching for a patient by MRN (Medical Record Number), use the \"identifier\" parameter with the MRN value, as MRN is stored in the identifier field, not as a direct patient ID.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving patient data that includes a birthDate, always compute the age by comparing the birthDate to the current time provided in the context, rounding down to the nearest integer year.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires an age calculation, do not return the MRN or patient ID; instead extract the birthDate from the patient resource and calculate the age using the current timestamp.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure that the final answer matches the exact question asked—if the question asks for age, compute and return the age, not an identifier or other demographic data.",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving lab results, always include the date parameter to filter for recent results, especially when the task requires assessing if data is older than a specific time threshold (e.g., 1 year), to avoid missing the need for follow-up actions.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving a lab value, compare its date against the current time and the task's time criteria (e.g., older than 1 year) to determine if a new order is required; do not simply report the value without this conditional check.",
+    "counter": 2
+  },
+  {
+    "text": "Use the `date` parameter in FHIR Observation searches with operators like `ge` (greater or equal) to narrow results to relevant time windows, but when searching for the most recent value, consider omitting the date filter or using a broad range to ensure you get the latest record, then evaluate its age.",
+    "counter": 2
+  },
+  {
+    "text": "When the task involves ordering a new test if a prior result is outdated, after confirming the result is too old, use the appropriate FHIR API (e.g., ServiceRequest.Create) to place the order, and include the required parameters such as LOINC code, patient reference, and current timestamp.",
+    "counter": 2
+  },
+  {
+    "text": "When querying for lab results, use the current time as the start of the date range (e.g., `ge{current_time}`) rather than just the date, to ensure you capture results from the most recent 24-hour period.",
+    "counter": 2
+  },
+  {
+    "text": "If a lab result search returns no results, do not immediately conclude the task is impossible; instead, try querying with a broader date range (e.g., without a date filter or with a `date=lt{current_time}`) to check for any historical results that may still be relevant.",
+    "counter": 2
+  },
+  {
+    "text": "For tasks requiring conditional ordering based on lab values, first retrieve the most recent lab result using a descending sort order (e.g., `_sort=-date`) to ensure you get the latest value, not just any result within a time window.",
+    "counter": 2
+  },
+  {
+    "text": "When the task involves ordering a follow-up lab (e.g., a morning serum potassium level), use the `POST {api_base}/ServiceRequest` endpoint with the appropriate LOINC code and set the `occurrenceDateTime` to the specified future time, not the MedicationRequest endpoint.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires computing derived data (e.g., age from birthdate), retrieve the necessary raw data from the API (e.g., birthDate from Patient resource) and compute the answer using the provided context time, rather than relying on any pre-computed or approximate values.",
+    "counter": 2
+  },
+  {
+    "text": "To search for a patient by Medical Record Number (MRN), use the `identifier` parameter with the full MRN value (e.g., `identifier=S6537563`) in a Patient search, as MRNs are stored in the identifier field.",
+    "counter": 2
+  },
+  {
+    "text": "When computing age, subtract the birth year from the current year, then adjust by comparing the current month/day to the birth month/day to ensure the age is rounded down correctly (i.e., if the birthday has not occurred yet this year, subtract one from the year difference).",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving lab observations with the Observation (Labs) API, use the \"date\" parameter with both \"ge\" and \"le\" modifiers to define a precise time window for the last 24 hours, and always convert the current time to UTC for the query.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving a bundle of observations, always sort the entries by effectiveDateTime in descending order and select the most recent value from the first entry to answer questions about the most recent measurement.",
+    "counter": 2
+  },
+  {
+    "text": "When a search returns multiple observations, do not assume the first entry in the bundle is the most recent; explicitly check the effectiveDateTime of each entry to determine the latest one.",
+    "counter": 2
+  },
+  {
+    "text": "For tasks requiring unit conversion, verify the unit of the returned value (e.g., mg/dL) and only convert if the unit differs from the requested unit; if already in the correct unit, use the value as-is.",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving lab observations, always include the date parameter to filter results by recency; use the current time context to determine the appropriate range (e.g., last 1 year) to avoid processing outdated data unnecessarily.",
+    "counter": 2
+  }
+]

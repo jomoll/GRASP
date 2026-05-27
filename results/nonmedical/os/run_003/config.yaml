@@ -1,0 +1,38 @@
+_resume: false
+agent:
+  module: src.client.agents.HTTPAgent
+  parameters:
+    body:
+      max_tokens: 8192
+      model: gpt-oss-120b
+      temperature: 0.0
+    headers:
+      Authorization: Bearer <REDACTED>
+      Content-Type: application/json
+    prompter:
+      args:
+        agent_role: assistant
+      name: role_content_dict
+    url: <REDACTED>
+cycle:
+  batch_concurrency: 8
+  epochs: 5
+  grpo_eval_n: 30
+  grpo_k: 4
+  max_learned_skills: 10
+  max_proposals: 1
+  proposal_temperature: 0.8
+  run_baseline: true
+  seed: 3
+  update_every: 40
+data:
+  dev: data/os_interaction/split_dev.json
+  val: data/os_interaction/split_val.json
+eval:
+  module: src.server.tasks.os_interaction.eval
+output_dir: outputs/skill_cycle_os
+skills:
+  base_dir: skills/os/base
+task:
+  controller_address: http://localhost:5040/api
+  name: os-std

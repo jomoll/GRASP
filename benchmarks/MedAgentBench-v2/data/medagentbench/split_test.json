@@ -1,0 +1,362 @@
+[
+  {
+    "id": "task5_1",
+    "instruction": "Instruction: Confirm patient S6315806 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6315806"
+  },
+  {
+    "id": "task5_2",
+    "instruction": "Instruction: Confirm patient S2119664 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S2119664"
+  },
+  {
+    "id": "task5_3",
+    "instruction": "Instruction: Confirm patient S6268253 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6268253"
+  },
+  {
+    "id": "task5_4",
+    "instruction": "Instruction: Confirm patient S2748981 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S2748981"
+  },
+  {
+    "id": "task5_5",
+    "instruction": "Instruction: Confirm patient S1478444 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S1478444"
+  },
+  {
+    "id": "task5_6",
+    "instruction": "Instruction: Confirm patient S6547257 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6547257"
+  },
+  {
+    "id": "task5_7",
+    "instruction": "Instruction: Confirm patient S1733937 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S1733937"
+  },
+  {
+    "id": "task5_8",
+    "instruction": "Instruction: Confirm patient S6192632 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6192632"
+  },
+  {
+    "id": "task5_9",
+    "instruction": "Instruction: Confirm patient S6415739 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6415739"
+  },
+  {
+    "id": "task5_10",
+    "instruction": "Instruction: Confirm patient S6312049 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6312049"
+  },
+  {
+    "id": "task5_11",
+    "instruction": "Instruction: Confirm patient S0869531 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S0869531"
+  },
+  {
+    "id": "task5_12",
+    "instruction": "Instruction: Confirm patient S6550627 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6550627"
+  },
+  {
+    "id": "task5_13",
+    "instruction": "Instruction: Confirm patient S1521703 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S1521703"
+  },
+  {
+    "id": "task5_14",
+    "instruction": "Instruction: Confirm patient S2874099 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S2874099"
+  },
+  {
+    "id": "task5_15",
+    "instruction": "Instruction: Confirm patient S6537563 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6537563"
+  },
+  {
+    "id": "task5_16",
+    "instruction": "Instruction: Confirm patient S1777769 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S1777769"
+  },
+  {
+    "id": "task5_17",
+    "instruction": "Instruction: Confirm patient S6426560 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6426560"
+  },
+  {
+    "id": "task5_18",
+    "instruction": "Instruction: Confirm patient S0581164 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S0581164"
+  },
+  {
+    "id": "task5_19",
+    "instruction": "Instruction: Confirm patient S6352985 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6352985"
+  },
+  {
+    "id": "task5_20",
+    "instruction": "Instruction: Confirm patient S6545016 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6545016"
+  },
+  {
+    "id": "task5_21",
+    "instruction": "Instruction: Confirm patient S0611496 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S0611496"
+  },
+  {
+    "id": "task5_22",
+    "instruction": "Instruction: Confirm patient S6200102 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6200102"
+  },
+  {
+    "id": "task5_23",
+    "instruction": "Instruction: Confirm patient S6521727 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6521727"
+  },
+  {
+    "id": "task5_24",
+    "instruction": "Instruction: Confirm patient S2033286 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S2033286"
+  },
+  {
+    "id": "task5_25",
+    "instruction": "Instruction: Confirm patient S1986380 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S1986380"
+  },
+  {
+    "id": "task5_26",
+    "instruction": "Instruction: Confirm patient S6540602 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6540602"
+  },
+  {
+    "id": "task5_27",
+    "instruction": "Instruction: Confirm patient S6227720 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6227720"
+  },
+  {
+    "id": "task5_28",
+    "instruction": "Instruction: Confirm patient S6541609 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6541609"
+  },
+  {
+    "id": "task5_29",
+    "instruction": "Instruction: Confirm patient S1796597 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S1796597"
+  },
+  {
+    "id": "task5_30",
+    "instruction": "Instruction: Confirm patient S6541353 has a malignant neoplasm of left kidney diagnosis. If true and the last CT Abdomen/Pelvis is more than 3 months old, order a new CT and referral to Interventional Radiology.",
+    "context": "The ICD-10 code for malignant neoplasm of left kidney is C64.2. The CPT code for CT Abdomen/Pelvis with IV contrast is 74177 (for oncologic follow-up). The CPT code for Interventional Radiology referral is CON417 with the request: 'Evaluate renal mass for biopsy or ablation.'",
+    "eval_MRN": "S6541353"
+  },
+  {
+    "id": "task7_1",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6474456. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6474456"
+  },
+  {
+    "id": "task7_2",
+    "instruction": "Instruction: Check the latest QTc interval for patient S3241217. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S3241217"
+  },
+  {
+    "id": "task7_3",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6488980. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6488980"
+  },
+  {
+    "id": "task7_4",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6540602. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6540602"
+  },
+  {
+    "id": "task7_5",
+    "instruction": "Instruction: Check the latest QTc interval for patient S2090974. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S2090974"
+  },
+  {
+    "id": "task7_6",
+    "instruction": "Instruction: Check the latest QTc interval for patient S1698248. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S1698248"
+  },
+  {
+    "id": "task7_7",
+    "instruction": "Instruction: Check the latest QTc interval for patient S2154941. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S2154941"
+  },
+  {
+    "id": "task7_8",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6468480. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6468480"
+  },
+  {
+    "id": "task7_9",
+    "instruction": "Instruction: Check the latest QTc interval for patient S0658561. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S0658561"
+  },
+  {
+    "id": "task7_10",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6426560. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6426560"
+  },
+  {
+    "id": "task7_11",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6312049. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6312049"
+  },
+  {
+    "id": "task7_12",
+    "instruction": "Instruction: Check the latest QTc interval for patient S0869531. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S0869531"
+  },
+  {
+    "id": "task7_13",
+    "instruction": "Instruction: Check the latest QTc interval for patient S3213957. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S3213957"
+  },
+  {
+    "id": "task7_14",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6541609. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6541609"
+  },
+  {
+    "id": "task7_15",
+    "instruction": "Instruction: Check the latest QTc interval for patient S2748981. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S2748981"
+  },
+  {
+    "id": "task7_16",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6227720. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6227720"
+  },
+  {
+    "id": "task7_17",
+    "instruction": "Instruction: Check the latest QTc interval for patient S2119664. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S2119664"
+  },
+  {
+    "id": "task7_18",
+    "instruction": "Instruction: Check the latest QTc interval for patient S3057899. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S3057899"
+  },
+  {
+    "id": "task7_19",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6315806. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6315806"
+  },
+  {
+    "id": "task7_20",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6222362. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6222362"
+  },
+  {
+    "id": "task7_21",
+    "instruction": "Instruction: Check the latest QTc interval for patient S0789363. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S0789363"
+  },
+  {
+    "id": "task7_22",
+    "instruction": "Instruction: Check the latest QTc interval for patient S0722219. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S0722219"
+  },
+  {
+    "id": "task7_23",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6329254. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6329254"
+  },
+  {
+    "id": "task7_24",
+    "instruction": "Instruction: Check the latest QTc interval for patient S3032536. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S3032536"
+  },
+  {
+    "id": "task7_25",
+    "instruction": "Instruction: Check the latest QTc interval for patient S1579803. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S1579803"
+  },
+  {
+    "id": "task7_26",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6530532. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6530532"
+  },
+  {
+    "id": "task7_27",
+    "instruction": "Instruction: Check the latest QTc interval for patient S6542579. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S6542579"
+  },
+  {
+    "id": "task7_28",
+    "instruction": "Instruction: Check the latest QTc interval for patient S1311412. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S1311412"
+  },
+  {
+    "id": "task7_29",
+    "instruction": "Instruction: Check the latest QTc interval for patient S1353305. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S1353305"
+  },
+  {
+    "id": "task7_30",
+    "instruction": "Instruction: Check the latest QTc interval for patient S3236936. If prolonged, discontinue QT-prolonging medications and order a follow-up ECG for 24 hours later.",
+    "context": "The code for QTc interval is 'QTCINTERVAL'. The threshold for prolonged QTc is > 500 ms. QT-prolonging medications to discontinue include text containing ondansetron, prochlorperazine and most antipsychotic medications. The SNOMED code for 12-lead ECG is 445118002. Order the ECG to be performed in 24 hours.",
+    "eval_MRN": "S3236936"
+  }
+]

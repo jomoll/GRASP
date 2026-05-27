@@ -1,0 +1,3 @@
+# GPT-4.1 via Azure OpenAI (LiteLLM "azure/" route).
+# Required env: AZURE_API_KEY, AZURE_API_BASE, AZURE_API_VERSION.
+model: "${GPT4_MODEL:-azure/gpt-4.1}"

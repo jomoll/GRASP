@@ -1,0 +1,20 @@
+{
+  "missing_fhir_query_before_answer": "Agent gave reasoning or answer without performing the required FHIR query.",
+  "unnecessary_service_request_created": "Agent created a ServiceRequest/order that was not required by the instruction.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "wrong_answer_returned": "Agent returned an answer that does not satisfy the instruction (e.g., \"Patient not found\" when patient exists).",
+  "placeholder_error_value_returned": "Agent returned a placeholder error indicator (e.g., -1) instead of a valid result.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "answer_type_mismatch": "Agent returned the correct value but in the wrong data type (e.g., string instead of integer).",
+  "patient_reference_used_in_observation_query": "Used a patient reference (Patient/ID) instead of an identifier in the Observation query, causing an incorrect lookup.",
+  "incorrect_low_threshold_logic": "Determined no replacement needed despite observation meeting low‑threshold criteria.",
+  "order_placed_without_verifying_low": "Placed a replacement order without first confirming the observation value is low.",
+  "missing_observation_query": "Failed to query the required Observation resource before making a decision or answer.",
+  "order_not_placed_when_low": "Did not create a replacement order despite the observed lab value being below the low‑threshold.",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "answer_missing_required_value": "Returned a generic statement without providing the specific numeric value or required field requested.",
+  "order_placed_without_verifying_date_threshold": "Placed a ServiceRequest/order without first checking that the observation date exceeds the required time threshold.",
+  "date_filter_omitted": "date filter omitted",
+  "service_request_note_not_array": "ServiceRequest 'note' field supplied as a single object instead of the required array of Annotation objects",
+  "answer_submitted_before_verification": "answer submitted before verification"
+}

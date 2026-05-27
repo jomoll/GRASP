@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When querying vital signs, use the specific code parameter for the vital sign of interest (e.g., heart rate) rather than relying solely on category, to filter out irrelevant observations.",
+    "counter": 2
+  },
+  {
+    "text": "For time-based data retrieval, construct date range parameters using the FHIR date format (YYYY-MM-DD) or a precise ISO timestamp with proper encoding, and avoid using the same parameter name twice in a single query.",
+    "counter": 2
+  },
+  {
+    "text": "When no results are found for a specific data type, verify that the correct resource and parameters were used before concluding data absence; consider alternative query methods or codes.",
+    "counter": 2
+  },
+  {
+    "text": "Always compute and return the requested quantitative results (e.g., average) from the retrieved data rather than reporting a lack of data when relevant observations exist but were not captured due to query limitations.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for COVID-19 vaccination records via MedicationRequest, use the exact category values (e.g., \"Community\", \"Inpatient\", \"Outpatient\", \"Discharge\") with correct capitalization as specified in the API documentation, as lowercase values may return empty results.",
+    "counter": 2
+  },
+  {
+    "text": "To find the most recent COVID-19 vaccine, search both Procedure (with code 'COVIDVACCINE') and MedicationRequest (with text containing 'COVID-19 VAC') without date filters initially, then filter results to identify the latest administration, rather than restricting by date prematurely.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding no vaccination records exist and ordering a booster, exhaust all relevant search options including all MedicationRequest categories (Community, Inpatient, Outpatient, Discharge) and Procedure searches without date restrictions, to ensure complete data retrieval.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires evaluating if the last COVID-19 vaccine dose was more than 12 months ago, retrieve all historical vaccination records first, then compare the most recent date to the current time; if no records found, consider that as exceeding 12 months and proceed to order the booster.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for procedures using the Procedure resource, use separate queries for each specific code rather than combining multiple codes with commas, as the API may not support comma-separated code parameters.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving procedure data, always verify the date of the most recent procedure against the 12-month threshold before deciding to order a new one; do not conclude \"no recent procedure\" from empty results without first trying broader search parameters.",
+    "counter": 2
+  },
+  {
+    "text": "If an initial search for procedures returns no results, consider searching without date filters or with a wider date range to confirm whether the procedure truly does not exist in the patient's record.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires ordering a new service (e.g., CT Abdomen), use the ServiceRequest.Create API with the correct CPT code and include required fields such as code, authoredOn, status, intent, priority, and subject, and include the indication in the note field.",
+    "counter": 2
+  },
+  {
+    "text": "When verifying a specific medication order (e.g., DVT prophylaxis), use a targeted search with medication or category parameters (e.g., `category=Inpatient`) to filter results, and manually inspect the returned entries for the exact medication of interest rather than relying on a general search that may return unrelated orders.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving medication orders, explicitly filter and count only those matching the specific medication name and indication (e.g., heparin for DVT prophylaxis) before deciding to create, discontinue, or keep orders; do not assume zero orders based on a non-specific search result.",
+    "counter": 2
+  },
+  {
+    "text": "If the task requires ensuring exactly one active order of a specific type, and multiple orders are found, identify the newest order by comparing the `authoredOn` date and discontinue the older duplicate orders using a `POST` to update their status to \"stopped\" or \"cancelled\".",
+    "counter": 2
+  },
+  {
+    "text": "When a search returns zero matching orders for the specific medication, proceed to create the required order using `POST` with the correct medication details, dosage, route, and patient reference, then confirm the order was created successfully.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for COVID-19 vaccination status, first attempt to retrieve the most recent vaccine record using the Procedure resource with code 'COVIDVACCINE' and a broad date range (e.g., no lower bound), then fall back to MedicationRequest with text containing 'COVID-19 VAC' if no results are found, to ensure all historical records are captured.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that no vaccination records exist, search for MedicationRequest without a date filter and across all categories (or omit category) to capture any vaccine orders that may not have a date parameter or fall outside the default category.",
+    "counter": 2
+  },
+  {
+    "text": "If no prior COVID-19 vaccine records are found after exhaustive searches, verify that the last dose was more than 12 months ago from the current time before ordering a booster; if no records exist, treat the condition as if the last dose was more than 12 months ago and proceed to order the booster.",
+    "counter": 2
+  },
+  {
+    "text": "Always include the full base URL (e.g., \"http://localhost:8080/fhir/\") in API calls from the start, replacing the placeholder '{api_base}' immediately to avoid invalid URL errors.",
+    "counter": 2
+  }
+]

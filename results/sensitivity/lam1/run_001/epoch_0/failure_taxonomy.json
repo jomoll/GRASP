@@ -1,0 +1,17 @@
+{
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "service_request_subject_reference_invalid": "ServiceRequest subject reference is malformed or missing the required Patient/ prefix.",
+  "date_filter_omitted": "date filter omitted",
+  "answer_missing_observation_value": "Returned a sentinel or missing value instead of the actual observation result.",
+  "unnecessary_service_request_created": "Created a ServiceRequest that was not required by the instruction.",
+  "patient_not_resolved_before_observation_post": "Did not resolve the patient identifier before attempting to POST a new Observation.",
+  "patient_not_queried_before_age_computation": "Did not perform a Patient lookup before computing the patient's age.",
+  "observation_not_queried_before_answer": "Did not retrieve the Observation data before answering the question.",
+  "observation_not_queried_before_decision": "Failed to query the Observation resource before making a clinical decision or providing an answer.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "answer_type_mismatch": "Returned a value with the wrong data type (e.g., string instead of integer).",
+  "referral_note_missing_requested_fields": "Referral ServiceRequest note does not contain the exact free‑text fields requested in the instruction.",
+  "unnecessary_medication_request_created": "MedicationRequest was created even though the lab value did not meet the criteria for replacement.",
+  "incorrect_lab_value_interpretation": "Lab result was misinterpreted relative to the clinical threshold, leading to an incorrect decision (e.g., reporting normal when the value is low).",
+  "patient_not_resolved_before_observation_query": "Observation query used patient identifier without resolving to a Patient resource reference (missing \"Patient/\" prefix)."
+}

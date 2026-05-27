@@ -1,0 +1,20 @@
+{
+  "patient_not_found_assumed_without_id_lookup": "Assumed the patient does not exist without first resolving the patient identifier to an MRN.",
+  "age_off_by_one_year": "Calculated the patient’s age incorrectly, typically off by one year due to date handling.",
+  "unnecessary_service_request_created": "Created a ServiceRequest for a lab test that already has a recent result, which is unnecessary.",
+  "magnesium_level_misinterpreted_as_normal": "Interpreted a low magnesium observation as being within the normal range.",
+  "observation_code_mismatch": "Queried the Observation resource with an incorrect code parameter, leading to missing or wrong results.",
+  "potassium_level_misinterpreted_as_normal": "Interpreted a low potassium observation as being above the treatment threshold.",
+  "missing_observation_assumed_no_replacement": "Assumed no recent observation existed and therefore did not place a replacement order when it was needed.",
+  "placeholder_minus_one_returned": "Returned sentinel '-1' placeholder instead of the actual observation value.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "low_magnesium_not_ordered": "Failed to order magnesium replacement despite the serum magnesium level being low.",
+  "date_format_missing_timezone": "Returned a date string without the required timezone or in an incorrect format.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "missing_answer_after_order": "Did not provide any answer after placing an order, returning an empty result.",
+  "low_potassium_not_ordered": "Failed to order potassium replacement despite potassium level being at or below the treatment threshold.",
+  "date_filter_omitted": "date filter omitted",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "value_string_format_mismatch": "Returned a value string with incorrect formatting (e.g., extra spaces or missing/extra characters)."
+}

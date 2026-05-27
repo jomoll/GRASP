@@ -1,0 +1,14 @@
+{
+  "observation_placeholder_minus_one_returned": "Returned sentinel value -1 for missing observation instead of handling absence appropriately.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "observation_get_not_executed": "Failed to issue a GET request for the required Observation before forming a response.",
+  "unnecessary_service_request_created": "Created a ServiceRequest order when the task only asked for existing lab value.",
+  "age_returned_as_string": "Returned the patient's age as a string instead of a numeric type as required.",
+  "missing_patient_get_action": "Did not perform a GET request to resolve patient ID before attempting further actions.",
+  "magnesium_value_missing_unit": "Returned magnesium numeric value without the required unit (e.g., mg/dL).",
+  "missing_observation_handled_incorrectly": "Incorrectly handled case of no recent observation, providing an inappropriate narrative response.",
+  "missing_observation_post_action": "Failed to create (POST) the required Observation resource after gathering patient info.",
+  "answer_not_structured_as_list": "Returned answer as a plain string rather than a list/array as required.",
+  "service_request_not_posted": "Planned to create a ServiceRequest but never executed the POST request.",
+  "answer_missing_expected_multiple_fields": "Returned a single answer element when the specification required multiple separate fields."
+}

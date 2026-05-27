@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Always check for relevant lab results within the specified time window before proceeding to the next clinical action.",
+    "counter": 2
+  },
+  {
+    "text": "If no relevant lab result is found in the required time frame, clearly state that no further action will be taken.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure all communication in the final output is consistent, precise, and uses the expected terminology for clinical actions and findings.",
+    "counter": 2
+  },
+  {
+    "text": "Use only the minimal and necessary parameters for API queries to optimize performance and accuracy.",
+    "counter": 2
+  },
+  {
+    "text": "When a lab result is not found within the specified time window, return the designated fallback value or instruction as stated in the task.",
+    "counter": 2
+  },
+  {
+    "text": "Always ensure the answer format, units, and structure match the requirements specified in the task.",
+    "counter": 2
+  },
+  {
+    "text": "When querying for recent lab values, use the appropriate code and patient ID, and set the date range correctly to capture the required period.",
+    "counter": 2
+  },
+  {
+    "text": "Provide clear, concise answers based solely on the retrieved data and task instructions.",
+    "counter": 2
+  },
+  {
+    "text": "Always select and report the most recent relevant measurement when multiple results are available.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure all task requirements are fulfilled before calling FINISH, including conditional actions based on data age or availability.",
+    "counter": 2
+  },
+  {
+    "text": "Carefully check observation dates against the current date to decide if follow-up actions (like ordering tests) are needed.",
+    "counter": 2
+  },
+  {
+    "text": "When no relevant measurement exists, return the specified placeholder or answer as instructed by the task.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify if additional actions are required based on the retrieved data before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure time-based conditions are checked, such as whether lab results are outdated and require new orders.",
+    "counter": 2
+  },
+  {
+    "text": "Provide all requested answers, including any required follow-up actions, in the FINISH step.",
+    "counter": 2
+  },
+  {
+    "text": "If no relevant data is found, return the specified default answer and avoid unnecessary actions.",
+    "counter": 2
+  },
+  {
+    "text": "When calculating age, use the patient's birthDate and the provided current date, ensuring the result is rounded down to the nearest integer.",
+    "counter": 2
+  },
+  {
+    "text": "Extract the required information directly from the API response fields relevant to the task.",
+    "counter": 2
+  },
+  {
+    "text": "Always perform necessary calculations explicitly rather than assuming or copying values from the response.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the final output format matches the instructions, providing only the requested data unless otherwise specified.",
+    "counter": 2
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "answer_includes_unnecessary_order": "Returned answer contains an order request that was not asked for in the instruction.",
+  "age_computation_incorrect": "Calculated patient age does not match the expected age based on birthdate and reference date.",
+  "patient_exists_but_mrn_not_extracted": "Patient record exists but the MRN was not retrieved, leading to an incorrect \"Patient not found\" response.",
+  "combined_value_date_string": "Answer combines the lab value and its date into a single string instead of providing them as separate fields.",
+  "wrong_service_request_type_ordered": "Created a ServiceRequest for the wrong resource (e.g., serum potassium test) instead of the required replacement order.",
+  "date_filter_missing": "FHIR query omitted the required date range filter for retrieving recent observations.",
+  "answer_contains_unnecessary_commentary": "Answer adds extra explanatory commentary beyond the required value/date output.",
+  "answer_submitted_before_verification": "Final answer was given without performing the necessary FHIR queries or verifying the retrieved data.",
+  "missing_observation_value_returned_error": "Answer returns an error code (e.g., -1) instead of the actual observation value.",
+  "date_filter_incorrect": "Date filter parameters in the FHIR query are incorrect or incomplete, potentially retrieving out‑of‑range observations.",
+  "replacement_not_ordered_when_needed": "Failed to create a replacement order despite the lab value indicating a deficiency.",
+  "answer_format_excessive_text": "Answer includes verbose explanation rather than the concise format required by the task.",
+  "order_created_without_verification": "Submitted an order (e.g., medication) without first verifying that the lab value meets the low‑threshold condition.",
+  "order_pair_missing": "Failed to include the required order (or placeholder) in the answer when the instruction asks to pair the order with the lab result.",
+  "no_fhir_query_executed": "Did not perform any FHIR GET/POST actions before attempting to answer, stopping after reasoning.",
+  "unnecessary_order_created": "Created an order resource that was not requested by the instruction.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "date_missing_time_component": "Returned date without required time component (e.g., only YYYY-MM-DD instead of full ISO datetime).",
+  "lab_result_not_returned": "Answer omitted the retrieved lab value/date when the instruction required reporting it.",
+  "answer_format_wrong_type": "Returned answer in an incorrect data structure or type (e.g., a single concatenated string instead of separate value and date fields)."
+}

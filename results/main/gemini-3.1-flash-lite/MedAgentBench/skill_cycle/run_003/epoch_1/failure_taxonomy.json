@@ -1,0 +1,9 @@
+{
+  "invalid_resource_reference_format": "Agent provided a malformed reference string (e.g., missing 'Patient/' prefix) in a POST request.",
+  "infinite_loop_resource_query": "Agent repeatedly queried the same resource without narrowing the search or finding the target.",
+  "loinc_code_not_found_in_records": "Agent failed to find the requested LOINC code in the FHIR server.",
+  "incorrect_lab_value_interpretation": "Agent correctly retrieved the lab value but incorrectly classified it as normal or abnormal.",
+  "patient_age_calculation_error": "Agent returned an incorrect age value despite successful patient resource retrieval.",
+  "unnecessary_action_performed": "Agent performed an order or action despite the condition for that action not being met.",
+  "answer_format_wrong_type": "Returned a scalar when a list was expected, or vice versa, or returned a placeholder/error code."
+}

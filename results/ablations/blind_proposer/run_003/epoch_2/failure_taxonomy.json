@@ -1,0 +1,20 @@
+{
+  "placeholder_value_returned": "Assistant returned a placeholder like '-1' instead of the actual computed answer.",
+  "order_without_lab_evaluation": "Assistant placed medication or service orders without first evaluating the retrieved lab result.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "required_service_request_omitted": "Assistant correctly identified low lab value but failed to create the required ServiceRequest for repeat testing.",
+  "no_fhir_actions_executed": "Assistant provided reasoning but performed no FHIR actions (neither GET nor POST).",
+  "no_fhir_query_executed": "Assistant described needed query but did not issue any FHIR GET request.",
+  "missing_requested_value_in_answer": "Assistant gave a narrative response instead of returning the specific requested lab value.",
+  "invalid_patient_reference_in_service_request": "Assistant used an incorrect patient reference format in a ServiceRequest payload.",
+  "patient_not_found_incorrect": "Assistant returned 'Patient not found' despite the patient existing, indicating failure to extract MRN.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "unnecessary_observation_posted": "Created a new Observation resource instead of returning the requested lab value, leading to an incorrect action and placeholder answer.",
+  "threshold_boundary_not_inclusive": "Applied the low‑value threshold incorrectly at the boundary (e.g., treated = threshold as normal).",
+  "unnecessary_replacement_ordered": "Ordered potassium replacement despite the lab value being within normal range.",
+  "date_filter_omitted": "date filter omitted",
+  "incorrect_threshold_evaluation": "Mis‑evaluated whether the observed value met the low‑value threshold, resulting in a missed order.",
+  "incorrect_lab_value_extracted": "Extracted the lab observation value incorrectly, leading to a wrong clinical decision.",
+  "incorrect_resource_type_created": "Created a resource of the wrong FHIR type for the intended clinical action (e.g., MedicationRequest instead of ServiceRequest).",
+  "required_observation_post_missing": "Assistant failed to create the required Observation resource after measuring a vital sign, stopping after only a patient lookup."
+}

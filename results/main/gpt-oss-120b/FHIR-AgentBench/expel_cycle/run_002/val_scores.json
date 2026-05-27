@@ -1,0 +1,26 @@
+[
+  {
+    "epoch": -1,
+    "score": 0.35
+  },
+  {
+    "epoch": 0,
+    "score": 0.4375
+  },
+  {
+    "epoch": 1,
+    "score": 0.45
+  },
+  {
+    "epoch": 2,
+    "score": 0.35
+  },
+  {
+    "epoch": 3,
+    "score": 0.4375
+  },
+  {
+    "epoch": 4,
+    "score": 0.45
+  }
+]

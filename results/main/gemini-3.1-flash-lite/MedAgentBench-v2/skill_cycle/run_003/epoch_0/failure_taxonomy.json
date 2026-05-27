@@ -1,0 +1,13 @@
+{
+  "incorrect_action_type_used": "Agent used an update/patch action when a different action was required.",
+  "false_positive_procedure_search": "Agent incorrectly identified a procedure as being within the required timeframe.",
+  "false_negative_procedure_search": "Agent failed to find existing procedure records despite them being present.",
+  "incorrect_calculation_logic": "Agent performed the calculation correctly but applied it to the wrong time window.",
+  "redundant_order_creation_failure": "Agent failed to consolidate or manage existing orders, leading to redundant actions.",
+  "unnecessary_duplicate_order_creation": "Agent created a new order despite an existing order already meeting the clinical requirement.",
+  "false_negative_observation_search": "Agent failed to find existing observation records despite them being present.",
+  "false_negative_medication_search": "Agent failed to find existing medication records despite them being present.",
+  "insufficient_data_handling_error": "Agent incorrectly concluded data was insufficient when records were available.",
+  "pagination_loop_failure": "Agent entered an infinite or redundant loop while attempting to navigate paginated FHIR search results.",
+  "incorrect_clinical_protocol_interpretation": "Agent correctly retrieved data but failed to follow the specific clinical logic provided in the instructions."
+}

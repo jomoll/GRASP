@@ -1,0 +1,25 @@
+# GRASP quickstart config — small + fast, for the in-process FHIR mock.
+output_dir: examples/quickstart/runs
+
+# Backend: resolved from configs/agents/<preset>.yaml. Override with --agent or
+# the GRASP_BACKEND env var. The default 'local' targets any OpenAI-compatible
+# endpoint (see configs/agents/local.yaml).
+agent_preset: local
+agent_temperature: 0.0
+
+# Skill library template (read-only base skills).
+skills:
+  base_dir: examples/quickstart/skills/base
+
+# Training loop — kept small so a full run finishes in minutes.
+cycle:
+  epochs: 3
+  update_every: 100        # one full-epoch batch over the dev split
+  batch_concurrency: 4
+  max_proposals: 1
+  max_learned_skills: 6
+  grpo_k: 3                 # candidate proposals sampled per update
+  grpo_eval_n: 8           # probe set size (failing + passing)
+  run_baseline: true
+  proposal_temperature: 0.8
+  seed: 1

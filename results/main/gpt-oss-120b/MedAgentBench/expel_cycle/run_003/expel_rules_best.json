@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Always identify the most recent observation by sorting the returned Observation resources on effectiveDateTime (or issued if effectiveDateTime is missing) and selecting the entry with the latest timestamp.",
+    "counter": 2
+  },
+  {
+    "text": "Compare the numeric value of the most recent observation to the clinical threshold before taking any action; only proceed with medication or follow‑up orders if the value meets the condition specified in the task.",
+    "counter": 2
+  },
+  {
+    "text": "When a replacement medication is required, calculate the exact dose using the dosing instructions provided (e.g., 10 mEq per 0.1 mEq/L below the threshold) and construct a valid MedicationRequest payload that includes the calculated dose, route, and patient reference.",
+    "counter": 2
+  },
+  {
+    "text": "Whenever a medication order is placed, automatically create a paired ServiceRequest for the required follow‑up laboratory test, setting the occurrenceDateTime to the specified future time (e.g., next day at 08:00) and using the correct LOINC code for the test.",
+    "counter": 2
+  },
+  {
+    "text": "When a task asks for a patient’s age, retrieve the patient’s `birthDate` via the Patient endpoint, compute the age relative to the provided current time, and round down to the nearest integer.",
+    "counter": 2
+  },
+  {
+    "text": "Always return the final answer inside a JSON‑loadable list of strings, e.g. `FINISH([\"80\"])`; never output a raw number or any additional text.",
+    "counter": 2
+  },
+  {
+    "text": "If a Patient search returns `total: 0`, immediately finish with `FINISH([\"Patient not found\"])` rather than proceeding with further calculations.",
+    "counter": 2
+  },
+  {
+    "text": "Use the `identifier` search parameter (or the appropriate MRN field) to locate the patient record, and ensure the retrieved resource contains a valid `birthDate` before attempting age calculation.",
+    "counter": 2
+  },
+  {
+    "text": "Always identify the most recent Observation by sorting the returned entries on effectiveDateTime (or issued) in descending order and use that latest value for any clinical decision.",
+    "counter": 2
+  },
+  {
+    "text": "Base the decision to order treatment on the numeric valueQuantity of the observation compared to the defined threshold/goal, not merely on interpretation codes such as LOW.",
+    "counter": 2
+  },
+  {
+    "text": "When a replacement medication is indicated, compute the required dose using the supplied dosing algorithm (e.g., 10 mEq per 0.1 unit below goal) and include the calculated dose in the MedicationRequest payload.",
+    "counter": 2
+  },
+  {
+    "text": "To schedule a follow‑up lab, create a ServiceRequest with the appropriate LOINC code, set status to \"active\", intent to \"order\", specify priority if needed, and set occurrenceDateTime to the exact future date and time required (e.g., next day at 08:00).",
+    "counter": 2
+  },
+  {
+    "text": "When a task asks for patient information based on an identifier (e.g., MRN), query the Patient resource using the `identifier` search parameter and verify that the response contains exactly one matching entry; if none are found, finish with “Patient not found”.",
+    "counter": 2
+  },
+  {
+    "text": "Always extract the patient’s `birthDate` from the returned Patient resource and compute the age relative to the **task’s context time** (provided in the task description), rounding down to the nearest whole number.",
+    "counter": 2
+  },
+  {
+    "text": "After performing any required calculations, return the final answer using the `FINISH([answer])` format with the answer as a JSON‑loadable string; do not include any additional explanatory text.",
+    "counter": 2
+  },
+  {
+    "text": "Before finishing, double‑check that all required data (e.g., patient existence, birthDate) has been obtained; if any required field is missing, issue an additional API call to retrieve it rather than guessing or providing an incomplete answer.",
+    "counter": 2
+  },
+  {
+    "text": "Respond with exactly ONE API action per turn (GET or POST) and no additional explanatory text; follow the prescribed response format strictly.",
+    "counter": 2
+  },
+  {
+    "text": "For tasks that involve a specific patient, always begin by issuing a GET request to retrieve the patient resource using the identifier, and use the returned patient reference in subsequent actions.",
+    "counter": 2
+  },
+  {
+    "text": "When constructing a POST payload, include all required fields exactly as defined in the API schema, using correct data types and prescribed values (e.g., status \"final\", proper category coding, effectiveDateTime in ISO format).",
+    "counter": 2
+  },
+  {
+    "text": "After all necessary API calls are completed, conclude with a FINISH action containing a JSON‑loadable list of result strings.",
+    "counter": 2
+  }
+]

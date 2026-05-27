@@ -1,0 +1,79 @@
+[
+  {
+    "epoch": "baseline",
+    "score": 0.28,
+    "n_correct": 14,
+    "n_total": 50,
+    "dev_score": null
+  },
+  {
+    "epoch": 0,
+    "score": 0.36,
+    "n_correct": 18,
+    "n_total": 50,
+    "dev_score": 0.22
+  },
+  {
+    "epoch": 1,
+    "score": 0.4,
+    "n_correct": 20,
+    "n_total": 50,
+    "dev_score": 0.25
+  },
+  {
+    "epoch": 2,
+    "score": 0.4,
+    "n_correct": 20,
+    "n_total": 50,
+    "dev_score": 0.26
+  },
+  {
+    "epoch": 3,
+    "score": 0.46,
+    "n_correct": 23,
+    "n_total": 50,
+    "dev_score": 0.33
+  },
+  {
+    "epoch": 4,
+    "score": 0.4,
+    "n_correct": 20,
+    "n_total": 50,
+    "dev_score": 0.44
+  },
+  {
+    "epoch": 5,
+    "score": 0.46,
+    "n_correct": 23,
+    "n_total": 50,
+    "dev_score": 0.47
+  },
+  {
+    "epoch": 6,
+    "score": 0.46,
+    "n_correct": 23,
+    "n_total": 50,
+    "dev_score": 0.43
+  },
+  {
+    "epoch": 7,
+    "score": 0.46,
+    "n_correct": 23,
+    "n_total": 50,
+    "dev_score": 0.46
+  },
+  {
+    "epoch": 8,
+    "score": 0.46,
+    "n_correct": 23,
+    "n_total": 50,
+    "dev_score": 0.42
+  },
+  {
+    "epoch": 9,
+    "score": 0.48,
+    "n_correct": 24,
+    "n_total": 50,
+    "dev_score": 0.42
+  }
+]

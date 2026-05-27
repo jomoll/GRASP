@@ -1,0 +1,19 @@
+{
+  "missing_paired_order": "Did not create the additional paired order (e.g., serum potassium test) that was explicitly required.",
+  "missing_service_request_for_outdated_result": "Failed to create a ServiceRequest when the existing lab result was older than the allowed interval.",
+  "missing_service_request_when_outdated": "Omitted ordering a new test despite the existing result being outdated per the instruction.",
+  "patient_not_found_when_exists": "Returned \"Patient not found\" even though the patient exists in the FHIR server.",
+  "missing_fhir_query_before_decision": "Provided reasoning but did not issue any FHIR GET request before making a decision.",
+  "missing_condition_check_before_order": "Created a medication order without first verifying the observation value against the clinical threshold.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "observation_not_found_handled_incorrectly": "Reported that no observation was recorded when one existed, or gave an incorrect narrative response.",
+  "missing_action": "Stopped after reasoning without performing any required FHIR actions (GET/POST).",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "no_observation_found_returned_invalid": "Returned a placeholder like -1 instead of handling a missing observation appropriately.",
+  "missing_service_request_creation": "Did not create the required ServiceRequest for the requested referral or order.",
+  "extraneous_service_request_created": "Created an unnecessary ServiceRequest when no new test was required by the instruction.",
+  "empty_answer_after_successful_action": "Returned an empty answer (e.g., empty list) after successfully performing the required FHIR action instead of returning the created resource or confirmation.",
+  "date_filter_omitted": "date filter omitted",
+  "order_created_but_wrong_answer_returned": "Created a ServiceRequest but returned the old observation instead of the expected order confirmation or appropriate response.",
+  "service_request_created_instead_of_returning_observation": "Created a ServiceRequest (ordering a test) and returned a placeholder value instead of extracting and returning the existing observation result."
+}

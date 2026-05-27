@@ -1,0 +1,740 @@
+{
+  "version": "1.0",
+  "benchmark": "appworld",
+  "created_at": "2026-05-16T16:29:37.193097",
+  "skills": {
+    "planning": {},
+    "functional": [
+      {
+        "name": "fhir create catheter removal service request",
+        "document": "Create a FHIR ServiceRequest resource to order the removal of a urinary catheter for a specific patient.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S6541609').\ninsertion_procedure_id : str, optional\n    The ID of the catheter insertion Procedure resource this removal order relates to (e.g., 'proc-12345').\ninsertion_date : str\n    ISO 8601 datetime string of the catheter insertion procedure (e.g., '2023-11-09T09:00:00Z').\n\nOutputs\n-------\ndict\n    The created FHIR ServiceRequest resource object, including its assigned 'id'.\n\nNotes:\n-------\n1. This skill uses apis.fhir.create_service_request with the following fields:\n   - status: 'active'\n   - intent: 'order'\n   - code: a Coding with code 'REMOVE_CATHETER' and display 'Remove urinary catheter'\n   - subject: a Reference to the patient (e.g., {'reference': f'Patient/{patient_id}'})\n   - reasonReference: a Reference to the insertion Procedure (if available)\n   - authoredOn: the current timestamp (use datetime.datetime.now(datetime.timezone.utc).isoformat())\n2. The skill should only be invoked after confirming:\n   - A catheter insertion procedure (NUR1373) exists for the patient\n   - The catheter has been in place for more than 48 hours\n   - No removal order already exists\n3. After creation, log the new ServiceRequest ID for traceability.\n4. Do not hardcode the patient_id; always use the parameter.\n",
+        "content": "import datetime\n\nservice_request = apis.fhir.create_service_request(\n    resource={\n        \"resourceType\": \"ServiceRequest\",\n        \"status\": \"active\",\n        \"intent\": \"order\",\n        \"code\": {\n            \"coding\": [\n                {\n                    \"system\": \"http://snomed.info/sct\",\n                    \"code\": \"REMOVE_CATHETER\",\n                    \"display\": \"Remove urinary catheter\"\n                }\n            ]\n        },\n        \"subject\": {\n            \"reference\": f\"Patient/{patient_id}\"\n        },\n        \"reasonReference\": [\n            {\n                \"reference\": f\"Procedure/{insertion_procedure_id}\"\n            }\n        ],\n        \"authoredOn\": datetime.datetime.now(datetime.timezone.utc).isoformat()\n    }\n)\n\ncreated_request_id = service_request.get(\"id\", \"unknown\")\napis.supervisor.log(f\"Created catheter removal ServiceRequest {created_request_id} for patient {patient_id}\")",
+        "tools": [
+          "apis.fhir.create_service_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.245993",
+          "modified_at": "2026-05-16T17:14:26.246215"
+        }
+      },
+      {
+        "name": "get_most_recent_lab_result",
+        "document": "Retrieve the most recent observation result for a specific lab test code for a given patient from a FHIR server.\n\nParameters\n----------\npatient_id : str\n    The patient identifier (e.g., 'S3228213').\nlab_code : str\n    The LOINC code or system code for the lab test (e.g., 'TSH', 'Free T4'). Default is 'TSH'.\n\nOutputs\n-------\nmost_recent_value : str or None\n    The value of the most recent observation, or None if no observations exist for the given code.\n\nNotes\n-----\n1. This skill queries the FHIR Observation endpoint with the specified code and patient ID.\n2. It does NOT automatically parse the result unit or reference range—only the value is returned.\n3. If multiple observations exist, this skill sorts by date (date field) descending and returns the first result.\n4. Ensure the patient_id and lab_code are correctly provided; no validation is performed inside this skill.\n",
+        "content": "observations = apis.fhir.search_observation(\n    patient_id=patient_id,\n    code=lab_code\n)\n\nif not observations:\n    most_recent_value = None\nelse:\n    sorted_obs = sorted(\n        observations,\n        key=lambda obs: obs.get('effectiveDateTime', ''),\n        reverse=True\n    )\n    most_recent_obs = sorted_obs[0]\n    # Extract the value from the FHIR Observation resource\n    value_component = most_recent_obs.get('valueQuantity', {})\n    most_recent_value = value_component.get('value', None)\n    if most_recent_value is None:\n        # Fallback to valueString or other representations\n        most_recent_value = most_recent_obs.get('valueString', None)",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246038",
+          "modified_at": "2026-05-16T17:14:26.246223"
+        }
+      },
+      {
+        "name": "fhir create urinary catheter removal service request",
+        "document": "Create a FHIR ServiceRequest resource to order the removal of a urinary catheter for a specific patient. This should only be called after confirming that a catheter exists and no removal order is already in place.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S1736710').\n\nOutputs\n-------\ndict\n    The created FHIR ServiceRequest resource containing details of the removal order.\n\nNotes:\n-------\n1. This skill creates a ServiceRequest with:\n   - status: 'active'\n   - intent: 'order'\n   - code: 'NUR1373' (urinary catheter removal)\n   - subject: reference to the patient\n   - reasonCode: a text justification for the removal (e.g., 'Catheter in place > 48 hours without removal order')\n2. Call this skill only after verifying that no existing removal order is present.\n3. The skill uses a default reason description; if a custom reason is needed, modify the reasonCode text accordingly.\n4. The created resource is immediately submitted to the FHIR server.\n",
+        "content": "service_request = {\n    \"resourceType\": \"ServiceRequest\",\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://example.com/fhir/CodeSystem/catheter-codes\",\n                \"code\": \"NUR1373\",\n                \"display\": \"Urinary catheter removal\"\n            }\n        ],\n        \"text\": \"Urinary catheter removal\"\n    },\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"reasonCode\": [\n        {\n            \"text\": \"Catheter in place > 48 hours without documented removal order\"\n        }\n    ]\n}\n\ncreated_request = apis.fhir.create_service_request(service_request)",
+        "tools": [
+          "apis.fhir.create_service_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246049",
+          "modified_at": "2026-05-16T17:14:26.246227"
+        }
+      },
+      {
+        "name": "fhir get most recent lab result by code",
+        "document": "Retrieve the most recent lab result for a given patient and observation code by searching FHIR Observation resources, sorting by date descending, and limiting to one result.\n\nParameters\n----------\npatient_id : str\n    The patient identifier (e.g., 'S3228213').\nobservation_code : str\n    The LOINC code or system code for the lab test (e.g., 'TSH', 'FT4').\n\nOutputs\n-------\ndict or None\n    The most recent Observation resource (as a dict) if found, otherwise None.\n\nNotes:\n-------\n1. Uses the FHIR search API with `_sort=-date` to get the most recent result first and `_count=1` to limit results.\n2. If no results are returned, the function returns None – handle this case in the caller.\n3. The result contains fields like `code`, `valueQuantity`, `effectiveDateTime`, etc.\n",
+        "content": "search_response = apis.fhir.search_observation(\n    patient=patient_id,\n    code=observation_code,\n    params={\n        \"_sort\": \"-date\",\n        \"_count\": \"1\"\n    }\n)\n\nif search_response and search_response.get('entry'):\n    most_recent_observation = search_response['entry'][0]['resource']\nelse:\n    most_recent_observation = None",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955307",
+          "modified_at": "2026-05-16T18:32:20.955469"
+        }
+      },
+      {
+        "name": "fhir authenticate and retrieve patient medication requests",
+        "document": "Authenticate to a FHIR-based EHR system and retrieve all MedicationRequest resources for a given patient, filtered by category. This skill handles authentication if required and fetches the medication orders.\n\nParameters\n----------\npatient_id : str\n    The patient identifier (e.g., 'S0547588').\ncategory : str, optional\n    The category code for filtering medication requests (e.g., 'Community'). Default is None (no filter).\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resources matching the query.\n\nNotes:\n-------\n1. Authentication is performed automatically if the system requires it (e.g., via apis.fhir.login).\n2. The function uses the FHIR MedicationRequest endpoint with the patient ID and optional category filter.\n3. This is a foundational step before analyzing medication/vaccination data.\n4. Does not include pagination logic; assumes results fit in a single page or uses default server pagination.\n",
+        "content": "# Authenticate if needed (assuming login is handled by the environment)\n# Fetch MedicationRequest resources for the patient\nmedication_requests = apis.fhir.get(\n    f\"MedicationRequest?patient={patient_id}\" + (f\"&category={category}\" if category else \"\")\n)",
+        "tools": [
+          "apis.fhir.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246070",
+          "modified_at": "2026-05-16T17:14:26.246233"
+        }
+      },
+      {
+        "name": "fhir check for catheter removal order",
+        "document": "Check whether a patient has a documented removal order for a urinary catheter. This involves searching for a Procedure or ServiceRequest with a removal-related code (e.g., 'NUR1374' for catheter removal) that is in 'active' or 'completed' status.\n\nParameters\n----------\npatient_id : str\n    The patient's logical ID (e.g., 'S2450227').\nremoval_code : str\n    The specific procedure or service request code for catheter removal (e.g., 'NUR1374').\n\nOutputs\n-------\nbool\n    True if a removal order (active or completed) exists, False otherwise.\n\nNotes:\n-------\n1. This skill searches both Procedure and ServiceRequest resources for the given removal code.\n2. For Procedure resources, only those with status 'completed' are considered.\n3. For ServiceRequest resources, only those with status 'active' or 'completed' are considered.\n4. If either resource type contains a matching removal code, the function returns True.\n",
+        "content": "has_removal_order = False\n\n# Search for removal Procedure (completed)\nremoval_procedures = apis.fhir.search_procedure(\n    patient=patient_id,\n    code=removal_code\n)\nfor proc in removal_procedures:\n    if proc.get('status') == 'completed':\n        has_removal_order = True\n        break\n\n# If not found, search for removal ServiceRequest (active or completed)\nif not has_removal_order:\n    removal_requests = apis.fhir.search_service_request(\n        patient=patient_id,\n        code=removal_code\n    )\n    for req in removal_requests:\n        status = req.get('status')\n        if status in ('active', 'completed'):\n            has_removal_order = True\n            break",
+        "tools": [
+          "apis.fhir.search_procedure",
+          "apis.fhir.search_service_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246079",
+          "modified_at": "2026-05-16T17:14:26.246237"
+        }
+      },
+      {
+        "name": "fhir search for urinary catheter procedures within time window",
+        "document": "Search the FHIR Procedure resource for urinary catheter insertion procedures (code 'NUR1373') for a given patient within a specified time window.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S6538722').\nstart_datetime : str\n    ISO 8601 datetime string representing the start of the search window (e.g., '2023-11-09T09:00:00Z').\nend_datetime : str\n    ISO 8601 datetime string representing the end of the search window.\n\nOutputs\n-------\nlist[dict]\n    A list of Procedure resources matching the criteria. Each resource is a FHIR Procedure object.\n\nNotes:\n-------\n1. The procedure code for urinary catheter insertion is 'NUR1373'.\n2. The search uses the 'date' parameter with a 'ge' (greater than or equal) and 'le' (less than or equal) range to find procedures within the window.\n3. If no procedures are found, an empty list is returned.\n4. The end_datetime is typically 'now' or the current timestamp when checking for catheters placed within the last 48 hours.\n5. Avoid printing the entire result list; inspect only the first few entries to verify structure.\n",
+        "content": "import json\n\n# Build the date range query parameter\ndate_param = f\"date=ge{start_datetime}&date=le{end_datetime}\"\n\n# Search for Procedure resources with the catheter insertion code\nsearch_results = apis.fhir.search_procedure(\n    patient=patient_id,\n    code=\"NUR1373\",\n    date=date_param\n)\n\n# Parse and store results\ncatheter_procedures = json.loads(search_results) if isinstance(search_results, str) else search_results\n\n# Note: result is stored in variable 'catheter_procedures' for further processing\n",
+        "tools": [
+          "apis.fhir.search_procedure"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246087",
+          "modified_at": "2026-05-16T17:14:26.246241"
+        }
+      },
+      {
+        "name": "fhir evaluate thyroid lab results per protocol",
+        "document": "Evaluate the most recent TSH and free T4 lab results for a patient and determine the appropriate action based on a thyroid protocol.\n\nParameters\n----------\ntsh_observation : dict or None\n    The most recent TSH Observation FHIR resource, or None if unavailable.\nft4_observation : dict or None\n    The most recent free T4 Observation FHIR resource, or None if unavailable.\npatient_id : str\n    The patient identifier for logging/reporting purposes.\n\nOutputs\n-------\nstr\n    A human-readable summary message describing the lab values and the recommended action per protocol.\n\nNotes:\n-------\n1. This skill assumes the input observations are raw FHIR resources with fields: `valueQuantity.value`, `valueQuantity.unit`, `effectiveDateTime`.\n2. The protocol logic: if TSH > 10 → recommend action; if TSH is in [4.5, 10] → recommend a different action; otherwise (TSH < 4.5, or TSH not available) → no action required.\n3. If FT4 is missing, the protocol may still proceed based on TSH alone.\n4. This skill does not make API calls; it only processes already-retrieved data.\n5. The skill extracts the numeric value and unit from the FHIR Observation resource safely, handling missing fields.\n",
+        "content": "def extract_obs_value_and_date(obs):\n    \"\"\"Extract numeric value, unit, and effective date from a FHIR Observation.\"\"\"\n    if obs is None:\n        return None, None, None\n    try:\n        value = obs['valueQuantity']['value']\n        unit = obs['valueQuantity'].get('unit', '')\n        date = obs.get('effectiveDateTime', '')\n        return value, unit, date\n    except (KeyError, TypeError):\n        return None, None, None\n\ntsh_value, tsh_unit, tsh_date = extract_obs_value_and_date(tsh_observation)\nft4_value, ft4_unit, ft4_date = extract_obs_value_and_date(ft4_observation)\n\ntsh_str = f\"{tsh_value} {tsh_unit} ({tsh_date})\" if tsh_value is not None else \"No TSH values found\"\nft4_str = f\"{ft4_value} {ft4_unit} ({ft4_date})\" if ft4_value is not None else \"No FT4 values found\"\n\n# Apply protocol\nif tsh_value is not None and tsh_value > 10:\n    action = \"TSH > 10: Recommend action per protocol.\"\nelif tsh_value is not None and 4.5 <= tsh_value <= 10:\n    action = \"TSH in 4.5-10 range: Recommend different action per protocol.\"\nelse:\n    action = \"No action required per protocol.\"\n\nsummary = f\"Patient {patient_id}: TSH values: {tsh_str}. FT4 values: {ft4_str}. {action}\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246096",
+          "modified_at": "2026-05-16T17:14:26.246244"
+        }
+      },
+      {
+        "name": "fhir get most recent observation by code",
+        "document": "Retrieve the most recent observation for a given patient and LOINC code by sorting results by date in descending order and limiting to one result.\n\nParameters\n----------\npatient_id : str\n    The patient's logical ID (e.g., 'S1311412').\nobservation_code : str\n    The LOINC code of the observation to fetch (e.g., 'TSH', 'FT4').\n\nOutputs\n-------\ndict or None\n    The most recent observation resource (as a dict) if one exists, otherwise None.\n\nNotes:\n-------\n1. Uses the 'apis.fhir.search_observation' API with '_sort=-date' and '_count=1' parameters.\n2. The returned dict includes fields such as 'resource', 'id', 'status', 'code', 'subject', 'effectiveDateTime', 'valueQuantity', etc.\n3. If no observations are found, the API returns an empty entry list; the skill returns None in that case.\n",
+        "content": "result = apis.fhir.search_observation(\n    patient=patient_id,\n    code=observation_code,\n    _sort=\"-date\",\n    _count=1\n)\nobservations = result.get('entry', [])\nif observations:\n    most_recent = observations[0]['resource']\nelse:\n    most_recent = None",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T18:02:58.103188",
+          "modified_at": "2026-05-16T18:02:58.103303"
+        }
+      },
+      {
+        "name": "fhir retrieve and interpret thyroid lab results",
+        "document": "Retrieve the most recent TSH and free T4 lab results for a patient, interpret each result against provided reference ranges, and output a clinical summary with recommended action.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S6521727').\n\nOutputs\n-------\nNone\n    Prints a summary for each lab result including value, unit, date, normal/abnormal status, and any recommended action.\n\nNotes:\n-------\n1. This skill retrieves two separate observations: TSH and free T4.\n2. Each observation is fetched using the 'fhir get most recent observation by code' skill's logic (code-based search, date descending, limit=1).\n3. After retrieval, each value is compared against typical reference ranges (TSH: 0.4-4.0 uIU/mL; free T4: 0.8-1.8 ng/dL).\n4. If both results are within normal range, a 'no action required' message is printed.\n5. If either result is abnormal, the skill prints an alert recommending further clinical review.\n6. Ensure the patient_id is provided as a string matching the FHIR server's identifier system.\n7. This skill does not modify any patient data; it only retrieves and interprets results.\n",
+        "content": "# Retrieve most recent TSH observation\nobservations_tsh = apis.fhir.search_observations(\n    code=\"TSH\",\n    patient=patient_id,\n    sort=\"-date\",\n    limit=1\n)\n\nif observations_tsh:\n    most_recent_tsh = observations_tsh[0]\n    tsh_value = most_recent_tsh.get(\"valueQuantity\", {}).get(\"value\")\n    tsh_unit = most_recent_tsh.get(\"valueQuantity\", {}).get(\"unit\")\n    tsh_date = most_recent_tsh.get(\"effectiveDateTime\") or most_recent_tsh.get(\"issued\")\n    print(f\"TSH: {tsh_value} {tsh_unit} ({tsh_date})\")\nelse:\n    print(f\"No TSH observation found for patient {patient_id}.\")\n    tsh_value = None\n\n# Retrieve most recent free T4 observation\nobservations_ft4 = apis.fhir.search_observations(\n    code=\"free T4\",\n    patient=patient_id,\n    sort=\"-date\",\n    limit=1\n)\n\nif observations_ft4:\n    most_recent_ft4 = observations_ft4[0]\n    ft4_value = most_recent_ft4.get(\"valueQuantity\", {}).get(\"value\")\n    ft4_unit = most_recent_ft4.get(\"valueQuantity\", {}).get(\"unit\")\n    ft4_date = most_recent_ft4.get(\"effectiveDateTime\") or most_recent_ft4.get(\"issued\")\n    print(f\"Free T4: {ft4_value} {ft4_unit} ({ft4_date})\")\nelse:\n    print(f\"No free T4 observation found for patient {patient_id}.\")\n    ft4_value = None\n\n# Interpret results and recommend action\nif tsh_value is not None and ft4_value is not None:\n    tsh_normal = 0.4 <= tsh_value <= 4.0\n    ft4_normal = 0.8 <= ft4_value <= 1.8\n    if tsh_normal and ft4_normal:\n        print(\"Both TSH and free T4 are within normal range. No action required per protocol.\")\n    else:\n        print(\"ALERT: Abnormal thyroid lab values detected. Further clinical review recommended.\")\nelif tsh_value is not None and ft4_value is None:\n    if 0.4 <= tsh_value <= 4.0:\n        print(\"TSH is normal, but no free T4 result available. Monitor per protocol.\")\n    else:\n        print(\"ALERT: Abnormal TSH detected. Further clinical review recommended.\")\nelif tsh_value is None and ft4_value is not None:\n    if 0.8 <= ft4_value <= 1.8:\n        print(\"Free T4 is normal, but no TSH result available. Monitor per protocol.\")\n    else:\n        print(\"ALERT: Abnormal free T4 detected. Further clinical review recommended.\")\nelse:\n    print(\"No thyroid lab results available for patient. Unable to determine action.\")",
+        "tools": [
+          "apis.fhir.search_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246114",
+          "modified_at": "2026-05-16T17:14:26.246251"
+        }
+      },
+      {
+        "name": "fhir get active medication requests by patient",
+        "document": "Retrieve all active medication requests (orders) for a given patient from a FHIR server.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S1353305').\n\nOutputs\n-------\nlist[dict]\n    A list of active MedicationRequest resources for the specified patient.\n\nNotes\n-----\n1. Only retrieves records with status='active'.\n2. The skill uses the apis.fhir.search_medication_requests tool with the patient identifier and status filter.\n3. If no active orders exist, an empty list is returned.\n4. This skill does not differentiate between opioid and non-opioid orders; further filtering is needed downstream.\n",
+        "content": "medication_requests = apis.fhir.search_medication_requests(\n    patient=patient_id,\n    status=\"active\"\n)",
+        "tools": [
+          "apis.fhir.search_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246123",
+          "modified_at": "2026-05-16T17:14:26.246255"
+        }
+      },
+      {
+        "name": "filter opioid medication orders from medication list",
+        "document": "Filter a list of MedicationRequest resources to retain only those whose medication is an opioid analgesic, using a predefined set of opioid RxNorm codes.\n\nParameters\n----------\nmedication_requests : list[dict]\n    A list of MedicationRequest FHIR resources (each containing medicationCodeableConcept).\n\nOutputs\n-------\nlist[dict]\n    Filtered list containing only opioid analgesic MedicationRequest resources.\n\nNotes\n-----\n1. Opioid detection is based on RxNorm codes. The skill includes a comprehensive set of common opioid codes.\n2. The skill inspects both 'medicationCodeableConcept' and 'medicationReference' fields (if present) to extract codes.\n3. If a medication reference is used (not a codeable concept), the skill attempts to resolve it via a FHIR read call.\n4. The opioid code set covers common analgesics (e.g., morphine, oxycodone, fentanyl, hydromorphone, codeine, hydrocodone, tramadol, methadone, meperidine, buprenorphine, tapentadol, sufentanil, remifentanil, alfentanil).\n5. This skill does not modify the input list; it returns a new filtered list.\n",
+        "content": "# Define a comprehensive set of RxNorm codes for opioid analgesics\nOPIOID_RXNORM_CODES = {\n    \"3016\",   # Acetaminophen / Oxycodone\n    \"3311\",   # Codeine\n    \"3412\",   # Fentanyl\n    \"3423\",   # Hydrocodone\n    \"3456\",   # Hydromorphone\n    \"3521\",   # Meperidine\n    \"3530\",   # Methadone\n    \"3616\",   # Morphine\n    \"3640\",   # Oxycodone\n    \"3655\",   # Oxymorphone\n    \"3672\",   # Pentazocine\n    \"3690\",   # Propoxyphene\n    \"3702\",   # Remifentanil\n    \"3710\",   # Sufentanil\n    \"3720\",   # Tapentadol\n    \"3730\",   # Tramadol\n    \"3740\",   # Buprenorphine\n    \"43067\",  # Butorphanol\n    \"43068\",  # Nalbuphine\n    \"43069\",  # Levorphanol\n    \"43070\",  # Dezocine\n}\n\nopioid_orders = []\n\nfor req in medication_requests:\n    # Attempt to extract codes from medicationCodeableConcept\n    coding_list = req.get(\"medicationCodeableConcept\", {}).get(\"coding\", [])\n    codes = {c.get(\"code\") for c in coding_list if c.get(\"system\") == \"http://www.nlm.nih.gov/research/umls/rxnorm\"}\n    \n    # If no codes found via medicationCodeableConcept, try medicationReference\n    if not codes:\n        med_ref = req.get(\"medicationReference\")\n        if med_ref and med_ref.get(\"reference\"):\n            # Resolve the reference by reading the Medication resource\n            med_resource = apis.fhir.read_resource(\n                resource_type=\"Medication\",\n                resource_id=med_ref[\"reference\"].split(\"/\")[-1]\n            )\n            med_coding = med_resource.get(\"code\", {}).get(\"coding\", [])\n            codes = {c.get(\"code\") for c in med_coding if c.get(\"system\") == \"http://www.nlm.nih.gov/research/umls/rxnorm\"}\n    \n    # Check if any extracted code is in the opioid set\n    if codes & OPIOID_RXNORM_CODES:\n        opioid_orders.append(req)\n",
+        "tools": [
+          "apis.fhir.read_resource"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246133",
+          "modified_at": "2026-05-16T17:14:26.246259"
+        }
+      },
+      {
+        "name": "check naloxone co-prescription for opioid orders",
+        "document": "For each active opioid medication order, verify whether a matching naloxone prescription exists for the same patient. If an opioid order lacks a concurrent naloxone order, create a new naloxone prescription.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S1353305').\nopioid_orders : list[dict]\n    A list of active opioid MedicationRequest resources that need naloxone verification.\n\nOutputs\n-------\nlist[dict]\n    A list of newly created naloxone MedicationRequest resources (one per opioid order missing naloxone).\n\nNotes\n-----\n1. This skill searches for active naloxone prescriptions for the same patient using the substance concept 'naloxone'.\n2. For each opioid order, it checks if any existing naloxone order overlaps in time (based on authoredOn or similar timing).\n3. If no matching naloxone order is found, a new naloxone MedicationRequest is created with appropriate parameters (patient, medication, status='active', etc.).\n4. The creation uses apis.fhir.create_resource to persist the new order.\n5. Only active orders are considered; discontinued or completed naloxone orders are ignored.\n6. This skill does not modify the input opioid_orders list.\n",
+        "content": "new_naloxone_orders = []\n\n# Retrieve existing active naloxone prescriptions for the patient\nnaloxone_requests = apis.fhir.search_medication_requests(\n    patient=patient_id,\n    status=\"active\",\n    substance=\"naloxone\"\n)\n\nfor opioid_order in opioid_orders:\n    # Determine the opioid order's timeframe (e.g., authoredOn, period)\n    opioid_authored = opioid_order.get(\"authoredOn\", \"\")\n    opioid_period = opioid_order.get(\"dosageInstruction\", [{}])[0].get(\"timing\", {}).get(\"repeat\", {}).get(\"boundsPeriod\", {})\n    opioid_start = opioid_period.get(\"start\", opioid_authored)\n    opioid_end = opioid_period.get(\"end\", None)\n    \n    # Check if any existing naloxone order overlaps with this opioid order\n    has_naloxone = False\n    for nal_order in naloxone_requests:\n        nal_authored = nal_order.get(\"authoredOn\", \"\")\n        nal_period = nal_order.get(\"dosageInstruction\", [{}])[0].get(\"timing\", {}).get(\"repeat\", {}).get(\"boundsPeriod\", {})\n        nal_start = nal_period.get(\"start\", nal_authored)\n        nal_end = nal_period.get(\"end\", None)\n        \n        # Simple overlap check: if opioid_start <= nal_end (or nal_end is None) and nal_start <= opioid_end (or opioid_end is None)\n        if (opioid_start <= (nal_end or \"9999-12-31\")) and (nal_start <= (opioid_end or \"9999-12-31\")):\n            has_naloxone = True\n            break\n    \n    if not has_naloxone:\n        # Create a new naloxone prescription\n        new_order = apis.fhir.create_resource(\n            resource_type=\"MedicationRequest\",\n            body={\n                \"status\": \"active\",\n                \"intent\": \"order\",\n                \"medicationCodeableConcept\": {\n                    \"coding\": [{\n                        \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n                        \"code\": \"4054\",  # Naloxone RxNorm code\n                        \"display\": \"Naloxone\"\n                    }]\n                },\n                \"subject\": {\"reference\": f\"Patient/{patient_id}\"},\n                \"authoredOn\": opioid_authored,  # Use same date as opioid order\n                \"dosageInstruction\": [{\n                    \"timing\": {\n                        \"repeat\": {\n                            \"boundsPeriod\": {\n                                \"start\": opioid_start,\n                                \"end\": opioid_end\n                            }\n                        }\n                    }\n                }]\n            }\n        )\n        new_naloxone_orders.append(new_order)\n",
+        "tools": [
+          "apis.fhir.search_medication_requests",
+          "apis.fhir.create_resource"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246142",
+          "modified_at": "2026-05-16T17:14:26.246263"
+        }
+      },
+      {
+        "name": "create naloxone prescription for opioid order",
+        "document": "Create a new naloxone MedicationRequest for a patient when an active opioid order lacks a matching naloxone prescription.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S1353305').\nopioid_order : dict\n    The active opioid MedicationRequest resource that requires a naloxone co-prescription.\n\nOutputs\n-------\ndict\n    The newly created naloxone MedicationRequest resource.\n\nNotes\n-----\n1. This skill creates a naloxone prescription that mirrors the opioid order's timing (authoredOn, start/end dates).\n2. The naloxone order is created with status='active' and intent='order'.\n3. The medication uses RxNorm code 4054 for Naloxone.\n4. The skill uses apis.fhir.create_resource to persist the new order.\n5. This skill does NOT check for existing naloxone orders; that verification should be done before calling this skill.\n6. The created naloxone order will have the same timeframe as the associated opioid order.\n",
+        "content": "# Create a new naloxone prescription for the given opioid order\nopioid_authored = opioid_order.get(\"authoredOn\", \"\")\nopioid_period = opioid_order.get(\"dosageInstruction\", [{}])[0].get(\"timing\", {}).get(\"repeat\", {}).get(\"boundsPeriod\", {})\nopioid_start = opioid_period.get(\"start\", opioid_authored)\nopioid_end = opioid_period.get(\"end\", None)\n\nnew_order = apis.fhir.create_resource(\n    resource_type=\"MedicationRequest\",\n    body={\n        \"status\": \"active\",\n        \"intent\": \"order\",\n        \"medicationCodeableConcept\": {\n            \"coding\": [{\n                \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n                \"code\": \"4054\",  # Naloxone RxNorm code\n                \"display\": \"Naloxone\"\n            }]\n        },\n        \"subject\": {\"reference\": f\"Patient/{patient_id}\"},\n        \"authoredOn\": opioid_authored,  # Use same date as opioid order\n        \"dosageInstruction\": [{\n            \"timing\": {\n                \"repeat\": {\n                    \"boundsPeriod\": {\n                        \"start\": opioid_start,\n                        \"end\": opioid_end\n                    }\n                }\n            }\n        }]\n    }\n)",
+        "tools": [
+          "apis.fhir.create_resource"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246150",
+          "modified_at": "2026-05-16T17:14:26.246267"
+        }
+      },
+      {
+        "name": "fhir retrieve inpatient medication requests for patient",
+        "document": "Retrieve all medication requests for a specific patient filtered by inpatient category (or equivalent scope). This is typically the first step when verifying or managing medication orders for a hospitalized patient.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient (e.g., 'S2823623').\n\nOutputs\n-------\nlist[dict]\n    A list of medication request resources returned by the FHIR server.\n\nNotes:\n-------\n1. The 'category' filter is set to 'inpatient' to scope requests to inpatient medications only.\n2. This call does NOT filter by status (active, draft, etc.) — the caller should further filter if needed.\n3. Be aware that pagination may be required if the result set is large; this implementation fetches only the first page.\n",
+        "content": "medication_requests = apis.fhir.search_medication_requests(\n    patient=patient_id,\n    category='inpatient'\n)",
+        "tools": [
+          "apis.fhir.search_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T17:14:26.246159",
+          "modified_at": "2026-05-16T17:14:26.246271"
+        }
+      },
+      {
+        "name": "fhir get most recent lab observation by code",
+        "document": "Retrieve the most recent laboratory observation for a given patient and LOINC code using FHIR search, sorted by date descending with a single result.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., \"S3228213\").\nobservation_code : str\n    The LOINC code for the desired lab observation (e.g., \"TSH\", \"FT4\").\n\nOutputs\n-------\ndict or None\n    The most recent Observation FHIR resource if found, otherwise None.\n\nNotes:\n-------\n1. The search uses sort=-date to get the newest result first, and _count=1 to limit to one entry.\n2. If the returned 'entry' list is empty or missing, return None to indicate no results.\n",
+        "content": "response = apis.fhir.search_observation(\n    patient=patient_id,\n    code=observation_code,\n    sort=\"-date\",\n    _count=1\n)\n\nmost_recent = None\nif response and \"entry\" in response and len(response[\"entry\"]) > 0:\n    most_recent = response[\"entry\"][0][\"resource\"]",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T17:36:49.226231",
+          "modified_at": "2026-05-16T17:36:49.226416"
+        }
+      },
+      {
+        "name": "fhir evaluate thyroid lab results and report outcome",
+        "document": "Evaluate the most recent TSH and free T4 lab results for a patient and report the appropriate action based on protocol logic.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., \"S3228213\").\ntsh_code : str\n    The LOINC code for TSH (e.g., \"TSH\").\nft4_code : str\n    The LOINC code for free T4 (e.g., \"FT4\").\n\nOutputs\n-------\nNone\n    The skill directly reports the outcome via apis.supervisor.complete_task.\n\nNotes:\n-------\n1. This skill first retrieves the most recent TSH and free T4 observations using the existing 'fhir get most recent lab observation by code' skill logic.\n2. If either or both lab results are missing (None), report that no action can be taken based on the protocol.\n3. If both results are present, extract their numeric values and compare them to protocol-defined reference ranges to determine the appropriate follow-up action.\n4. The skill uses apis.supervisor.complete_task to finalize the task with a clear message.\n",
+        "content": "tsh_result = apis.fhir.search_observation(\n    patient=patient_id,\n    code=tsh_code,\n    sort=\"-date\",\n    _count=1\n)\nft4_result = apis.fhir.search_observation(\n    patient=patient_id,\n    code=ft4_code,\n    sort=\"-date\",\n    _count=1\n)\n\ntsh_most_recent = None\nif tsh_result and \"entry\" in tsh_result and len(tsh_result[\"entry\"]) > 0:\n    tsh_most_recent = tsh_result[\"entry\"][0][\"resource\"]\n\nft4_most_recent = None\nif ft4_result and \"entry\" in ft4_result and len(ft4_result[\"entry\"]) > 0:\n    ft4_most_recent = ft4_result[\"entry\"][0][\"resource\"]\n\nif tsh_most_recent is None or ft4_most_recent is None:\n    missing = []\n    if tsh_most_recent is None:\n        missing.append(tsh_code)\n    if ft4_most_recent is None:\n        missing.append(ft4_code)\n    message = f\"No {' or '.join(missing)} lab results found for patient {patient_id}. No action can be taken based on the protocol.\"\n    apis.supervisor.complete_task([message])\nelse:\n    tsh_value = None\n    if \"valueQuantity\" in tsh_most_recent and \"value\" in tsh_most_recent[\"valueQuantity\"]:\n        tsh_value = tsh_most_recent[\"valueQuantity\"][\"value\"]\n    ft4_value = None\n    if \"valueQuantity\" in ft4_most_recent and \"value\" in ft4_most_recent[\"valueQuantity\"]:\n        ft4_value = ft4_most_recent[\"valueQuantity\"][\"value\"]\n\n    if tsh_value is not None and ft4_value is not None:\n        if tsh_value > 4.5:\n            action = f\"TSH is elevated ({tsh_value}). Recommend follow-up for hypothyroidism evaluation.\"\n        elif tsh_value < 0.4:\n            action = f\"TSH is suppressed ({tsh_value}). Recommend follow-up for hyperthyroidism evaluation.\"\n        else:\n            action = f\"TSH is normal ({tsh_value}). No specific action required based on TSH.\"\n        \n        if ft4_value < 0.8:\n            action += f\" Free T4 is low ({ft4_value}). Further evaluation may be needed.\"\n        elif ft4_value > 1.8:\n            action += f\" Free T4 is elevated ({ft4_value}). Further evaluation may be needed.\"\n        else:\n            action += f\" Free T4 is normal ({ft4_value}).\"\n        \n        apis.supervisor.complete_task([action])\n    else:\n        apis.supervisor.complete_task([f\"Lab results found for patient {patient_id} but values could not be extracted. No action can be taken based on the protocol.\"])",
+        "tools": [
+          "apis.fhir.search_observation",
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T17:36:49.226285",
+          "modified_at": "2026-05-16T17:36:49.226434"
+        }
+      },
+      {
+        "name": "fhir retrieve and interpret thyroid lab protocol",
+        "document": "Retrieve the most recent TSH and free T4 (FT4) observations for a given patient from a FHIR server, then determine the appropriate action based on a simple thyroid protocol.\n\nParameters\n----------\nbase_url : str\n    Base URL of the FHIR server (e.g., http://localhost:8080/fhir).\npatient_id : str\n    The patient identifier.\n\nOutputs\n-------\nstr\n    A message describing the TSH and FT4 results and the recommended action per protocol.\n\nNotes:\n-------\n1. This skill assumes the protocol: if TSH > 10, action required; if TSH between 4.5-10, further evaluation; otherwise no action.\n2. The skill uses the existing 'fhir retrieve most recent observation by code and patient' logic but combines both lab values and applies decision logic.\n3. The decision logic is simplified and should be adapted to the actual clinical protocol in use.\n4. Ensure the patient_id is properly URL-encoded if it contains special characters.\n",
+        "content": "# Retrieve most recent TSH observation\ntsh_observations = apis.fhir.search_observation_list(\n    base_url=base_url,\n    patient_id=patient_id,\n    code=\"TSH\",\n    sort=\"-date\",\n    page_index=0,\n    page_limit=1\n)\n\n# Retrieve most recent free T4 observation\nft4_observations = apis.fhir.search_observation_list(\n    base_url=base_url,\n    patient_id=patient_id,\n    code=\"FT4\",\n    sort=\"-date\",\n    page_index=0,\n    page_limit=1\n)\n\n# Extract TSH value and date\nif tsh_observations:\n    tsh_value = tsh_observations[0].get(\"valueQuantity\", {}).get(\"value\", None)\n    tsh_date = tsh_observations[0].get(\"effectiveDateTime\", tsh_observations[0].get(\"issued\", \"\"))[:10]\n    tsh_unit = tsh_observations[0].get(\"valueQuantity\", {}).get(\"unit\", \"uIU/mL\")\n    tsh_result = f\"TSH: {tsh_value} {tsh_unit} ({tsh_date})\"\nelse:\n    tsh_result = \"No TSH results found.\"\n\n# Extract FT4 value and date\nif ft4_observations:\n    ft4_value = ft4_observations[0].get(\"valueQuantity\", {}).get(\"value\", None)\n    ft4_date = ft4_observations[0].get(\"effectiveDateTime\", ft4_observations[0].get(\"issued\", \"\"))[:10]\n    ft4_unit = ft4_observations[0].get(\"valueQuantity\", {}).get(\"unit\", \"ng/dL\")\n    ft4_result = f\"Free T4: {ft4_value} {ft4_unit} ({ft4_date})\"\nelse:\n    ft4_result = \"No FT4 results found.\"\n\n# Apply protocol logic\nif tsh_value is not None:\n    if tsh_value > 10:\n        action = \"Action required: TSH > 10. Notify physician.\"\n    elif 4.5 <= tsh_value <= 10:\n        action = \"Further evaluation needed: TSH in 4.5-10 range. Consider repeat testing.\"\n    else:\n        action = \"No action required per protocol.\"\nelse:\n    action = \"Cannot determine action: TSH result unavailable.\"\n\nresult_message = f\"{tsh_result}. {ft4_result}. {action}\"",
+        "tools": [
+          "apis.fhir.search_observation_list"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T17:36:49.226298",
+          "modified_at": "2026-05-16T17:36:49.226440"
+        }
+      },
+      {
+        "name": "fhir check naloxone co-prescription for opioid orders",
+        "document": "For a list of active opioid medication orders, verify whether each has a matching active naloxone prescription for the same patient. If an opioid order lacks a naloxone co-prescription, create a new naloxone order.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier.\nopioid_orders : list[dict]\n    A list of active opioid MedicationRequest resources to verify.\nnaloxone_code : str, optional\n    The FHIR medication code for naloxone (default is \"197680\").\n\nOutputs\n-------\nlist[dict]\n    A list of newly created naloxone MedicationRequest resources (empty if none were needed).\n\nNotes:\n-------\n1. For each opioid order, search for an active naloxone prescription for the same patient using the naloxone medication code.\n2. If no matching naloxone prescription is found, create a new naloxone order that mirrors the opioid order's patient, status, and relevant details.\n3. Avoid creating duplicate naloxone orders; only create one per unmatched opioid order.\n4. The creation uses the FHIR MedicationRequest POST endpoint.\n",
+        "content": "new_naloxone_orders = []\nfor opioid in opioid_orders:\n    # Search for existing active naloxone prescription for this patient\n    existing_naloxone = apis.fhir.search_medication_requests(\n        patient=patient_id,\n        status=\"active\",\n        code=naloxone_code\n    )\n    if not existing_naloxone:\n        # No naloxone found; create a new naloxone order\n        new_order = apis.fhir.create_medication_request(\n            patient=patient_id,\n            medication_code=naloxone_code,\n            status=\"active\",\n            # Additional fields can be copied from the opioid order as needed\n            # e.g., prescriber, dosage instructions, etc.\n        )\n        new_naloxone_orders.append(new_order)\n",
+        "tools": [
+          "apis.fhir.search_medication_requests",
+          "apis.fhir.create_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T17:36:49.226309",
+          "modified_at": "2026-05-16T17:36:49.226446"
+        }
+      },
+      {
+        "name": "fhir create naloxone order from opioid template",
+        "document": "Create a new naloxone MedicationRequest for a patient by copying relevant attributes from an existing opioid order template.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier.\nopioid_order : dict\n    The active opioid MedicationRequest resource to use as a template for the naloxone order.\nnaloxone_code : str, optional\n    The FHIR medication code for naloxone (default is \"197680\").\n\nOutputs\n-------\ndict\n    The newly created naloxone MedicationRequest resource.\n\nNotes:\n-------\n1. This skill copies key fields from the opioid order (e.g., prescriber, dosage instructions, route) to ensure the naloxone order is appropriately matched.\n2. The medication code is overridden to the naloxone code provided.\n3. The new order is created with status=\"active\".\n4. Avoid creating duplicate orders; this skill assumes a prior check has confirmed no existing naloxone prescription.\n5. The creation uses the FHIR MedicationRequest POST endpoint (apis.fhir.create_medication_request).\n",
+        "content": "import json\n\n# Extract fields from the opioid order template\ntemplate = opioid_order\n\n# Build the new naloxone order payload\nnaloxone_order = {\n    \"resourceType\": \"MedicationRequest\",\n    \"status\": \"active\",\n    \"medicationCodeableConcept\": {\n        \"coding\": [{\n            \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n            \"code\": naloxone_code,\n            \"display\": \"Naloxone\"\n        }]\n    },\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"authoredOn\": template.get(\"authoredOn\"),\n    \"requester\": template.get(\"requester\"),\n    \"dosageInstruction\": template.get(\"dosageInstruction\"),\n    \"dispenseRequest\": template.get(\"dispenseRequest\")\n}\n\n# Create the new naloxone order\nnew_order = apis.fhir.create_medication_request(\n    patient=patient_id,\n    medication_code=naloxone_code,\n    status=\"active\",\n    payload=json.dumps(naloxone_order)\n)",
+        "tools": [
+          "apis.fhir.create_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T17:36:49.226319",
+          "modified_at": "2026-05-16T17:36:49.226451"
+        }
+      },
+      {
+        "name": "fhir get most recent observation by code and patient",
+        "document": "Retrieve the most recent observation for a given LOINC code and patient ID, sorted by date descending so the newest result is first.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S3057899').\nobservation_code : str\n    The LOINC code for the observation type (e.g., 'TSH', 'FT4').\n\nOutputs\n-------\ndict or None\n    The most recent observation resource (a FHIR Observation JSON object) if one exists, otherwise None.\n\nNotes:\n-------\n1. The API returns results sorted by date descending (newest first).\n2. Only the first result is taken as the most recent.\n3. If no observations are found, the function returns None.\n",
+        "content": "results = apis.fhir.search_observation(\n    patient_id=patient_id,\n    code=observation_code,\n    sort=\"-date\",\n    count=1\n)\nif results and len(results) > 0:\n    most_recent = results[0]\nelse:\n    most_recent = None",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T17:36:49.226339",
+          "modified_at": "2026-05-16T17:36:49.226493"
+        }
+      },
+      {
+        "name": "fhir retrieve and evaluate thyroid labs for patient",
+        "document": "Retrieve the most recent TSH and free T4 observations for a given patient and evaluate them against standard thyroid protocol thresholds, then produce a final summary with the recommended action.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier.\n\nOutputs\n-------\nstr\n    A summary message containing the most recent TSH and FT4 results (with dates and units) and the action determined per protocol.\n\nNotes:\n-------\n1. This skill combines retrieving TSH and FT4 observations (using a reasonable lookback period of 30 days) with clinical evaluation.\n2. If no results are found within the lookback period, the function should be called with a larger lookback (e.g., 365 days) by adjusting the days_lookback parameter.\n3. Standard TSH normal range: 0.4-4.0 uIU/mL. Standard FT4 normal range: 0.7-1.8 ng/dL.\n4. The skill handles missing results gracefully (e.g., 'no results found').\n5. The final output is passed to apis.supervisor.complete_task to finish the task.\n6. This skill does not import any external Python packages; it uses the available apis.fhir.read_observations and apis.supervisor.complete_task functions.\n",
+        "content": "# Step 1: Retrieve most recent TSH observation (using a 30-day lookback)\ntsh_result = None\nfrom datetime import datetime, timedelta\n\ncutoff_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')\ntsh_observations = apis.fhir.read_observations(\n    patient_id=patient_id,\n    code='TSH',\n    date=f'ge{cutoff_date}'\n)\nif tsh_observations:\n    sorted_tsh = sorted(tsh_observations, key=lambda o: o.get('effectiveDateTime', ''), reverse=True)\n    tsh_result = sorted_tsh[0]\n\n# Step 2: Retrieve most recent FT4 observation (using a 30-day lookback)\nft4_result = None\nft4_observations = apis.fhir.read_observations(\n    patient_id=patient_id,\n    code='FT4',\n    date=f'ge{cutoff_date}'\n)\nif ft4_observations:\n    sorted_ft4 = sorted(ft4_observations, key=lambda o: o.get('effectiveDateTime', ''), reverse=True)\n    ft4_result = sorted_ft4[0]\n\n# Step 3: Extract values and dates\ntsh_value = None\ntsh_unit = None\ntsh_date = None\nif tsh_result:\n    tsh_value = tsh_result.get('valueQuantity', {}).get('value')\n    tsh_unit = tsh_result.get('valueQuantity', {}).get('unit', '')\n    tsh_date = tsh_result.get('effectiveDateTime', '')[:10]\n\nft4_value = None\nft4_unit = None\nft4_date = None\nif ft4_result:\n    ft4_value = ft4_result.get('valueQuantity', {}).get('value')\n    ft4_unit = ft4_result.get('valueQuantity', {}).get('unit', '')\n    ft4_date = ft4_result.get('effectiveDateTime', '')[:10]\n\n# Step 4: Build summary\ntsh_summary = f\"TSH: {tsh_value} {tsh_unit} ({tsh_date})\" if tsh_value else \"TSH: no results found\"\nft4_summary = f\"FT4: {ft4_value} {ft4_unit} ({ft4_date})\" if ft4_value else \"FT4: no results found\"\n\n# Step 5: Determine action\naction = \"No action required per protocol.\"\nif tsh_value is not None:\n    if tsh_value < 0.4:\n        action = \"TSH is below normal (low). Consider reducing thyroid medication dosage or consult endocrinologist.\"\n    elif tsh_value > 4.0:\n        action = \"TSH is above normal (high). Consider increasing thyroid medication dosage or consult endocrinologist.\"\n    else:\n        action = \"TSH is within normal range. No action required per protocol.\"\n\nsummary = f\"{tsh_summary}, {ft4_summary}. {action}\"\n\n# Step 6: Return final result\napis.supervisor.complete_task([summary])",
+        "tools": [
+          "apis.fhir.read_observations",
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T18:02:58.103122",
+          "modified_at": "2026-05-16T18:02:58.103280"
+        }
+      },
+      {
+        "name": "evaluate thyroid lab results against protocol thresholds",
+        "document": "Evaluate the most recent TSH and free T4 lab results against protocol thresholds to determine the appropriate clinical action.\n\nParameters\n----------\ntsh_result : dict or None\n    The most recent TSH Observation resource as a dict, or None if not available.\nft4_result : dict or None\n    The most recent free T4 Observation resource as a dict, or None if not available.\n\nOutputs\n-------\nstr\n    A message describing the determined action: dose adjustment recommendation, no change, alert notification, or an indication that results are unavailable.\n\nNotes:\n-------\n1. This skill assumes that the protocol thresholds are predefined constants within the skill (e.g., TSH normal range 0.4–4.0 mIU/L, FT4 normal range 0.8–1.8 ng/dL). Adjust thresholds as needed for the specific protocol.\n2. Extract the numeric value from each Observation resource by accessing the 'valueQuantity' field (e.g., result['valueQuantity']['value']).\n3. If either or both results are None, report that lab results are unavailable and no action can be determined.\n4. The skill does not call any external APIs; it performs local evaluation only.\n",
+        "content": "# Define protocol thresholds (customize as needed)\nTSH_LOW = 0.4\nTSH_HIGH = 4.0\nFT4_LOW = 0.8\nFT4_HIGH = 1.8\n\n# Check availability of results\nif tsh_result is None or ft4_result is None:\n    action_message = \"No TSH or free T4 lab results found for patient. Unable to determine appropriate action per protocol.\"\nelse:\n    # Extract numeric values\n    tsh_value = tsh_result['valueQuantity']['value']\n    ft4_value = ft4_result['valueQuantity']['value']\n    \n    # Evaluate against thresholds\n    if tsh_value < TSH_LOW:\n        action_message = f\"TSH is low ({tsh_value}). Consider dose reduction or alert physician.\"\n    elif tsh_value > TSH_HIGH:\n        action_message = f\"TSH is high ({tsh_value}). Consider dose increase or alert physician.\"\n    else:\n        action_message = f\"TSH is normal ({tsh_value}). No dose adjustment needed.\"\n    \n    # Optionally incorporate FT4 for more nuanced action\n    if ft4_value < FT4_LOW:\n        action_message += f\" FT4 is low ({ft4_value}). Consider dose increase.\"\n    elif ft4_value > FT4_HIGH:\n        action_message += f\" FT4 is high ({ft4_value}). Consider dose reduction.\"\n    else:\n        action_message += f\" FT4 is normal ({ft4_value}).\"\n",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T18:02:58.103167",
+          "modified_at": "2026-05-16T18:02:58.103293"
+        }
+      },
+      {
+        "name": "fhir evaluate thyroid lab results and determine action",
+        "document": "Evaluate retrieved TSH and free T4 lab results for a patient and determine appropriate action per thyroid protocol. This skill checks if both values are present, compares them to standard reference ranges, and flags abnormalities or missing data.\n\nParameters\n----------\nlatest_observations : dict[str, dict | None]\n    Dictionary mapping observation codes (e.g., 'TSH', 'FT4') to their most recent FHIR Observation resource dict, or None if not found.\npatient_id : str\n    The patient identifier (e.g., 'S3228213').\n\nOutputs\n-------\nstr\n    A message describing the findings and recommended action (or stating inability to determine action).\n\nNotes:\n-------\n1. This skill assumes standard reference ranges: TSH normal ~0.4-4.0 mIU/L, free T4 normal ~0.8-1.8 ng/dL. Adjust ranges if protocol specifies different values.\n2. The skill extracts the numeric value from the FHIR Observation resource's 'valueQuantity' field.\n3. If a value is outside the normal range, the skill flags it as abnormal and suggests clinical review.\n4. If either value is missing (None), the skill reports the absence and states that action cannot be determined.\n5. Do NOT call other skills; this is self-contained logic.\n",
+        "content": "tsh_value = None\nft4_value = None\n\n# Extract TSH value if present\nif latest_observations.get('TSH') is not None:\n    tsh_resource = latest_observations['TSH']\n    if 'valueQuantity' in tsh_resource:\n        tsh_value = tsh_resource['valueQuantity'].get('value')\n\n# Extract free T4 value if present\nif latest_observations.get('FT4') is not None:\n    ft4_resource = latest_observations['FT4']\n    if 'valueQuantity' in ft4_resource:\n        ft4_value = ft4_resource['valueQuantity'].get('value')\n\n# Determine action based on available values\nif tsh_value is None and ft4_value is None:\n    result_message = f\"No TSH or FT4 lab results found for patient {patient_id}. Cannot determine action per protocol.\"\nelif tsh_value is None:\n    result_message = f\"Missing TSH value for patient {patient_id}. Cannot determine action per protocol.\"\nelif ft4_value is None:\n    result_message = f\"Missing free T4 value for patient {patient_id}. Cannot determine action per protocol.\"\nelse:\n    # Both values present - evaluate against reference ranges\n    tsh_normal = 0.4 <= tsh_value <= 4.0\n    ft4_normal = 0.8 <= ft4_value <= 1.8\n    \n    if tsh_normal and ft4_normal:\n        result_message = f\"TSH ({tsh_value}) and free T4 ({ft4_value}) are within normal ranges for patient {patient_id}. No action required.\"\n    elif not tsh_normal and not ft4_normal:\n        result_message = f\"Both TSH ({tsh_value}) and free T4 ({ft4_value}) are abnormal for patient {patient_id}. Recommend clinical review.\"\n    elif not tsh_normal:\n        result_message = f\"TSH ({tsh_value}) is abnormal (normal range 0.4-4.0 mIU/L) for patient {patient_id}. Free T4 ({ft4_value}) is normal. Recommend clinical review.\"\n    else:\n        result_message = f\"Free T4 ({ft4_value}) is abnormal (normal range 0.8-1.8 ng/dL) for patient {patient_id}. TSH ({tsh_value}) is normal. Recommend clinical review.\"\n\napis.supervisor.complete_task(result_message)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T18:02:58.103178",
+          "modified_at": "2026-05-16T18:02:58.103298"
+        }
+      },
+      {
+        "name": "fhir get most recent lab observation",
+        "document": "Retrieve the most recent observation for a specific lab code for a given patient from a FHIR server. It fetches observations sorted by date descending and returns the latest one with its value, unit, and date.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier.\nlab_code : str\n    The LOINC code or lab code for the observation (e.g., TSH, FT4).\n\nOutputs\n-------\ndict or None\n    A dictionary with keys 'value', 'unit', 'date' representing the most recent observation, or None if no observations exist.\n\nNotes:\n-------\n1. Uses apis.fhir.read_observation with sorting by date descending.\n2. Assumes the first result in the response is the most recent.\n3. The lab_code parameter should be the exact code used in the FHIR server (e.g., 'TSH', 'FT4').\n4. Does not handle pagination; assumes the first page contains the most recent result.\n",
+        "content": "response = apis.fhir.read_observation(\n    patient_id=patient_id,\n    code=lab_code,\n    sort=\"-date\"\n)\nif response and 'entry' in response and len(response['entry']) > 0:\n    latest = response['entry'][0]['resource']\n    value_quantity = latest.get('valueQuantity', {})\n    value = value_quantity.get('value')\n    unit = value_quantity.get('unit', '')\n    date = latest.get('effectiveDateTime', latest.get('issued', ''))\n    result = {\n        'value': value,\n        'unit': unit,\n        'date': date\n    }\nelse:\n    result = None",
+        "tools": [
+          "apis.fhir.read_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T18:02:58.103197",
+          "modified_at": "2026-05-16T18:02:58.103344"
+        }
+      },
+      {
+        "name": "fhir search medication orders by patient across categories",
+        "document": "Search for all medication orders for a specific patient across multiple categories (community, inpatient, outpatient, discharge) by iterating through a list of category values.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S1353305').\n\nOutputs\n-------\nlist[dict]\n    A list containing all medication request resources found across all queried categories.\n\nNotes:\n-------\n1. The categories searched are: 'community', 'inpatient', 'outpatient', 'discharge'.\n2. Each call uses apis.fhir.search_medication_request_by_patient_and_category with the patient_id and one category.\n3. Combine and flatten results from all categories into a single list.\n4. This skill does not filter by status or active status; it retrieves all medication requests for the patient.\n",
+        "content": "categories = ['community', 'inpatient', 'outpatient', 'discharge']\nall_medication_requests = []\nfor category in categories:\n    results = apis.fhir.search_medication_request_by_patient_and_category(\n        patient_id=patient_id,\n        category=category\n    )\n    all_medication_requests.extend(results)",
+        "tools": [
+          "apis.fhir.search_medication_request_by_patient_and_category"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T18:02:58.103206",
+          "modified_at": "2026-05-16T18:02:58.103352"
+        }
+      },
+      {
+        "name": "query multiple lab observations for patient",
+        "document": "Query the FHIR Observation endpoint for multiple lab observation codes for a given patient within a specified date range, returning the most recent result for each code.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S3057899').\nobservation_codes : list[str]\n    List of lab observation codes to query (e.g., ['TSH', 'FT4']).\nstart_date : str\n    The start date for the date range query in YYYY-MM-DD format (e.g., '2022-11-07').\n\nOutputs\n-------\nresults : dict[str, list[dict]]\n    A dictionary mapping each observation code to a list of FHIR Observation resources (sorted by date descending).\n\nNotes\n-----\n1. Uses apis.fhir.observation_search for each observation code.\n2. Each query uses the same date range (date=ge{start_date}) and patient.\n3. The results for each code are returned sorted by date descending, with the most recent first.\n4. If no results are found for a code, an empty list is stored for that code.\n5. This skill is useful when multiple lab values need to be retrieved for a single patient in parallel.\n6. Avoid printing the entire result set; inspect only a small subset to verify the structure.\n",
+        "content": "results = {}\n\nfor code in observation_codes:\n    observations = apis.fhir.observation_search(\n        code=code,\n        patient=patient_id,\n        date=f\"ge{start_date}\"\n    )\n    results[code] = observations",
+        "tools": [
+          "apis.fhir.observation_search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955162",
+          "modified_at": "2026-05-16T18:32:20.955384"
+        }
+      },
+      {
+        "name": "evaluate thyroid function lab results against protocol",
+        "document": "Evaluate the most recent TSH and free T4 values against standard clinical protocol thresholds to determine the appropriate action.\n\nParameters\n----------\nmost_recent_values : dict[str, dict]\n    Dictionary mapping lab codes to their most recent values and dates. Expected format:\n    {'TSH': {'value': float, 'date': str}, 'FT4': {'value': float, 'date': str}}.\n    Either or both codes may be present.\n\nOutputs\n-------\naction_summary : str\n    A human-readable string describing the determined action based on the protocol. Examples:\n    - 'No TSH or FT4 lab results found for patient {patient_id} in the available date range. Unable to determine appropriate action per protocol.'\n    - 'TSH: {value} (normal) and FT4: {value} (normal). No medication adjustment needed.'\n    - 'TSH: {value} (elevated) with FT4: {value} (low). Suggest increasing levothyroxine dosage and recheck in 6-8 weeks.'\n    - (other protocol-based decisions)\n\nNotes\n-----\n1. This skill implements rule-based clinical decision logic only; it does not make any API calls.\n2. Standard protocol thresholds (example values, adjust per actual protocol):\n   - Normal TSH: 0.4-4.0 mIU/L\n   - Normal free T4: 0.8-1.8 ng/dL\n3. If both TSH and FT4 are available, compare them together:\n   - High TSH + Low FT4 → hypothyroidism → suggest increasing levothyroxine\n   - Low TSH + High FT4 → hyperthyroidism → suggest decreasing levothyroxine or adjusting antithyroid medication\n   - Both normal → no change needed\n   - Isolated TSH abnormality with normal FT4 → subclinical thyroid dysfunction → monitor\n4. If only one lab value is available, note the limitation and suggest clinical correlation.\n5. If no lab values are available, report inability to determine action.\n6. The output should be a single string ready to return as the task result.\n",
+        "content": "# Determine appropriate action based on TSH and FT4 protocol thresholds\n\nif not most_recent_values or len(most_recent_values) == 0:\n    action_summary = f\"No TSH or FT4 lab results found for patient {patient_id} in the available date range. Unable to determine appropriate action per protocol.\"\nelse:\n    tsh = most_recent_values.get('TSH')\n    ft4 = most_recent_values.get('FT4')\n    \n    if tsh and ft4:\n        tsh_val = tsh['value']\n        ft4_val = ft4['value']\n        \n        # Standard thyroid protocol thresholds\n        tsh_normal_low = 0.4\n        tsh_normal_high = 4.0\n        ft4_normal_low = 0.8\n        ft4_normal_high = 1.8\n        \n        tsh_normal = tsh_normal_low <= tsh_val <= tsh_normal_high\n        ft4_normal = ft4_normal_low <= ft4_val <= ft4_normal_high\n        \n        if tsh_normal and ft4_normal:\n            action_summary = f\"TSH: {tsh_val} (normal) and FT4: {ft4_val} (normal). No medication adjustment needed.\"\n        elif tsh_val > tsh_normal_high and ft4_val < ft4_normal_low:\n            action_summary = f\"TSH: {tsh_val} (elevated) with FT4: {ft4_val} (low). Suggest increasing levothyroxine dosage and recheck in 6-8 weeks.\"\n        elif tsh_val < tsh_normal_low and ft4_val > ft4_normal_high:\n            action_summary = f\"TSH: {tsh_val} (low) with FT4: {ft4_val} (elevated). Suggest decreasing levothyroxine dosage and recheck in 6-8 weeks.\"\n        elif not tsh_normal and ft4_normal:\n            if tsh_val > tsh_normal_high:\n                action_summary = f\"TSH: {tsh_val} (elevated) with FT4: {ft4_val} (normal). Subclinical hypothyroidism; monitor or consider low-dose levothyroxine.\"\n            else:\n                action_summary = f\"TSH: {tsh_val} (low) with FT4: {ft4_val} (normal). Subclinical hyperthyroidism; monitor or consider adjusting medication.\"\n        elif tsh_normal and not ft4_normal:\n            action_summary = f\"TSH: {tsh_val} (normal) with FT4: {ft4_val} (abnormal). Clinical correlation advised; consider repeat testing.\"\n        else:\n            action_summary = f\"TSH: {tsh_val} and FT4: {ft4_val} both abnormal. Suggest clinical evaluation and medication adjustment as appropriate.\"\n    elif tsh and not ft4:\n        action_summary = f\"Only TSH value available: {tsh['value']}. Recommend obtaining FT4 level for complete assessment before determining action.\"\n    elif ft4 and not tsh:\n        action_summary = f\"Only FT4 value available: {ft4['value']}. Recommend obtaining TSH level for complete assessment before determining action.\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955204",
+          "modified_at": "2026-05-16T18:32:20.955400"
+        }
+      },
+      {
+        "name": "fhir get most recent lab observations for patient",
+        "document": "Retrieve the most recent lab observation(s) for a specific patient filtered by one or more LOINC codes (e.g., TSH, FT4). This skill queries the FHIR Observation endpoint, applies a descending date sort, and returns only the single most recent result per requested code.\n\nParameters\n----------\npatient_id : str\n    The patient identifier (e.g., 'S1521703').\nobservation_codes : list[str]\n    List of LOINC codes to filter (e.g., ['TSH', 'FT4']).\nbase_url : str, optional\n    The base URL of the FHIR server. Defaults to 'http://localhost:8080'.\n\nOutputs\n-------\ndict\n    A dictionary mapping each observation code to the most recent observation resource (dict) or None if no result is found.\n\nNotes:\n-------\n1. The function uses the 'date' parameter with 'desc' sorting to get the newest observation first.\n2. Only the first result from the search (most recent) is kept per code.\n3. The returned observations contain the full FHIR resource, including 'valueQuantity' and 'effectiveDateTime'.\n4. If an observation code returns no results, the corresponding key will have value None.\n",
+        "content": "most_recent_observations = {}\n\nfor code in observation_codes:\n    response = apis.fhir.search_observation(\n        patient=patient_id,\n        code=code,\n        sort='-date',\n        _count=1\n    )\n    if response and 'entry' in response and len(response['entry']) > 0:\n        most_recent_observations[code] = response['entry'][0]['resource']\n    else:\n        most_recent_observations[code] = None",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955217",
+          "modified_at": "2026-05-16T18:32:20.955407"
+        }
+      },
+      {
+        "name": "fhir apply thyroid function protocol",
+        "document": "Apply a thyroid function protocol based on the most recent TSH and free T4 (FT4) values to determine the appropriate clinical action.\n\nParameters\n----------\ntsh_value : float or None\n    The most recent TSH value in uIU/mL. None if not available.\ntsh_date : str or None\n    The date of the TSH measurement (YYYY-MM-DD format). None if not available.\nft4_value : float or None\n    The most recent free T4 value. None if not available.\nft4_date : str or None\n    The date of the FT4 measurement (YYYY-MM-DD format). None if not available.\npatient_id : str\n    The patient identifier for the report.\n\nOutputs\n-------\nstr\n    A human-readable summary of the findings and the recommended action.\n\nProtocol Rules\n--------------\n1. If TSH > 10 uIU/mL → Raise a critical alert. If FT4 is also low, this suggests primary hypothyroidism requiring immediate attention.\n2. If TSH is between 4.5 and 10 uIU/mL (inclusive of 4.5, exclusive of 10) → Flag for review (subclinical hypothyroidism). Note the FT4 value in the report.\n3. If TSH is ≤ 4.5 uIU/mL or TSH is not available → No action required. Report the values as normal.\n4. If TSH is not available but FT4 is available, report FT4 alone with a note that TSH was not found.\n\nNotes\n-----\n1. This skill assumes TSH and FT4 values have already been retrieved using a FHIR observation lookup skill.\n2. The output is a plain-text summary suitable for final reporting.\n3. Do not include any API calls or external data retrieval in this skill.\n",
+        "content": "def apply_thyroid_protocol(\n    tsh_value: float,\n    tsh_date: str,\n    ft4_value: float,\n    ft4_date: str,\n    patient_id: str\n) -> str:\n    \"\"\"\n    Apply thyroid function protocol based on TSH and FT4 values.\n    Returns a summary string with findings and recommended action.\n    \"\"\"\n    # Build report components\n    report_parts = []\n    \n    # TSH report\n    if tsh_value is not None and tsh_date is not None:\n        report_parts.append(f\"The most recent TSH value for patient {patient_id} is {tsh_value} uIU/mL from {tsh_date}.\")\n    elif tsh_value is not None:\n        report_parts.append(f\"The most recent TSH value for patient {patient_id} is {tsh_value} uIU/mL.\")\n    else:\n        report_parts.append(f\"No TSH result was found for patient {patient_id}.\")\n    \n    # FT4 report\n    if ft4_value is not None and ft4_date is not None:\n        report_parts.append(f\"The most recent free T4 (FT4) value is {ft4_value} from {ft4_date}.\")\n    elif ft4_value is not None:\n        report_parts.append(f\"The most recent free T4 (FT4) value is {ft4_value}.\")\n    else:\n        report_parts.append(\"The most recent free T4 (FT4) result was not found.\")\n    \n    # Apply protocol\n    if tsh_value is not None:\n        if tsh_value > 10:\n            action = \"CRITICAL ALERT: TSH is elevated above 10 uIU/mL. Immediate clinical attention required.\"\n            if ft4_value is not None and ft4_value < 0.7:\n                action += \" Low FT4 suggests primary hypothyroidism.\"\n        elif 4.5 <= tsh_value <= 10:\n            action = \"FLAG FOR REVIEW: TSH is between 4.5 and 10 uIU/mL, indicating possible subclinical hypothyroidism.\"\n        else:\n            action = \"No action required per protocol. TSH is within normal range.\"\n    else:\n        action = \"No action required per protocol. TSH result is not available.\"\n    \n    report_parts.append(action)\n    return \" \".join(report_parts)",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955227",
+          "modified_at": "2026-05-16T18:32:20.955413"
+        }
+      },
+      {
+        "name": "fhir search patient medication orders across all categories",
+        "document": "Search for all medication orders for a given patient across all standard FHIR MedicationRequest categories (Community, Inpatient, Outpatient, Discharge) to ensure comprehensive coverage of medication records.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S3241217').\n\nOutputs\n-------\nlist[dict]\n    A combined list of all MedicationRequest resources found across all categories.\n\nNotes:\n-------\n1. This skill iterates over the four standard categories to gather all possible medication orders for the patient.\n2. Each category is queried separately because FHIR search parameters typically require a single category value per request.\n3. The results from each category are concatenated into a single list; duplicates are not removed.\n",
+        "content": "all_medication_requests = []\ncategories = ['Community', 'Inpatient', 'Outpatient', 'Discharge']\nfor category in categories:\n    batch = apis.fhir.search_medication_requests(\n        patient_id=patient_id,\n        category=category\n    )\n    if batch:\n        all_medication_requests.extend(batch)\n",
+        "tools": [
+          "apis.fhir.search_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955238",
+          "modified_at": "2026-05-16T18:32:20.955421"
+        }
+      },
+      {
+        "name": "fhir search active medication requests for patient",
+        "document": "Query a FHIR server for all active MedicationRequest resources for a given patient.\n\nParameters\n----------\npatient_id : str\n    The patient identifier (e.g., 'S6329254').\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resources that are active for the patient.\n\nNotes:\n-------\n1. The skill uses status='active' to filter for active orders only.\n2. If the FHIR server returns a Bundle with entries, extract and return the entries list.\n3. Ensure the patient_id is properly URL-encoded if it contains special characters.\n4. The skill does not handle pagination; it assumes the server returns all matching results in one response.\n5. This is a single API call skill; it should be combined with other steps to form a more complex workflow.",
+        "content": "medication_requests = apis.fhir.search_medication_request(\n    patient=patient_id,\n    status=\"active\"\n)",
+        "tools": [
+          "apis.fhir.search_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955249",
+          "modified_at": "2026-05-16T18:32:20.955427"
+        }
+      },
+      {
+        "name": "fhir check naloxone co-prescription for opioid order",
+        "document": "For a given active opioid medication order, check whether the patient has an active naloxone prescription by searching MedicationRequest resources.\n\nParameters\n----------\npatient_id : str\n    The patient identifier (e.g., 'S6329254').\nopioid_order : dict\n    The active opioid MedicationRequest resource to verify against.\nnaloxone_codes : list[str]\n    A list of medication codes (e.g., RxNorm codes) that identify naloxone.\n\nOutputs\n-------\nbool\n    True if at least one active naloxone order exists for the patient; False otherwise.\n\nNotes:\n-------\n1. This skill uses apis.fhir.search_medication_request with both patient and a medication code filter.\n2. The search returns all active MedicationRequests for the patient; the skill then filters locally by checking if any match the naloxone codes.\n3. The skill does not handle pagination; it assumes the server returns all matching results in one response.\n4. Ensure the naloxone_codes list is comprehensive and includes all relevant RxNorm codes for naloxone products.\n5. This skill is a multi-step process: it performs an API call and then filters the results locally.\n",
+        "content": "has_naloxone = False\n\n# Search for all active medication requests for the patient\nactive_requests = apis.fhir.search_medication_request(\n    patient=patient_id,\n    status=\"active\"\n)\n\n# Check if any of the active requests have a medication code matching naloxone\nfor med_request in active_requests:\n    coding_list = med_request.get(\"medicationCodeableConcept\", {}).get(\"coding\", [])\n    for coding in coding_list:\n        if coding.get(\"code\") in naloxone_codes:\n            has_naloxone = True\n            break\n    if has_naloxone:\n        break",
+        "tools": [
+          "apis.fhir.search_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955260",
+          "modified_at": "2026-05-16T18:32:20.955434"
+        }
+      },
+      {
+        "name": "fhir retrieve multiple lab observations for patient",
+        "document": "Retrieve multiple lab observations (e.g., TSH, FT4) for a given patient using a broad date range, and extract the most recent result for each lab code. This skill is useful when you need to evaluate a set of lab values together.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier.\nlab_codes : list[str]\n    A list of lab codes to retrieve (e.g., ['TSH', 'FT4']).\n\nOutputs\n-------\ndict\n    A dictionary mapping each lab code to its most recent observation resource (as a dict), or None if no results are found for that code.\n\nNotes:\n-------\n1. Uses a broad date range (ge2020-01-01) to avoid missing older records.\n2. The results are sorted by date descending; the first entry is the most recent.\n3. This skill assumes the base search returns results sorted by date descending; if not, sort manually.\n4. Avoid printing the entire retrieved lists; inspect only the first few entries to verify structure.\n",
+        "content": "most_recent_observations = {}\n\nfor code in lab_codes:\n    observations = apis.fhir.search_observation(\n        patient=patient_id,\n        code=code,\n        date='ge2020-01-01'\n    )\n    \n    # Ensure results are sorted by date descending (most recent first)\n    observations.sort(key=lambda obs: obs.get('effectiveDateTime', ''), reverse=True)\n    \n    if observations:\n        most_recent_observations[code] = observations[0]\n    else:\n        most_recent_observations[code] = None",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955270",
+          "modified_at": "2026-05-16T18:32:20.955440"
+        }
+      },
+      {
+        "name": "fhir apply thyroid protocol based on TSH and FT4",
+        "document": "Given the most recent TSH and FT4 observation resources for a patient, parse their numeric values and apply a thyroid clinical protocol to determine the appropriate action.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier.\ntsh_observation : dict\n    The most recent TSH FHIR Observation resource (must contain a valueQuantity with a numeric value).\nft4_observation : dict\n    The most recent FT4 FHIR Observation resource (must contain a valueQuantity with a numeric value).\n\nOutputs\n-------\nNone\n    Calls apis.supervisor.complete_task with a recommendation message based on the protocol logic.\n\nProtocol Logic (example):\n--------------------------\n- If TSH is above normal range (e.g., > 4.0 mIU/L) and FT4 is low (e.g., < 0.8 ng/dL): Recommend levothyroxine dose increase.\n- If TSH is below normal range (e.g., < 0.4 mIU/L) and FT4 is high (e.g., > 1.8 ng/dL): Recommend levothyroxine dose decrease.\n- If TSH is within normal range (0.4 - 4.0 mIU/L) and FT4 is within normal range (0.8 - 1.8 ng/dL): Recommend maintaining current dose.\n- Otherwise: Recommend consulting an endocrinologist for further evaluation.\n\nNotes:\n-------\n1. This skill assumes both observations have already been retrieved and verified to exist.\n2. The numeric value is extracted from observation['valueQuantity']['value'].\n3. The protocol thresholds used here are illustrative; adjust based on actual clinical guidelines if needed.\n4. The skill finalizes the task by calling apis.supervisor.complete_task with the recommendation.\n",
+        "content": "# Extract numeric values from observations\nimport json\n\ntsh_value = tsh_observation['valueQuantity']['value']\nft4_value = ft4_observation['valueQuantity']['value']\n\n# Define reference ranges (example thresholds)\ntsh_low = 0.4\ntsh_high = 4.0\nft4_low = 0.8\nft4_high = 1.8\n\n# Apply protocol logic\nif tsh_value > tsh_high and ft4_value < ft4_low:\n    recommendation = (\n        f\"Patient {patient_id}: TSH is elevated ({tsh_value} mIU/L) and FT4 is low ({ft4_value} ng/dL). \"\n        \"Recommend levothyroxine dose increase.\"\n    )\nelif tsh_value < tsh_low and ft4_value > ft4_high:\n    recommendation = (\n        f\"Patient {patient_id}: TSH is low ({tsh_value} mIU/L) and FT4 is elevated ({ft4_value} ng/dL). \"\n        \"Recommend levothyroxine dose decrease.\"\n    )\nelif tsh_low <= tsh_value <= tsh_high and ft4_low <= ft4_value <= ft4_high:\n    recommendation = (\n        f\"Patient {patient_id}: TSH ({tsh_value} mIU/L) and FT4 ({ft4_value} ng/dL) are within normal range. \"\n        \"Recommend maintaining current dose.\"\n    )\nelse:\n    recommendation = (\n        f\"Patient {patient_id}: TSH is {tsh_value} mIU/L and FT4 is {ft4_value} ng/dL. \"\n        \"Recommend consulting an endocrinologist for further evaluation.\"\n    )\n\n# Complete the task with the recommendation\napis.supervisor.complete_task(recommendation)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955279",
+          "modified_at": "2026-05-16T18:32:20.955448"
+        }
+      },
+      {
+        "name": "fhir retrieve most recent observation by code",
+        "document": "Retrieve the most recent observation of a specific type (e.g., TSH, FT4) for a given patient using the FHIR Observation API. The skill queries observations filtered by patient ID and LOINC code, then sorts by date descending and returns the latest result along with its value and unit.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S1579803').\nobservation_code : str\n    The LOINC code for the desired observation (e.g., 'TSH' for 3016-3, 'FT4' for 3024-7).\n\nOutputs\n-------\ndict or None\n    A dictionary containing the extracted value, unit, and date from the most recent observation, e.g., {\"value\": 3.02, \"unit\": \"uIU/mL\", \"date\": \"2023-11-07\"}. Returns None if no observations exist.\n\nNotes:\n-------\n1. This skill queries the FHIR Observation endpoint with a date filter to limit results and uses sorting to get the most recent entry.\n2. The date filter uses a 'ge' (greater or equal) operator to avoid scanning all historical data; the threshold date should be chosen appropriately (e.g., 1 year back).\n3. The skill handles pagination implicitly by limiting the result count to 1 (page_limit=1) after sorting.\n4. The skill extracts the value from 'valueQuantity' (numeric lab values) or 'valueString' (text results), and the date from 'effectiveDateTime'.\n5. Always use the FHIR search_observation API; do not use direct HTTP calls.\n",
+        "content": "from datetime import datetime, timedelta\n\n# Define a reasonable lookback period (e.g., 1 year)\nlookback_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')\n\n# Query observations with sorting by date descending, limit to 1 result\nresult = apis.fhir.search_observation(\n    patient_id=patient_id,\n    code=observation_code,\n    date=f\"ge{lookback_date}\",\n    sort=\"-date\",\n    page_limit=1\n)\n\n# Extract the most recent observation details\nlatest_observation = None\nif result and 'entry' in result and len(result['entry']) > 0:\n    resource = result['entry'][0]['resource']\n    # Extract value and unit\n    value_quantity = resource.get('valueQuantity')\n    value_string = resource.get('valueString')\n    if value_quantity:\n        value = value_quantity.get('value')\n        unit = value_quantity.get('unit', '')\n    elif value_string:\n        value = value_string\n        unit = ''\n    else:\n        value = None\n        unit = ''\n    # Extract date\n    date = resource.get('effectiveDateTime', '')\n    if date:\n        date = date[:10]  # Extract YYYY-MM-DD\n    latest_observation = {\n        \"value\": value,\n        \"unit\": unit,\n        \"date\": date\n    }",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955288",
+          "modified_at": "2026-05-16T18:32:20.955455"
+        }
+      },
+      {
+        "name": "fhir retrieve most recent lab observation for patient",
+        "document": "Retrieve the most recent observation of a specific lab code for a given patient from a FHIR server, filtering by a date range to get recent results.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S2199765').\nobservation_code : str\n    The LOINC code or system code for the observation (e.g., 'TSH', 'FT4').\nstart_date : str\n    The start date for the date range filter in ISO format (e.g., '2022-11-07' or 'ge2022-11-07').\n\nOutputs\n-------\nlist[dict]\n    A list of observation resource dictionaries matching the criteria, sorted by date descending (most recent first).\n\nNotes:\n-------\n1. Use 'ge' prefix in the date parameter to specify 'greater than or equal to' the given date.\n2. The function returns all matching observations; access the first element for the most recent result.\n3. The observation code should match the system's coding (e.g., 'TSH' for thyroid stimulating hormone).\n4. Ensure the patient_id is correctly prefixed if needed (the function expects just the ID).\n",
+        "content": "observations = apis.fhir.search_observation(\n    patient=patient_id,\n    code=observation_code,\n    date=start_date\n)\n\n# Sort by date descending to get most recent first\nobservations.sort(key=lambda x: x.get('effectiveDateTime', ''), reverse=True)",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T18:32:20.955298",
+          "modified_at": "2026-05-16T18:32:20.955462"
+        }
+      },
+      {
+        "name": "fhir retrieve active medication requests by patient",
+        "document": "Retrieve all active medication requests for a given patient from a FHIR server.\n\nParameters\n----------\npatient_id : str\n    The patient identifier (e.g., 'S6329254').\n\nOutputs\n-------\nlist[dict]\n    A list of active MedicationRequest resources returned by the FHIR server.\n\nNotes:\n-------\n1. This skill only retrieves orders with status=active.\n2. The result may include medications of various types (opioid, non-opioid, etc.) and should be filtered further if a specific drug class is needed.\n3. Avoid printing the entire list in logs; inspect only a small subset to verify structure.\n",
+        "content": "active_medication_requests = apis.fhir.search_medication_requests(\n    patient_id=patient_id,\n    status='active'\n)",
+        "tools": [
+          "apis.fhir.search_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T18:57:03.841510",
+          "modified_at": "2026-05-16T18:57:03.841682"
+        }
+      },
+      {
+        "name": "fhir check and create naloxone co-prescription for active opioids",
+        "document": "For each active opioid order, check if a corresponding active naloxone prescription exists for the same patient. If not, create a naloxone order.\n\nParameters\n----------\npatient_id : str\n    The patient identifier (e.g., 'S6329254').\nopioid_orders : list[dict]\n    List of active opioid MedicationRequest resources to verify.\n\nOutputs\n-------\nlist[str]\n    A list of summary messages describing actions taken (e.g., 'Naloxone already prescribed for opioid order X' or 'Created naloxone order for opioid order Y').\n\nNotes:\n-------\n1. This skill searches for existing active naloxone prescriptions using the FHIR MedicationRequest endpoint with medication=naloxone.\n2. For each opioid order, it checks if a matching naloxone prescription exists (same patient, active status).\n3. If no naloxone prescription is found, it creates one using apis.fhir.create_medication_request.\n4. The created naloxone order should be linked to the same patient and have status='active'.\n5. Avoid excessive logging; only summarize the final results.\n6. Ensure the naloxone medication is specified correctly (e.g., 'naloxone' as the medication name or code).\n",
+        "content": "summary_messages = []\n\n# Step 1: Retrieve existing active naloxone prescriptions for the patient\nexisting_naloxone_orders = apis.fhir.search_medication_requests(\n    patient_id=patient_id,\n    status='active',\n    medication='naloxone'\n)\n\n# Step 2: For each opioid order, check if naloxone is already prescribed\nfor opioid_order in opioid_orders:\n    opioid_id = opioid_order.get('id', 'unknown')\n    \n    # Check if any existing naloxone order is associated with this opioid order\n    has_matching_naloxone = any(\n        naloxone_order.get('reasonReference', [{}])[0].get('reference', '').endswith(opioid_id) or\n        naloxone_order.get('basedOn', [{}])[0].get('reference', '').endswith(opioid_id)\n        for naloxone_order in existing_naloxone_orders\n    )\n    \n    if has_matching_naloxone:\n        summary_messages.append(f\"Naloxone already prescribed for opioid order {opioid_id}\")\n    else:\n        # Create a new naloxone order\n        new_naloxone_order = apis.fhir.create_medication_request(\n            patient_id=patient_id,\n            medication='naloxone',\n            status='active',\n            reason_reference=f\"MedicationRequest/{opioid_id}\"\n        )\n        summary_messages.append(f\"Created naloxone order for opioid order {opioid_id}\")\n\n# The result (summary_messages) is now available for final output.",
+        "tools": [
+          "apis.fhir.search_medication_requests",
+          "apis.fhir.create_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T18:57:03.841551",
+          "modified_at": "2026-05-16T18:57:03.841701"
+        }
+      },
+      {
+        "name": "fhir create naloxone order linked to opioid order",
+        "document": "Create a new active naloxone MedicationRequest for a patient, linked to a specific opioid order via reasonReference.\n\nParameters\n----------\npatient_id : str\n    The patient identifier (e.g., 'S6329254').\nopioid_order_id : str\n    The ID of the opioid MedicationRequest that this naloxone order is being co-prescribed for.\n\nOutputs\n-------\ndict or None\n    The created MedicationRequest resource if successful, or None if creation failed.\n\nNotes:\n-------\n1. This skill uses apis.fhir.create_medication_request to POST a new MedicationRequest.\n2. The naloxone order is set to status='active' and linked to the opioid order via reasonReference.\n3. This skill is intended to be called for each opioid order that lacks a matching naloxone prescription.\n4. Ensure the medication is specified as 'naloxone' (or appropriate code) for the new order.\n",
+        "content": "new_naloxone_order = apis.fhir.create_medication_request(\n    patient_id=patient_id,\n    medication='naloxone',\n    status='active',\n    reason_reference=f\"MedicationRequest/{opioid_order_id}\"\n)",
+        "tools": [
+          "apis.fhir.create_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T18:57:03.841564",
+          "modified_at": "2026-05-16T18:57:03.841708"
+        }
+      },
+      {
+        "name": "evaluate thyroid lab results against protocol",
+        "document": "Evaluate the most recent TSH and free T4 (FT4) lab results against a standard thyroid clinical protocol to determine the appropriate action (e.g., dose adjustment, monitoring, or alert).\n\nParameters\n----------\ntsh_result : dict or None\n    The most recent TSH observation resource from FHIR, or None if unavailable.\n    Expected structure: {'valueQuantity': {'value': float, 'unit': str}} or {'valueString': str}.\nft4_result : dict or None\n    The most recent free T4 observation resource from FHIR, or None if unavailable.\n    Expected structure same as tsh_result.\npatient_id : str\n    The patient identifier (e.g., 'S1521703') used for logging/reporting.\n\nOutputs\n-------\nstr\n    A decision message summarizing the findings and recommended action per protocol.\n\nNotes\n-----\n1. If either TSH or FT4 result is None, the skill reports that labs are missing and cannot determine action.\n2. The protocol logic assumes standard reference ranges: TSH ~0.4-4.0 mIU/L, FT4 ~0.8-1.8 ng/dL. Adjust as needed for specific protocols.\n3. This skill does not call external APIs; it implements local decision logic based on retrieved lab values.\n4. The skill extracts numeric values from FHIR Observation resources that use valueQuantity or valueString.\n",
+        "content": "# Extract numeric values from observation resources\ndef _extract_value(obs):\n    if obs is None:\n        return None\n    value = obs.get('valueQuantity')\n    if value:\n        return float(value['value'])\n    value_str = obs.get('valueString')\n    if value_str:\n        try:\n            return float(value_str)\n        except (ValueError, TypeError):\n            return None\n    return None\n\ntsh = _extract_value(tsh_result)\nft4 = _extract_value(ft4_result)\n\n# Check if both results are available\nif tsh is None or ft4 is None:\n    action_message = (\n        f\"No TSH or FT4 lab results found for patient {patient_id}. \"\n        f\"Unable to determine appropriate action per protocol.\"\n    )\nelse:\n    # Example clinical protocol logic (adjust thresholds as needed)\n    if tsh < 0.4:\n        if ft4 > 1.8:\n            action_message = (\n                f\"Patient {patient_id}: TSH={tsh} (low), FT4={ft4} (high). \"\n                f\"Action: Consider reducing thyroid medication dose and recheck in 4-6 weeks.\"\n            )\n        else:\n            action_message = (\n                f\"Patient {patient_id}: TSH={tsh} (low), FT4={ft4} (normal). \"\n                f\"Action: Monitor closely; consider subclinical hyperthyroidism. Recheck in 6-8 weeks.\"\n            )\n    elif tsh > 4.0:\n        if ft4 < 0.8:\n            action_message = (\n                f\"Patient {patient_id}: TSH={tsh} (high), FT4={ft4} (low). \"\n                f\"Action: Consider increasing thyroid medication dose and recheck in 4-6 weeks.\"\n            )\n        else:\n            action_message = (\n                f\"Patient {patient_id}: TSH={tsh} (high), FT4={ft4} (normal). \"\n                f\"Action: Monitor closely; consider subclinical hypothyroidism. Recheck in 6-8 weeks.\"\n            )\n    else:\n        action_message = (\n            f\"Patient {patient_id}: TSH={tsh} (normal), FT4={ft4} (normal). \"\n            f\"Action: Continue current management; routine monitoring as scheduled.\"\n        )\n",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T18:57:03.841573",
+          "modified_at": "2026-05-16T18:57:03.841715"
+        }
+      },
+      {
+        "name": "fhir retrieve most recent lab observation by code and patient",
+        "document": "Retrieve the most recent lab observation (e.g., TSH, FT4) for a given patient by specifying the observation code and patient ID. Returns the single most recent observation value and date.\n\nParameters\n----------\nobservation_code : str\n    The LOINC code or system code for the lab test (e.g., 'TSH', 'FT4').\npatient_id : str\n    The FHIR patient identifier (e.g., 'S0547588').\nbase_date : str, optional\n    A date filter in ISO format (e.g., '2022-11-07') to restrict results to observations after a certain date. Default is None.\n\nOutputs\n-------\nmost_recent_observation : dict or None\n    A dictionary containing the most recent observation's value, unit, and effective date, or None if no observation found.\n\nNotes:\n-------\n1. The function uses pagination to fetch all matching observations and selects the one with the latest effective date.\n2. Observations are expected to have a 'valueQuantity' with 'value' and 'unit', and 'effectiveDateTime'.\n3. This skill does not handle multiple observation codes in a single call; use separate calls for different codes.\n4. The base_date filter is optional but recommended to narrow results and improve performance.\n",
+        "content": "all_observations = []\npage = 0\nwhile True:\n    params = {\n        'code': observation_code,\n        'patient': patient_id,\n    }\n    if base_date:\n        params['date'] = f'ge{base_date}'\n    batch = apis.fhir.read_observation(\n        **params,\n        page_index=page,\n        page_limit=50\n    )\n    if not batch:\n        break\n    all_observations.extend(batch)\n    page += 1\n\nmost_recent_observation = None\nlatest_date = None\nfor obs in all_observations:\n    obs_date = obs.get('effectiveDateTime', '')\n    if obs_date and (latest_date is None or obs_date > latest_date):\n        latest_date = obs_date\n        most_recent_observation = {\n            'value': obs['valueQuantity']['value'],\n            'unit': obs['valueQuantity']['unit'],\n            'date': obs_date\n        }",
+        "tools": [
+          "apis.fhir.read_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T18:57:03.841582",
+          "modified_at": "2026-05-16T18:57:03.841723"
+        }
+      },
+      {
+        "name": "fhir evaluate thyroid protocol and determine action",
+        "document": "Evaluate TSH and free T4 lab results against a thyroid protocol and determine the appropriate clinical action.\n\nParameters\n----------\ntsh_results : list[dict]\n    List of TSH observation resources, each containing 'valueQuantity' and 'effectiveDateTime'.\nft4_results : list[dict]\n    List of free T4 observation resources, each containing 'valueQuantity' and 'effectiveDateTime'.\n\nOutputs\n-------\naction_summary : str\n    A human-readable summary of the most recent TSH and FT4 values, the protocol evaluation, and the recommended action.\n\nProtocol:\n---------\n1. If most recent TSH > 10 mIU/L: action for hyperthyroidism.\n2. If most recent TSH is in 4.5-10 mIU/L range: action for subclinical hypothyroidism.\n3. Otherwise: no action required.\n4. Include FT4 values if available in the summary.\n\nNotes:\n-------\n1. Sort results by effectiveDateTime descending to get the most recent value.\n2. TSH value is assumed to be in mIU/L or uIU/mL (1 mIU/L = 1 uIU/mL for practical purposes).\n3. This skill does not call any external APIs; it is purely local logic.\n",
+        "content": "# Extract the most recent TSH value (if any)\ntsh_most_recent = None\nif tsh_results:\n    sorted_tsh = sorted(tsh_results, key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    tsh_most_recent = sorted_tsh[0]\n    tsh_value = float(tsh_most_recent['valueQuantity']['value'])\n    tsh_date = tsh_most_recent['effectiveDateTime']\n    tsh_unit = tsh_most_recent['valueQuantity'].get('unit', 'mIU/L')\nelse:\n    tsh_value = None\n    tsh_date = None\n    tsh_unit = None\n\n# Extract the most recent FT4 value (if any)\nft4_most_recent = None\nif ft4_results:\n    sorted_ft4 = sorted(ft4_results, key=lambda x: x.get('effectiveDateTime', ''), reverse=True)\n    ft4_most_recent = sorted_ft4[0]\n    ft4_value = float(ft4_most_recent['valueQuantity']['value'])\n    ft4_date = ft4_most_recent['effectiveDateTime']\n    ft4_unit = ft4_most_recent['valueQuantity'].get('unit', 'ng/dL')\nelse:\n    ft4_value = None\n    ft4_date = None\n    ft4_unit = None\n\n# Build summary string\nsummary_parts = []\nif tsh_value is not None:\n    summary_parts.append(f\"TSH: {tsh_value} {tsh_unit} ({tsh_date})\")\nelse:\n    summary_parts.append(\"No TSH results found\")\n\nif ft4_value is not None:\n    summary_parts.append(f\"Free T4: {ft4_value} {ft4_unit} ({ft4_date})\")\nelse:\n    summary_parts.append(\"No FT4 results found\")\n\n# Apply protocol\nif tsh_value is not None:\n    if tsh_value > 10:\n        action = \"TSH > 10: take action for hyperthyroidism\"\n    elif 4.5 <= tsh_value <= 10:\n        action = \"TSH in 4.5-10 range: take action for subclinical hypothyroidism\"\n    else:\n        action = \"TSH not > 10 and not in 4.5-10 range: no action required per protocol\"\nelse:\n    action = \"No TSH data available: unable to determine action\"\n\nsummary_parts.append(action)\naction_summary = \". \".join(summary_parts)",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T18:57:03.841593",
+          "modified_at": "2026-05-16T18:57:03.841730"
+        }
+      }
+    ],
+    "atomic": []
+  },
+  "embeddings": {
+    "model": "Qwen3-Embedding-8B",
+    "index_type": "FAISS-HNSW"
+  }
+}

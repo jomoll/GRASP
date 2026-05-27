@@ -1,0 +1,15 @@
+{
+  "protocol_action_not_executed": "Protocol-specified follow-up action (e.g., order repeat labs) was not actually executed or ordered.",
+  "active_order_status_not_filtered": "Did not filter MedicationRequest queries by active status, potentially missing or duplicating orders.",
+  "removal_order_created_without_removal_check": "Created a removal order for a device without first checking for an existing removal order.",
+  "insufficient_observation_window_for_average": "Averages are calculated or reported even when there are not enough observations in the required time window.",
+  "order_discontinuation_not_executed": "Identified duplicate orders but did not actually discontinue the older/duplicate order.",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "observation_time_window_not_applied": "Did not apply the correct time window when calculating averages from observations.",
+  "date_filter_omitted": "date filter omitted",
+  "opioid_order_detection_false_negative": "Failed to detect existing active opioid orders due to incomplete search or filtering.",
+  "vaccine_history_time_window_not_applied": "Did not check vaccine history within the required time window before ordering.",
+  "covid_vaccine_code_mismatch": "Queried COVID vaccine with incorrect code, missing valid records.",
+  "fhir_resource_wrong_field_extracted": "Extracted the wrong field (e.g., Procedure date instead of last administration date) from the FHIR resource.",
+  "duplicate_order_check_omitted": "Did not check for or discontinue duplicate DVT prophylaxis orders before creating a new one."
+}

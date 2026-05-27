@@ -1,0 +1,33 @@
+_resume: false
+agent:
+  module: src.client.agents.LiteLLMAgent
+  parameters:
+    api_version: 2025-01-01-preview
+    base_url: <REDACTED>
+    max_output_tokens: 8192
+    model: azure/<REDACTED>-02-gpt-4.1-2025-04-14
+    temperature: 0.0
+    timeout: 360
+cycle:
+  batch_concurrency: 1
+  epochs: 5
+  grpo_eval_n: 36
+  grpo_k: 4
+  max_learned_skills: 10
+  max_proposals: 1
+  run_baseline: true
+  seed: 13701
+  update_every: 48
+data:
+  dev: data/medagentbench/split_dev.json
+  full: data/medagentbench/new_patient_tasks.json
+  id_test: data/medagentbench/split_id_test.json
+  test: data/medagentbench/split_test.json
+  val: data/medagentbench/split_val.json
+output_dir: outputs/skill_cycle_gpt41
+skills:
+  base_dir: skills/base
+task:
+  controller_address: http://localhost:5070/api
+  fhir_api_base: http://localhost:8080/fhir/
+  name: medagentbench-v2-skill

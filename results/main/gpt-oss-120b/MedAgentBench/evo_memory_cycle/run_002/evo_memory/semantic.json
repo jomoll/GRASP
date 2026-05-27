@@ -1,0 +1,337 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-13T07:17:20.937559",
+  "rules": [
+    "[P1] Always perform a Patient Search API call for the given identifier before any subsequent data query.",
+    "[P1] If the observation is missing or outside the time window, finish with an explicit statement and do not place orders.",
+    "[P1] Include appropriate dosage parameters and monitoring schedules when creating medication orders, based on guidelines or retrieved lab values.",
+    "[P1] Emit at most one structured API call per turn and wait for its response before proceeding.",
+    "[P1] If the MRN is already known or retrieved from a successful patient search and the user requests it, you may finish with the MRN without extra API calls.",
+    "[P1] Only FINISH after all required lookups and orders are completed; if Patient Search returns no matches, FINISH with a 'Patient not found' message.",
+    "[P1] Query the Observation API with a time‑window filter, selecting the most recent record that satisfies the constraint.",
+    "[P1] Verify that the selected observation’s timestamp falls within the required window (recency) before using it.",
+    "[P1] Extract the age from the returned patient resource after a successful search.",
+    "[P1] Validate MRN format before any API call or usage.",
+    "[P1] Never fabricate patient, observation, demographic, or timestamp data; use only values returned by APIs or the current time.",
+    "[P1] Only create medication orders when the observation exists and meets the clinical condition.",
+    "[P1] If the user supplies a complete measurement and explicitly asks to record it, you may finish with a confirmation statement instead of an API call, provided the patient ID is known and no further verification is required.",
+    "[P1] If a required observation is missing or outdated beyond clinical thresholds, create a new lab order using the appropriate CREATE API.",
+    "[P1] When medication requires monitoring, create a paired observation order only if the primary clinical condition is satisfied."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_28cca42e687b",
+      "text": "[P1] Always perform a Patient Search API call for the given identifier before any subsequent data query.",
+      "tags": [
+        "observation_retrieval",
+        "recency",
+        "patient_search",
+        "always",
+        "perform",
+        "patient",
+        "search",
+        "call",
+        "given",
+        "identifier"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-13T07:12:48.911686",
+      "updated_at": "2026-05-13T07:17:20.930820"
+    },
+    {
+      "id": "rule_74aa622cc942",
+      "text": "[P1] If the observation is missing or outside the time window, finish with an explicit statement and do not place orders.",
+      "tags": [
+        "observation",
+        "api_query",
+        "conditional_ordering",
+        "validation",
+        "missing",
+        "outside",
+        "time",
+        "window",
+        "finish",
+        "with"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-13T07:11:41.812934",
+      "updated_at": "2026-05-13T07:17:20.930863"
+    },
+    {
+      "id": "rule_68b56d8cac86",
+      "text": "[P1] Include appropriate dosage parameters and monitoring schedules when creating medication orders, based on guidelines or retrieved lab values.",
+      "tags": [
+        "patient-search",
+        "observation-query",
+        "lab-ordering",
+        "premature-finish",
+        "include",
+        "appropriate",
+        "dosage",
+        "parameters",
+        "monitoring",
+        "schedules"
+      ],
+      "shown": 7,
+      "success": 4,
+      "failure": 3,
+      "created_at": "2026-05-13T06:57:31.202815",
+      "updated_at": "2026-05-13T07:17:20.931052"
+    },
+    {
+      "id": "rule_d6f2028c8b8f",
+      "text": "[P1] Emit at most one structured API call per turn and wait for its response before proceeding.",
+      "tags": [
+        "patient-search",
+        "observation-query",
+        "lab-ordering",
+        "premature-finish",
+        "emit",
+        "most",
+        "structured",
+        "call",
+        "turn",
+        "wait"
+      ],
+      "shown": 8,
+      "success": 4,
+      "failure": 4,
+      "created_at": "2026-05-13T06:57:31.202919",
+      "updated_at": "2026-05-13T07:17:20.931082"
+    },
+    {
+      "id": "rule_56d483e562be",
+      "text": "[P1] If the MRN is already known or retrieved from a successful patient search and the user requests it, you may finish with the MRN without extra API calls.",
+      "tags": [
+        "observation_retrieval",
+        "recency",
+        "patient_search",
+        "already",
+        "known",
+        "retrieved",
+        "from",
+        "successful",
+        "patient",
+        "search"
+      ],
+      "shown": 4,
+      "success": 1,
+      "failure": 3,
+      "created_at": "2026-05-13T07:12:48.912114",
+      "updated_at": "2026-05-13T07:17:20.930902"
+    },
+    {
+      "id": "rule_3f3b8770bc72",
+      "text": "[P1] Only FINISH after all required lookups and orders are completed; if Patient Search returns no matches, FINISH with a 'Patient not found' message.",
+      "tags": [
+        "observation_retrieval",
+        "recency",
+        "patient_search",
+        "only",
+        "finish",
+        "after",
+        "required",
+        "lookups",
+        "orders",
+        "completed"
+      ],
+      "shown": 4,
+      "success": 1,
+      "failure": 3,
+      "created_at": "2026-05-13T07:12:48.911893",
+      "updated_at": "2026-05-13T07:17:20.930938"
+    },
+    {
+      "id": "rule_33007c840b56",
+      "text": "[P1] Query the Observation API with a time‑window filter, selecting the most recent record that satisfies the constraint.",
+      "tags": [
+        "observation_retrieval",
+        "recency",
+        "patient_search",
+        "query",
+        "observation",
+        "with",
+        "time",
+        "window",
+        "filter",
+        "selecting"
+      ],
+      "shown": 4,
+      "success": 1,
+      "failure": 3,
+      "created_at": "2026-05-13T07:12:48.911743",
+      "updated_at": "2026-05-13T07:17:20.930979"
+    },
+    {
+      "id": "rule_ec387f53517f",
+      "text": "[P1] Verify that the selected observation’s timestamp falls within the required window (recency) before using it.",
+      "tags": [
+        "observation_retrieval",
+        "recency",
+        "patient_search",
+        "verify",
+        "that",
+        "selected",
+        "observation",
+        "timestamp",
+        "falls",
+        "within"
+      ],
+      "shown": 4,
+      "success": 1,
+      "failure": 3,
+      "created_at": "2026-05-13T07:12:48.911786",
+      "updated_at": "2026-05-13T07:17:20.931018"
+    },
+    {
+      "id": "rule_b0809aeb399a",
+      "text": "[P1] Extract the age from the returned patient resource after a successful search.",
+      "tags": [
+        "patient-search",
+        "age-query",
+        "api-call",
+        "validation",
+        "extract",
+        "from",
+        "returned",
+        "patient",
+        "resource",
+        "after"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-13T07:17:20.931340",
+      "updated_at": "2026-05-13T07:17:20.931341"
+    },
+    {
+      "id": "rule_1dc5407d3fd8",
+      "text": "[P1] Validate MRN format before any API call or usage.",
+      "tags": [
+        "patient-search",
+        "age-query",
+        "api-call",
+        "validation",
+        "validate",
+        "format",
+        "before",
+        "call",
+        "usage"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-13T07:17:20.931128",
+      "updated_at": "2026-05-13T07:17:20.931129"
+    },
+    {
+      "id": "rule_c14553b9b5b0",
+      "text": "[P1] Never fabricate patient, observation, demographic, or timestamp data; use only values returned by APIs or the current time.",
+      "tags": [
+        "patient-search",
+        "observation-query",
+        "lab-ordering",
+        "premature-finish",
+        "never",
+        "fabricate",
+        "patient",
+        "observation",
+        "demographic",
+        "timestamp"
+      ],
+      "shown": 5,
+      "success": 1,
+      "failure": 4,
+      "created_at": "2026-05-13T06:57:31.202973",
+      "updated_at": "2026-05-13T07:17:20.931211"
+    },
+    {
+      "id": "rule_5cbcae6d6522",
+      "text": "[P1] Only create medication orders when the observation exists and meets the clinical condition.",
+      "tags": [
+        "observation_lookup",
+        "conditional_ordering",
+        "no-order",
+        "only",
+        "create",
+        "medication",
+        "orders",
+        "when",
+        "observation",
+        "exists"
+      ],
+      "shown": 5,
+      "success": 1,
+      "failure": 4,
+      "created_at": "2026-05-13T07:05:55.015331",
+      "updated_at": "2026-05-13T07:17:20.931241"
+    },
+    {
+      "id": "rule_3bffaf3456d5",
+      "text": "[P1] If the user supplies a complete measurement and explicitly asks to record it, you may finish with a confirmation statement instead of an API call, provided the patient ID is known and no further verification is required.",
+      "tags": [
+        "observation_recording",
+        "confirmation",
+        "no_api_needed",
+        "user",
+        "supplies",
+        "complete",
+        "measurement",
+        "explicitly",
+        "asks",
+        "record"
+      ],
+      "shown": 12,
+      "success": 5,
+      "failure": 7,
+      "created_at": "2026-05-13T07:04:34.363739",
+      "updated_at": "2026-05-13T07:17:20.931178"
+    },
+    {
+      "id": "rule_8528456090c0",
+      "text": "[P1] If a required observation is missing or outdated beyond clinical thresholds, create a new lab order using the appropriate CREATE API.",
+      "tags": [
+        "patient-search",
+        "observation-query",
+        "lab-ordering",
+        "premature-finish",
+        "required",
+        "observation",
+        "missing",
+        "outdated",
+        "beyond",
+        "clinical"
+      ],
+      "shown": 16,
+      "success": 5,
+      "failure": 11,
+      "created_at": "2026-05-13T06:57:31.202713",
+      "updated_at": "2026-05-13T07:17:20.931276"
+    },
+    {
+      "id": "rule_6e47ce21d994",
+      "text": "[P1] When medication requires monitoring, create a paired observation order only if the primary clinical condition is satisfied.",
+      "tags": [
+        "patient-search",
+        "observation-query",
+        "lab-ordering",
+        "premature-finish",
+        "when",
+        "medication",
+        "requires",
+        "monitoring",
+        "create",
+        "paired"
+      ],
+      "shown": 16,
+      "success": 5,
+      "failure": 11,
+      "created_at": "2026-05-13T06:57:31.202868",
+      "updated_at": "2026-05-13T07:17:20.931308"
+    }
+  ]
+}

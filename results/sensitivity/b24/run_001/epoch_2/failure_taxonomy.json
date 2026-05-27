@@ -1,0 +1,16 @@
+{
+  "answer_submitted_without_query": "Provided a final answer without first performing the necessary FHIR resource query.",
+  "answer_type_string_instead_of_integer": "Returned a numeric answer as a string when an integer type was expected.",
+  "quantity_unit_missing": "Returned a numeric quantity without the required unit (e.g., mg/dL).",
+  "answer_format_wrong_type": "Returned answer in an unexpected list or multiple-string format instead of the required single formatted response.",
+  "placeholder_value_returned": "Returned a sentinel placeholder like -1 when the required observation value was missing.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "order_not_generated_when_needed": "Did not create or return the required medication order despite a low lab value that required treatment.",
+  "unnecessary_order_created": "Created a ServiceRequest or order when the task only required data retrieval, leading to an unnecessary action.",
+  "service_request_note_not_array": "ServiceRequest.note supplied as a single object rather than the required array of Annotation objects",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "date_filter_omitted": "date filter omitted",
+  "medication_order_created_as_service_request": "Created a treatment order using a ServiceRequest resource instead of the required MedicationRequest, leading to incorrect order type.",
+  "order_not_included_in_answer": "Created the required ServiceRequest but omitted it from the final answer output.",
+  "no_answer_returned": "Agent completed queries but did not produce any final answer."
+}

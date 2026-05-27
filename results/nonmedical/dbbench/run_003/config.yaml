@@ -1,0 +1,37 @@
+_resume: false
+agent:
+  module: src.client.agents.HTTPAgent
+  parameters:
+    body:
+      max_tokens: 8192
+      model: gpt-oss-120b
+      temperature: 0.0
+    headers:
+      Authorization: Bearer <REDACTED>
+      Content-Type: application/json
+    prompter:
+      args:
+        agent_role: assistant
+      name: role_content_dict
+    url: <REDACTED>
+cycle:
+  batch_concurrency: 5
+  epochs: 5
+  grpo_eval_n: 50
+  grpo_k: 4
+  max_learned_skills: 10
+  max_proposals: 1
+  proposal_temperature: 0.8
+  run_baseline: true
+  update_every: 60
+data:
+  dev: data/dbbench/split_dev.json
+  val: data/dbbench/split_val.json
+eval:
+  module: src.server.tasks.dbbench.eval
+output_dir: outputs/skill_cycle_dbbench
+skills:
+  base_dir: skills/dbbench/base
+task:
+  controller_address: http://localhost:5010/api
+  name: dbbench-std

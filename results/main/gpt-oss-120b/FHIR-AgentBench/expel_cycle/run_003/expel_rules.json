@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When answering questions about a patient’s discharge or departure, first identify hospital encounters by checking for identifiers whose system includes “encounter‑hosp” or by using class codes that denote inpatient stays; exclude non‑hospital encounters such as ICU or outpatient visits.",
+    "counter": 2
+  },
+  {
+    "text": "If more than one hospital encounter is present, programmatically determine the most recent discharge by comparing the period.end timestamps (or period.start if end is missing) after converting them to timezone‑naive datetimes.",
+    "counter": 2
+  },
+  {
+    "text": "Always use the execute_python_code tool to parse the retrieved FHIR resources and extract the required date, rather than relying on manual inspection of printed output, to ensure reproducibility and avoid errors.",
+    "counter": 2
+  },
+  {
+    "text": "Conclude every response with the exact required format “The final answer is: <answer>” and, when the needed information cannot be found, explicitly state that the information is unavailable.",
+    "counter": 2
+  },
+  {
+    "text": "Always filter retrieved medication‑related resources (MedicationRequest, MedicationAdministration, etc.) by the date criteria specified in the question, using timezone‑naive comparisons, before concluding whether any qualifying record exists.",
+    "counter": 2
+  },
+  {
+    "text": "When a question could be answered by more than one resource type, systematically combine and evaluate all relevant resources rather than inspecting only one, to ensure no qualifying data is missed.",
+    "counter": 2
+  },
+  {
+    "text": "Base the final answer exclusively on the result produced by the executed Python code; avoid accepting a plain “stdout” value from a tool call that may not reflect actual data analysis.",
+    "counter": 2
+  },
+  {
+    "text": "End every response with the exact phrase “The final answer is: <answer>”, matching the answer format required (e.g., “Yes”, “No”, or a concise sentence) and ensuring the answer directly addresses the original query.",
+    "counter": 2
+  },
+  {
+    "text": "Retrieve all medication‑related resources (e.g., MedicationAdministration, MedicationRequest) for the patient using get_resources_by_patient_fhir_id before performing any analysis.",
+    "counter": 2
+  },
+  {
+    "text": "Always filter the retrieved medication resources by the exact calendar period requested (e.g., April of the prior year) with timezone‑naive datetime comparisons inside execute_python_code.",
+    "counter": 2
+  },
+  {
+    "text": "Validate that each resource contains a usable date field (such as effectiveDateTime or period.start); skip or log resources with missing or malformed dates instead of assuming they do not meet the criteria.",
+    "counter": 2
+  },
+  {
+    "text": "If after proper filtering no qualifying records are found, explicitly state that no matching data were located rather than relying on a generic “NO” output from a tool.",
+    "counter": 2
+  },
+  {
+    "text": "When determining the most recent hospital departure, retrieve all Encounter resources for the patient and select the encounter with the latest period.end value (or discharge date) regardless of identifier system.",
+    "counter": 2
+  },
+  {
+    "text": "Verify that the chosen Encounter includes a discharge disposition indicating the patient left the facility; if the disposition is absent, still treat the period.end as the departure time.",
+    "counter": 2
+  },
+  {
+    "text": "Compare and sort dates in a timezone‑naive manner (remove or ignore timezone offsets) to ensure correct chronological ordering.",
+    "counter": 2
+  },
+  {
+    "text": "Return the final answer using the exact ISO‑8601 datetime string from the selected Encounter’s period.end field, preserving its original format.",
+    "counter": 2
+  },
+  {
+    "text": "When a question refers to a specific encounter (e.g., “first hospital encounter”), first isolate that encounter by using identifiers or class codes, then filter all subsequent resource queries (MedicationRequest, Procedure, etc.) to that encounter’s reference.",
+    "counter": 2
+  },
+  {
+    "text": "Normalize all textual comparisons by converting strings to lower‑case and stripping surrounding whitespace; also account for common synonyms or variations (e.g., “IV”, “IV DRIP”, “IV‑DRIP”) when matching route or drug names.",
+    "counter": 2
+  },
+  {
+    "text": "Choose the correct FHIR resource for the query – use MedicationRequest for prescribed drugs and MedicationAdministration for administered drugs – and, when necessary, retrieve both and cross‑reference them to ensure the answer reflects the intended action (prescription vs. administration).",
+    "counter": 2
+  },
+  {
+    "text": "Always test that the generated Python code executes without errors and handles empty result sets; if no matching record is found, explicitly state that the information cannot be found rather than returning an incorrect or empty answer.",
+    "counter": 2
+  }
+]

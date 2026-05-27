@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When searching for vaccine administration records, use the Procedure resource with the relevant CPT code, and avoid adding date filters initially to ensure all historical records are returned; then analyze the results to find the most recent date.",
+    "counter": 2
+  },
+  {
+    "text": "Before using a base URL variable like {api_base} in a GET request, ensure it is replaced with the actual server URL (e.g., http://localhost:8080/fhir/) to prevent invalid URL errors.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving a list of procedures, always sort or compare the performedDateTime values to identify the most recent one; do not rely on search date filters alone to determine the last administration.",
+    "counter": 2
+  },
+  {
+    "text": "If the task requires conditional ordering based on time elapsed since a previous event, perform the date comparison after retrieving all relevant records, and if the condition is met, use the appropriate POST endpoint (e.g., MedicationRequest.Create) to place the new order.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for procedures using a code parameter, use a single code per request if the API does not explicitly support comma-separated multiple codes; otherwise, issue separate requests for each code to ensure results are not missed.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving existing procedure data, always compare the most recent procedure date against the current time to determine if it is more than 12 months old before deciding whether to order a new study.",
+    "counter": 2
+  },
+  {
+    "text": "If the initial search for a procedure returns no results, do not immediately conclude the procedure does not exist; instead, try alternative search parameters (e.g., different date ranges, broader code sets, or different resource types) before finalizing.",
+    "counter": 2
+  },
+  {
+    "text": "When ordering a new procedure or service, use the appropriate API endpoint (e.g., ServiceRequest.Create for imaging orders) and include all required parameters such as code, subject, authoredOn, status, intent, and priority, as well as any specified indication in the note field.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for opioid medications to verify naloxone coverage, do not restrict by category (e.g., \"community\") unless the task specifies; use status=active to retrieve all active orders across categories, then filter by medication name to identify opioids.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving active medication orders, examine the medicationCodeableConcept or medicationReference to identify specific opioid agents (e.g., hydromorphone, oxycodone) rather than relying solely on category filters that may miss relevant orders.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires checking for a specific medication (e.g., naloxone) to accompany another medication class, perform separate searches for both the target medication class (opioids) and the companion medication (naloxone) using the same patient and status parameters, then cross-reference the results.",
+    "counter": 2
+  },
+  {
+    "text": "Always include the full base URL (e.g., http://localhost:8080/fhir/) in GET requests to avoid \"No scheme supplied\" errors; never use relative paths like \"MedicationRequest?...\".",
+    "counter": 2
+  },
+  {
+    "text": "When using FHIR API URLs, always replace the placeholder \"{api_base}\" with the actual base URL provided (e.g., \"http://localhost:8080/fhir/\") before making a request.",
+    "counter": 2
+  },
+  {
+    "text": "To find the most recent vaccination, query the Procedure resource with the patient ID and CPT code, but do not restrict the date range initially; instead, retrieve all records and determine the latest performedDateTime from the results.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires both checking a condition and taking an action (e.g., ordering a vaccine), first complete the data retrieval and analysis, then execute the action using the appropriate POST endpoint (e.g., MedicationRequest.Create) rather than just finishing with a textual answer.",
+    "counter": 2
+  },
+  {
+    "text": "For date comparison tasks, always use the current time provided in the context (e.g., \"Current time: 2023-11-07T22:47:00+00:00\") as the reference point, not an arbitrary date from the instruction.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for procedures using the Procedure resource with a code parameter, pass only a single code value; do not use comma-separated lists, as the FHIR API may treat them as a single code and return no results.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving an empty search result for a procedure or observation, first verify the search parameters are correct (e.g., single code, valid date range) before concluding that no data exists; if parameters are invalid, re-query with corrected parameters.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires ordering a new service (e.g., CT scan) if a condition is met, ensure that the order is actually placed via a POST to the appropriate resource (e.g., ServiceRequest) and not just mentioned in the FINISH response.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for specific medication orders (e.g., DVT prophylaxis), always filter by the relevant medication name or class using the `medicationCodeableConcept` or `code` parameter if available, to avoid retrieving all patient medications and overwhelming the response.",
+    "counter": 2
+  }
+]

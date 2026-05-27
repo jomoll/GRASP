@@ -1,0 +1,52 @@
+# skillx_cycle — SkillX
+# Model backend: select with --agent / GRASP_BACKEND, or change agent_preset.
+# See configs/agents/README.md for the available presets.
+output_dir: outputs/skillx_cycle
+agent_preset: gptoss
+agent:
+  strategy: multi_turn_code_resource
+  model: azure/gpt-4.1
+  timeout: 60
+  max_retries: 1
+  verbose: false
+  enable_cache: true
+updater:
+  model: azure/gpt-4.1
+  temperature: 0.7
+  max_tokens: 32768
+  timeout: 60
+  max_retries: 2
+eval:
+  model: azure/gpt-4.1
+  timeout: 60
+  max_retries: 1
+data:
+  csv: final_dataset/questions_answers_sql_fhir.csv
+  dev_splits:
+  - train
+  val_splits:
+  - valid
+  test_splits:
+  - test
+  dev_limit: 120
+  val_limit: 80
+  test_limit: 80
+skillx:
+  skill_type: functional
+  retrieval_top_k: 5
+  filter_stage1: true
+  filter_stage2: false
+  use_plan_extraction: true
+  enable_llm_merge: true
+  extractor_max_retries: 2
+  plan_extractor_max_retries: 1
+  max_history_messages: 24
+  max_message_chars: 1200
+  max_action_chars: 600
+  max_actions: 12
+cycle:
+  epochs: 5
+  update_every: 40
+  batch_concurrency: 4
+  run_baseline: true
+  seed: 1

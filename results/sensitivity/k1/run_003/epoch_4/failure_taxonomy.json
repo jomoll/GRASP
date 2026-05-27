@@ -1,0 +1,12 @@
+{
+  "placeholder_returned_for_missing_data": "Returned a placeholder value (e.g., -1) indicating missing data instead of handling the absence properly.",
+  "incorrect_patient_not_found_assumption": "Assumed patient does not exist and returned 'Patient not found' without verifying via FHIR response.",
+  "order_placed_without_verifying_lab_result": "Created a medication or service order without first checking that the lab result met the condition for ordering.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "no_action_performed_before_answer": "Provided reasoning or answer without executing any FHIR actions (GET/POST).",
+  "answer_without_using_fhir_response": "Returned a final answer without parsing or using the data from the FHIR response.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "note_field_not_array": "FHIR ServiceRequest 'note' field was sent as an object instead of an array of Annotation objects, violating the expected structure.",
+  "required_order_not_placed": "Instruction required placing an order based on lab result, but the agent returned only the lab value without creating the order.",
+  "date_filter_omitted": "date filter omitted"
+}

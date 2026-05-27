@@ -1,0 +1,10 @@
+{
+  "method": "evo_memory",
+  "library_path": null,
+  "memory_dir": "../gpt-mab/evo_memory_cycle_gpt54_low/20260520_184625/evo_memory_best",
+  "splits": [
+    "test",
+    "id_test"
+  ],
+  "run_name": "gpt54-to-gemini-evo_memory-seed3"
+}

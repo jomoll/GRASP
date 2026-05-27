@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-15T01:18:28.355515",
+  "rules": [
+    "[P1] Document lack of data explicitly when halting workflow",
+    "[P1] Withhold protocol-driven action if criteria are not met or required data are absent",
+    "[P1] Discontinue duplicates, keeping only the most recent order",
+    "[P1] Explicitly search all relevant sources for required procedures, orders, measurements, device status, immunization records, lab values, items, observations, or active medication orders within each specified time window before concluding absence or performing calculations",
+    "[P1] Only initiate new or repeat actions when triggering criteria are met and required intervals verified"
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_9713b29d8f9f",
+      "text": "[P1] Document lack of data explicitly when halting workflow",
+      "tags": [
+        "lab_values",
+        "absence",
+        "protocol",
+        "document",
+        "lack",
+        "data",
+        "explicitly",
+        "when",
+        "halting",
+        "workflow"
+      ],
+      "shown": 11,
+      "success": 9,
+      "failure": 2,
+      "created_at": "2026-05-15T01:16:39.104236",
+      "updated_at": "2026-05-15T01:18:28.345936"
+    },
+    {
+      "id": "rule_0a6bf5a30bf5",
+      "text": "[P1] Withhold protocol-driven action if criteria are not met or required data are absent",
+      "tags": [
+        "labs",
+        "protocol",
+        "data-verification",
+        "withhold",
+        "driven",
+        "action",
+        "criteria",
+        "required",
+        "data",
+        "absent"
+      ],
+      "shown": 47,
+      "success": 24,
+      "failure": 21,
+      "created_at": "2026-05-15T01:10:28.268726",
+      "updated_at": "2026-05-15T01:18:28.346028"
+    },
+    {
+      "id": "rule_59079362bd0b",
+      "text": "[P1] Discontinue duplicates, keeping only the most recent order",
+      "tags": [
+        "order-verification",
+        "deduplication",
+        "medical-workflow",
+        "discontinue",
+        "duplicates",
+        "keeping",
+        "only",
+        "most",
+        "recent",
+        "order"
+      ],
+      "shown": 52,
+      "success": 27,
+      "failure": 20,
+      "created_at": "2026-05-15T01:10:06.767548",
+      "updated_at": "2026-05-15T01:18:28.346108"
+    },
+    {
+      "id": "rule_4ae0991540b1",
+      "text": "[P1] Explicitly search all relevant sources for required procedures, orders, measurements, device status, immunization records, lab values, items, observations, or active medication orders within each specified time window before concluding absence or performing calculations",
+      "tags": [
+        "medication-reconciliation",
+        "search-protocol",
+        "explicitly",
+        "search",
+        "relevant",
+        "sources",
+        "required",
+        "procedures",
+        "orders",
+        "measurements"
+      ],
+      "shown": 82,
+      "success": 47,
+      "failure": 35,
+      "created_at": "2026-05-15T00:51:44.067094",
+      "updated_at": "2026-05-15T01:18:28.345847"
+    },
+    {
+      "id": "rule_cdc5ad40f575",
+      "text": "[P1] Only initiate new or repeat actions when triggering criteria are met and required intervals verified",
+      "tags": [
+        "procedure-order",
+        "absence-verification",
+        "workflow",
+        "only",
+        "initiate",
+        "repeat",
+        "actions",
+        "when",
+        "triggering",
+        "criteria"
+      ],
+      "shown": 160,
+      "success": 95,
+      "failure": 55,
+      "created_at": "2026-05-15T00:28:15.043802",
+      "updated_at": "2026-05-15T01:18:28.346207"
+    }
+  ]
+}

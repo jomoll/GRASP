@@ -1,0 +1,987 @@
+{
+  "version": "1.0",
+  "benchmark": "appworld",
+  "created_at": "2026-05-19T12:57:30.546583",
+  "skills": {
+    "planning": {},
+    "functional": [
+      {
+        "name": "fhir get medication requests by patient and indication",
+        "document": "Retrieve all active medication orders for a specific patient that match a given indication or medication criteria, such as DVT prophylaxis. This is useful for checking whether a patient has relevant active orders for a clinical indication.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier.\nindication_keywords : list[str]\n    List of keywords (e.g., medication names, codes, or terms such as 'DVT prophylaxis', 'heparin') to match against MedicationRequest resources' medicationCodeableConcept or text fields.\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resources for the specified patient that are active and match the indication keywords.\n\nNotes:\n------\n1. The skill filters for only 'active' MedicationRequest resources for the patient.\n2. Indication matching relies on substring or code matches in medicationCodeableConcept.coding.display, code, or text fields.\n3. This skill does not create, modify, or discontinue orders—only retrieves and filters them.\n4. If no keywords are provided, all active MedicationRequests for the patient are returned.",
+        "content": "all_orders = apis.fhir.get_medication_requests(patient=patient_id)\nactive_orders = []\nfor order in all_orders:\n    if order.get('status') != 'active':\n        continue\n    med_concept = order.get('medicationCodeableConcept', {})\n    found = False\n    # Check display, code, and text fields for any keyword\n    for coding in med_concept.get('coding', []):\n        for keyword in indication_keywords:\n            if (\n                (coding.get('display') and keyword.lower() in coding['display'].lower()) or\n                (coding.get('code') and keyword.lower() in coding['code'].lower())\n            ):\n                found = True\n                break\n        if found:\n            break\n    if not found and med_concept.get('text'):\n        for keyword in indication_keywords:\n            if keyword.lower() in med_concept['text'].lower():\n                found = True\n                break\n    if found:\n        active_orders.append(order)",
+        "tools": [
+          "apis.fhir.get_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533488",
+          "modified_at": "2026-05-19T13:36:57.534163"
+        }
+      },
+      {
+        "name": "fhir discontinue duplicate medication orders except newest",
+        "document": "Given a list of active MedicationRequest resources for a patient (all for the same indication), identify the newest order by comparison of the 'authoredOn' timestamp, and discontinue (change status to 'stopped') all other orders, leaving only the newest active.\n\nParameters\n----------\norders : list[dict]\n    List of active MedicationRequest resources (for a single indication and patient).\n\nOutputs\n-------\nlist[dict]\n    List of MedicationRequest resources that were discontinued (their final state after update).\n\nNotes:\n------\n1. This skill does not check that input orders are for the same patient/indication; ensure this prior to use.\n2. The newest order is determined by the most recent 'authoredOn' field in ISO8601 format.\n3. For each discontinued order, the status is set to 'stopped' using the FHIR PATCH or equivalent update API.\n4. The function does not create or modify any orders except discontinuing duplicates.\n5. The input list must have length >1; otherwise, no action is taken.",
+        "content": "if len(orders) <= 1:\n    discontinued = []\nelse:\n    # Sort orders descending by authoredOn (most recent first)\n    sorted_orders = sorted(orders, key=lambda o: o.get('authoredOn', ''), reverse=True)\n    newest_order = sorted_orders[0]\n    duplicates = sorted_orders[1:]\n    discontinued = []\n    for order in duplicates:\n        update_payload = {\"status\": \"stopped\"}\n        result = apis.fhir.patch_medication_request(order_id=order['id'], update=update_payload)\n        discontinued.append(result)",
+        "tools": [
+          "apis.fhir.patch_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533513",
+          "modified_at": "2026-05-19T13:36:57.534170"
+        }
+      },
+      {
+        "name": "fhir get recent lab observations by code",
+        "document": "Retrieve all laboratory observation records for a specified patient and lab code (e.g., TSH, FT4) from a FHIR-compatible service, then sort the observations by date in descending order to identify the most recent results.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nlab_code : str\n    The LOINC or standardized code for the laboratory test (e.g., 'TSH', 'FT4').\n\nOutputs\n-------\nlist[dict]\n    A list of observation records sorted by result date (most recent first). Each record contains observation value, date, and any relevant metadata.\n\nNotes\n-----\n- Ensure that the correct FHIR Observation resource endpoint is used, and that patient and lab code are both provided as query parameters.\n- If no records are found, output should be an empty list.\n- Downstream logic can select the first item as the most recent result.",
+        "content": "observations = apis.fhir.get_observations(\n    patient_id=patient_id,\n    code=lab_code\n)\nif observations:\n    # Assume each observation has a 'date' field in ISO format\n    observations.sort(key=lambda obs: obs['date'], reverse=True)\nelse:\n    observations = []",
+        "tools": [
+          "apis.fhir.get_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533526",
+          "modified_at": "2026-05-19T13:36:57.534175"
+        }
+      },
+      {
+        "name": "summarize vaccine administration and order actions",
+        "document": "Generate a concise summary statement describing the date of the last vaccine administration for a patient and whether a new vaccine order was placed. This skill takes as input the date of the last vaccine, the current date, the minimum interval (in days), and a flag indicating whether a new order was submitted. It outputs one or two human-readable summary sentences for downstream display or reporting.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nvaccine_name : str\n    The display name of the vaccine (e.g., 'Influenza vaccine (quadrivalent, preservative-free, IM)').\nlast_vaccine_date : str or None\n    Date string (YYYY-MM-DD) of the most recent vaccine administration, or None if never received.\ntoday : str\n    Date string (YYYY-MM-DD) representing the current date.\nminimum_interval_days : int\n    The required number of days before a new vaccine is considered overdue.\norder_placed : bool\n    Whether a new vaccine order was submitted.\n\nOutputs\n-------\nlist[str]\n    List of summary statements: (1) describing last vaccine administration; (2) describing vaccine order action if performed.\n\nNotes\n------\n1. If no last vaccine date is available, state that no previous administration was found.\n2. If order_placed is True, clearly state that a new order was placed for today.\n3. All dates should appear in YYYY-MM-DD format for clarity.",
+        "content": "summaries = []\nif last_vaccine_date:\n    summaries.append(f\"The last {vaccine_name} for patient {patient_id} was administered on {last_vaccine_date}.\")\n    days = (int((apis.utils.date_to_days(today) - apis.utils.date_to_days(last_vaccine_date))))\n    if days > minimum_interval_days:\n        summaries[0] += f\" This is more than {minimum_interval_days} days ago.\"\n    else:\n        summaries[0] += f\" This is within {minimum_interval_days} days.\"\nelse:\n    summaries.append(f\"No previous {vaccine_name} administration was found for patient {patient_id}.\")\nif order_placed:\n    summaries.append(f\"A new order for {vaccine_name} has been placed for today ({today}).\")",
+        "tools": [
+          "apis.utils.date_to_days"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533537",
+          "modified_at": "2026-05-19T13:36:57.534180"
+        }
+      },
+      {
+        "name": "fhir get patient active medication orders by indication",
+        "document": "Retrieve all active medication orders for a specified patient that are associated with a particular indication or purpose (e.g., 'DVT prophylaxis').\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient.\nindication_text : str\n    A string or keyword to match within medication orders' codeable concept text, indicating the purpose or indication (e.g., 'DVT prophylaxis').\n\nOutputs\n-------\nlist[dict]\n    A list of FHIR MedicationRequest resources (dictionaries) that match the patient and the given indication, and which are currently active.\n\nNotes\n------\n1. Only medication orders with status 'active' are included.\n2. The indication_text match is case-insensitive and can be a partial substring of the medication name or codeable concept text.\n3. This skill does not filter by drug class, only by indication text match in the order.\n4. Ensure the result structure is verified for downstream processing, for example by checking for presence of 'status', 'medicationCodeableConcept', and 'authoredOn' fields.",
+        "content": "active_orders = []\nall_orders = apis.fhir.get_medication_requests(patient_id=patient_id)\nfor order in all_orders:\n    if order.get('status', '').lower() == 'active':\n        med_text = ''\n        if 'medicationCodeableConcept' in order and 'text' in order['medicationCodeableConcept']:\n            med_text = order['medicationCodeableConcept']['text'].lower()\n        if indication_text.lower() in med_text:\n            active_orders.append(order)",
+        "tools": [
+          "apis.fhir.get_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533548",
+          "modified_at": "2026-05-19T13:36:57.534185"
+        }
+      },
+      {
+        "name": "fhir create patient medication order for indication",
+        "document": "Create a new MedicationRequest FHIR order for a patient for a specified indication, filling in all required fields for a DVT prophylaxis or similar order.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nmedication_text : str\n    Text description of the medication (e.g., 'heparin 5000 units SC q8h prophylaxis').\ndose_value : float\n    The numerical dose of the medication.\ndose_unit : str\n    The unit for the dose (e.g., 'units').\ntiming_text : str\n    The timing/frequency of administration (e.g., 'q8h').\nroute_text : str\n    The route of administration (e.g., 'Subcutaneous').\nauthored_on : str\n    ISO 8601 datetime string representing when the order was authored.\n\nOutputs\n-------\ndict\n    The created MedicationRequest FHIR resource.\n\nNotes\n------\n1. The status should be set to 'active' and intent set to 'order'.\n2. The resulting resource should conform to FHIR standards for MedicationRequest.\n3. Ensure all required subfields—such as dosage instructions, timing, and route—are present.\n4. Use this skill when there is no active order for a particular indication.",
+        "content": "new_order = {\n    \"resourceType\": \"MedicationRequest\",\n    \"medicationCodeableConcept\": {\n        \"text\": medication_text\n    },\n    \"authoredOn\": authored_on,\n    \"dosageInstruction\": [\n        {\n            \"route\": {\n                \"text\": route_text\n            },\n            \"doseAndRate\": [\n                {\n                    \"doseQuantity\": {\n                        \"value\": dose_value,\n                        \"unit\": dose_unit\n                    }\n                }\n            ],\n            \"timing\": {\n                \"code\": {\n                    \"text\": timing_text\n                }\n            }\n        }\n    ],\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    }\n}\ncreated_resource = apis.fhir.create_medication_request(body=new_order)",
+        "tools": [
+          "apis.fhir.create_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533559",
+          "modified_at": "2026-05-19T13:36:57.534190"
+        }
+      },
+      {
+        "name": "fhir discontinue duplicate active medication orders by indication",
+        "document": "Discontinue all but the most recent active medication orders for a specific indication in a patient, ensuring only the newest order remains active.\n\nParameters\n----------\npatient_id : str\n    Unique identifier of the patient.\norders : list[dict]\n    List of active MedicationRequest resources (matching the indication) for the patient; each must have 'authoredOn' as an ISO 8601 string and a unique 'id'.\n\nOutputs\n-------\nlist[str]\n    A list of MedicationRequest resource IDs that were discontinued.\n\nNotes\n-----\n1. The newest order is determined by comparing the 'authoredOn' timestamps (ISO 8601 format).\n2. All other orders with older 'authoredOn' timestamps will have their status updated to 'stopped' (FHIR standard for discontinuation).\n3. Each update must target the correct MedicationRequest resource by its unique 'id'.\n4. Ensure that the input 'orders' list contains only active orders for the relevant indication.\n5. Use this skill when more than one active order for the same indication is present and deduplication is required.",
+        "content": "if not orders or len(orders) <= 1:\n    discontinued_ids = []\nelse:\n    # Sort orders by authoredOn descending (newest first)\n    sorted_orders = sorted(\n        orders,\n        key=lambda o: o.get('authoredOn', ''),\n        reverse=True\n    )\n    # Keep the first (newest); discontinue the rest\n    discontinued_ids = []\n    for order in sorted_orders[1:]:\n        resource_id = order.get('id')\n        if resource_id:\n            update_body = {\"status\": \"stopped\"}\n            apis.fhir.update_medication_request(resource_id=resource_id, body=update_body)\n            discontinued_ids.append(resource_id)",
+        "tools": [
+          "apis.fhir.update_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533569",
+          "modified_at": "2026-05-19T13:36:57.534195"
+        }
+      },
+      {
+        "name": "fhir order ct abdomen with iv contrast for renal mass",
+        "document": "Create a new ServiceRequest resource on a FHIR server to order a CT Abdomen with IV contrast for a specified patient, using 'Renal mass follow-up' as the clinical indication.\n\nParameters\n----------\npatient_id : str\n    The FHIR Patient ID for whom the order is placed.\norder_date : str\n    The ISO 8601 datetime string representing when the order is authored (e.g., '2024-06-09T12:30:00+00:00').\nbase_url : str\n    The base URL of the FHIR server (e.g., 'http://localhost:8080/fhir').\npriority : str\n    The order priority (e.g., 'routine', 'urgent', 'stat').\n\nOutputs\n-------\nservice_request_response : dict\n    The response from the FHIR server after creating the ServiceRequest resource.\n\nNotes:\n------\n1. Uses CPT code '74177' for 'CT Abdomen with IV contrast'.\n2. Sets the indication note to 'Renal mass follow-up'.\n3. Ensure that patient_id exists and is valid in the FHIR system.\n4. The ServiceRequest resource is created with status 'active', intent 'order', and the specified priority. Modify 'priority' as appropriate for the clinical scenario.\n",
+        "content": "service_request = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.ama-assn.org/go/cpt\",\n                \"code\": \"74177\",\n                \"display\": \"CT Abdomen with IV contrast\"\n            }\n        ]\n    },\n    \"authoredOn\": order_date,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority,\n    \"subject\": {\n        \"reference\": \"Patient/\" + patient_id\n    },\n    \"note\": [\n        {\n            \"text\": \"Renal mass follow-up\"\n        }\n    ]\n}\nendpoint = base_url + \"/ServiceRequest\"\nservice_request_response = apis.fhir.post(endpoint=endpoint, json=service_request)",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533579",
+          "modified_at": "2026-05-19T13:36:57.534200"
+        }
+      },
+      {
+        "name": "fhir get active opioid analgesic orders by patient",
+        "document": "Retrieve all active medication orders for opioid analgesics for a specified patient from a FHIR server. Filters the MedicationRequest resources to include only those that are active and where the medication belongs to the opioid analgesic drug class.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient whose medication orders are being retrieved.\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resource objects that are active and correspond to opioid analgesics.\n\nNotes:\n------\n1. This skill assumes that opioid analgesic medications can be identified via either medication codes (e.g., RxNorm) or by drug class coding in the MedicationRequest resource. Additional logic may be required to check medication codes or class, as not all MedicationRequest resources will be opioid analgesics.\n2. Pagination may be necessary if the patient has a large number of orders; adapt accordingly for production use.\n3. Use this skill as a filtering step before comparing to naloxone orders or taking further action.",
+        "content": "all_orders = apis.fhir.get_medication_requests(patient_id=patient_id)\nactive_opioid_orders = []\nfor order in all_orders:\n    if order.get('status', '').lower() == 'active':\n        med = order.get('medicationCodeableConcept', {})\n        codes = med.get('coding', [])\n        for code in codes:\n            # RxNorm opioid analgesic codes or opioid drug class system\n            if (code.get('system') == 'http://www.nlm.nih.gov/research/umls/rxnorm' and is_opioid_analgesic_code(code.get('code')))\n                or (code.get('system') == 'http://www.whocc.no/atc' and code.get('code', '').startswith('N02A')):\n                active_opioid_orders.append(order)\n                break\n# 'is_opioid_analgesic_code' should be implemented based on institution's opioid code list.",
+        "tools": [
+          "apis.fhir.get_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533590",
+          "modified_at": "2026-05-19T13:36:57.534205"
+        }
+      },
+      {
+        "name": "fhir get active naloxone orders by patient",
+        "document": "Retrieve all active naloxone medication orders for a specified patient from a FHIR server. Filters MedicationRequest resources to include only those that are active and where the medication is naloxone (by code or text).\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient whose naloxone orders are being retrieved.\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resource objects that are active and correspond specifically to naloxone prescriptions.\n\nNotes\n-----\n1. Naloxone identification can use RxNorm code(s) (e.g., '1790098' for naloxone nasal spray 4mg) or medication name text match. Consider local formulary for code variations.\n2. The skill returns only orders with status 'active'.\n3. Use this to verify naloxone coverage in opioid-prescribed patients before initiating new orders.",
+        "content": "orders = apis.fhir.get_medication_requests(patient_id=patient_id)\nactive_naloxone_orders = []\nfor order in orders:\n    if order.get('status', '').lower() == 'active':\n        med = order.get('medicationCodeableConcept', {})\n        codes = med.get('coding', [])\n        found_naloxone = False\n        for code in codes:\n            # RxNorm code for naloxone (e.g., 1790098) or other valid local codes\n            if code.get('system') == 'http://www.nlm.nih.gov/research/umls/rxnorm' and is_naloxone_code(code.get('code')):\n                found_naloxone = True\n                break\n        if not found_naloxone and 'naloxone' in med.get('text', '').lower():\n            found_naloxone = True\n        if found_naloxone:\n            active_naloxone_orders.append(order)\n# is_naloxone_code should be implemented based on recognized naloxone RxNorm codes.",
+        "tools": [
+          "apis.fhir.get_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533601",
+          "modified_at": "2026-05-19T13:36:57.534211"
+        }
+      },
+      {
+        "name": "fhir create naloxone order for uncovered opioid prescriptions",
+        "document": "For each active opioid analgesic medication order for a given patient that does not have a matching active naloxone prescription, generate a new MedicationRequest for naloxone. This skill cross-compares opioid and naloxone orders, identifying opioids not covered by an active naloxone order, and issues a new order for each uncovered opioid order. \n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient for whom orders are being managed.\nactive_opioid_orders : list[dict]\n    List of active opioid MedicationRequest resource objects.\nactive_naloxone_orders : list[dict]\n    List of active naloxone MedicationRequest resource objects.\n\nOutputs\n-------\nlist[dict]\n    A list of responses (typically MedicationRequest resources or server responses) from the creation of new naloxone orders. If all opioid orders are covered, returns an empty list.\n\nNotes\n-----\n1. Coverage is defined as the presence of any active naloxone order for the patient; this skill does not attempt to match on specific opioid-naloxone pairings but assumes one active naloxone order covers all active opioids.\n2. Naloxone order details (such as dose and route) should be set to a safe, default, and configurable value; update as needed for local formulary.\n3. The implementation should avoid duplicating naloxone orders if already present.\n4. All created orders should use appropriate coding (e.g., RxNorm: 1790098 for naloxone nasal spray 4mg).\n5. This skill does not perform patient eligibility checks or check for previous adverse reactions.",
+        "content": "created_naloxone_orders = []\nif len(active_naloxone_orders) == 0 and len(active_opioid_orders) > 0:\n    # Create a single naloxone order for the patient if none exists and opioids are present\n    naloxone_order = {\n        \"resourceType\": \"MedicationRequest\",\n        \"medicationCodeableConcept\": {\n            \"coding\": [\n                {\n                    \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n                    \"code\": \"1790098\",\n                    \"display\": \"naloxone nasal spray 4 mg\"\n                }\n            ],\n            \"text\": \"naloxone nasal spray 4 mg\"\n        },\n        \"subject\": {\"reference\": f\"Patient/{patient_id}\"},\n        \"authoredOn\": apis.utils.get_current_iso_datetime(),\n        \"dosageInstruction\": [\n            {\n                \"route\": {\"text\": \"Nasal\"},\n                \"doseAndRate\": [\n                    {\n                        \"doseQuantity\": {\"value\": 4, \"unit\": \"mg\"}\n                    }\n                ]\n            }\n        ],\n        \"status\": \"active\",\n        \"intent\": \"order\"\n    }\n    response = apis.fhir.create_medication_request(order=naloxone_order)\n    created_naloxone_orders.append(response)\n# If naloxone already exists or there are no opioid orders, do nothing.",
+        "tools": [
+          "apis.fhir.create_medication_request",
+          "apis.utils.get_current_iso_datetime"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533611",
+          "modified_at": "2026-05-19T13:36:57.534217"
+        }
+      },
+      {
+        "name": "fhir get all medication requests for patient",
+        "document": "Retrieve all medication orders (MedicationRequest resources) associated with a specific patient from a FHIR-compliant server. This is typically used as an initial step for medication reconciliation, safety checks, or prescription management workflows.\n\nParameters\n----------\npatient_id : str\n    The FHIR identifier (e.g., MRN or system-specific ID) for the patient whose medication requests are to be retrieved.\n\nOutputs\n-------\nmedication_requests : list[dict]\n    A list of MedicationRequest resource objects (dictionaries), each representing a medication order for the given patient.\n\nNotes:\n------\n- This retrieves all medication requests, not just active ones; additional filtering by status or medication type (e.g., opioid) may be needed in downstream steps.\n- Be sure to handle pagination if the FHIR server limits the number of results per response.\n- The result may include prescriptions that are discontinued, completed, or on hold—verify status as needed.\n",
+        "content": "medication_requests = apis.fhir.search_medication_request(patient=patient_id)",
+        "tools": [
+          "apis.fhir.search_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533621",
+          "modified_at": "2026-05-19T13:36:57.534222"
+        }
+      },
+      {
+        "name": "fhir match opioid orders with naloxone prescriptions",
+        "document": "For a given patient, identify all active opioid analgesic medication orders and verify that each has a corresponding active naloxone prescription. If an active opioid order lacks a matching naloxone prescription, record its details for potential intervention.\n\nParameters\n----------\npatient_id : str\n    The FHIR identifier for the patient whose orders are being reviewed.\n\nOutputs\n-------\nmissing_naloxone_matches : list[dict]\n    A list of dictionaries, each containing details of an active opioid analgesic order that does not have an associated active naloxone prescription.\n\nNotes:\n------\n- Opioid and naloxone medications must be identified using appropriate medication codes, categories, or name-matching logic (implementation must define how to distinguish these classes).\n- Both opioid and naloxone orders must be ACTIVE (typically status == 'active').\n- The output allows downstream logic to take action, such as generating new naloxone orders if needed.",
+        "content": "medication_requests = apis.fhir.search_medication_request(patient=patient_id)\n\nactive_opioids = []\nactive_naloxones = []\n\nfor req in medication_requests:\n    # Check if the order is active\n    if req.get('status', '').lower() != 'active':\n        continue\n    med = req.get('medicationCodeableConcept', {})\n    # Simple opioid/naloxone identification - implementation may use codes or text matching\n    med_text = med.get('text', '').lower() if med else ''\n    if 'opioid' in med_text or ('morphine' in med_text or 'oxycodone' in med_text or 'hydrocodone' in med_text):\n        active_opioids.append(req)\n    elif 'naloxone' in med_text:\n        active_naloxones.append(req)\n\nopioid_orders_missing_naloxone = []\nfor opioid_order in active_opioids:\n    # Attempt to match by patient and ensure at least one active naloxone Rx exists\n    has_naloxone = len(active_naloxones) > 0\n    if not has_naloxone:\n        opioid_orders_missing_naloxone.append(opioid_order)\n\nmissing_naloxone_matches = opioid_orders_missing_naloxone",
+        "tools": [
+          "apis.fhir.search_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533632",
+          "modified_at": "2026-05-19T13:36:57.534228"
+        }
+      },
+      {
+        "name": "fhir create naloxone orders for unmatched opioid prescriptions",
+        "document": "For all active opioid analgesic orders for a patient that do not have an associated active naloxone prescription, create a new naloxone MedicationRequest for the same patient. This skill batches through unmatched opioid orders and generates a naloxone order for each one, allowing for downstream tracking or intervention.\n\nParameters\n----------\npatient_id : str\n    The FHIR identifier for the patient.\nunmatched_opioid_orders : list[dict]\n    A list of active opioid MedicationRequest resources that lack a matching active naloxone prescription.\n\nOutputs\n-------\nnaloxone_orders : list[dict]\n    A list of newly created naloxone MedicationRequest resource objects.\n\nNotes:\n------\n- Each naloxone order is generated for the same patient and should be configured using standard naloxone prescribing practices. This implementation sets a basic text and status but can be extended to include more detailed prescription parameters as required by local policy.\n- Ensure that duplicate naloxone orders are not created if one already exists and is active.\n- Downstream systems may need to validate that order creation succeeded and handle any errors.\n",
+        "content": "naloxone_orders = []\nfor opioid_order in unmatched_opioid_orders:\n    naloxone_request = {\n        'resourceType': 'MedicationRequest',\n        'status': 'active',\n        'intent': 'order',\n        'medicationCodeableConcept': {\n            'text': 'naloxone'\n        },\n        'subject': {\n            'reference': f'Patient/{patient_id}'\n        }\n        # Additional prescription details (dosage, instructions) can be added here\n    }\n    created_order = apis.fhir.create_medication_request(naloxone_request)\n    naloxone_orders.append(created_order)",
+        "tools": [
+          "apis.fhir.create_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533643",
+          "modified_at": "2026-05-19T13:36:57.534233"
+        }
+      },
+      {
+        "name": "fhir order ct abdomen with contrast for indication",
+        "document": "Place a new CT Abdomen (and Pelvis) with IV contrast order for a patient using the FHIR ServiceRequest API, with a configurable clinical indication/reason. This skill builds the ServiceRequest resource with appropriate coding and required metadata, and submits it.\n\nParameters\n----------\npatient_id : str\n    Unique FHIR identifier for the patient (e.g., 'S6329254').\nindication : str\n    Clinical note or reason for the CT order (e.g., 'Renal mass follow-up').\norder_datetime : str\n    ISO 8601 datetime string for when the order is authored (e.g., '2024-06-10T14:00:00+00:00').\npriority : str (optional)\n    Priority level for the CT order ('routine', 'urgent', 'stat'); default is 'routine'.\n\nOutputs\n-------\norder_response : dict\n    The JSON response from the FHIR ServiceRequest POST, containing order confirmation or error details.\n\nNotes:\n------\n- Uses CPT code 74177 for 'CT Abdomen and Pelvis with contrast'.\n- Will set 'intent' to 'order' and 'status' to 'active'.\n- The 'note' field will use the provided indication.\n- Check that all required parameters are provided to avoid order rejection.\n- The API must have proper authorization and patient context.\n",
+        "content": "service_request = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.ama-assn.org/go/cpt\",\n                \"code\": \"74177\",\n                \"display\": \"CT Abdomen and Pelvis with contrast\"\n            }\n        ]\n    },\n    \"authoredOn\": order_datetime,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority if priority else \"routine\",\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"note\": [\n        {\n            \"text\": indication\n        }\n    ]\n}\norder_response = apis.fhir.post(\n    path=\"/ServiceRequest\",\n    data=service_request\n)",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533653",
+          "modified_at": "2026-05-19T13:36:57.534239"
+        }
+      },
+      {
+        "name": "fhir order procedure if overdue",
+        "document": "Places a new order for a procedure (e.g., vaccine) via FHIR ServiceRequest for a patient if there is no prior procedure record or if the last occurrence is older than a specified threshold in days relative to a given date.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient (e.g., 'S3195056').\nprocedure_code : str\n    The standardized procedure code (e.g., CPT code '90686' for influenza vaccine).\nprocedure_display : str\n    Human-readable display for the procedure code (e.g., 'Influenza virus vaccine, quadrivalent...').\nreference_date : str\n    The date (in 'YYYY-MM-DD') to compare for recency and as the order date if needed.\nlatest_procedure_date : str or None\n    The date (in 'YYYY-MM-DD') of the most recent procedure, or None if none exists.\nwithin_window : bool\n    True if the last procedure is within the threshold (e.g., 365 days), else False.\ndays_threshold : int\n    The maximum allowed interval in days before a new order is required.\n\nOutputs\n-------\norder_response : dict or None\n    The response dict from the ServiceRequest API call if a new order is placed, else None if no order is needed.\n\nNotes\n-----\n- This skill is responsible for deciding whether to issue an order and for constructing the ServiceRequest body for the specified procedure.\n- The ServiceRequest is set to status 'active', intent 'order', and priority 'stat'.\n- The authoredOn field is set to the reference_date.\n- No order is placed if a qualifying procedure was performed within the days_threshold.\n- Useful for scheduled immunizations, periodic procedures, and similar needs.\n",
+        "content": "# Only place order if no prior procedure or outside window\nshould_order = (latest_procedure_date is None) or (not within_window)\norder_response = None\nif should_order:\n    service_request_body = {\n        \"resourceType\": \"ServiceRequest\",\n        \"code\": {\n            \"coding\": [\n                {\n                    \"system\": \"http://www.ama-assn.org/go/cpt\",\n                    \"code\": procedure_code,\n                    \"display\": procedure_display\n                }\n            ]\n        },\n        \"authoredOn\": reference_date + \"T00:00:00+00:00\",\n        \"status\": \"active\",\n        \"intent\": \"order\",\n        \"priority\": \"stat\",\n        \"subject\": {\n            \"reference\": f\"Patient/{patient_id}\"\n        },\n        \"note\": {\n            \"text\": f\"Order for {procedure_display} placed due to last procedure date: {latest_procedure_date if latest_procedure_date else 'none'}; threshold: {days_threshold} days.\"\n        }\n    }\n    order_response = apis.fhir.post(\"/fhir/ServiceRequest\", service_request_body)\n# order_response is the API response if order placed, else None",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533664",
+          "modified_at": "2026-05-19T13:36:57.534244"
+        }
+      },
+      {
+        "name": "fhir order CT Abdomen with IV contrast for renal mass follow-up",
+        "document": "Place a new FHIR ServiceRequest for a CT Abdomen (and Pelvis) with IV contrast using the standard CPT code and a clinical indication of 'Renal mass follow-up'.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient (e.g., 'S2823623').\nbase_url : str\n    The base URL for the FHIR server (e.g., 'http://localhost:8080/fhir').\norder_datetime : str\n    ISO8601 datetime string (e.g., '2023-11-07T22:47:00+00:00'), representing the time the order is authored.\npriority : str\n    The priority of the order (e.g., 'stat', 'routine').\n\nOutputs\n-------\nservice_request : dict\n    The FHIR ServiceRequest resource as submitted to the FHIR server.\n\nNotes:\n------\n1. Uses CPT code 74177 for 'CT Abdomen and Pelvis with IV contrast'.\n2. Sets the intent to 'order' and status to 'active'.\n3. The indication is always set to 'Renal mass follow-up' in the note field.\n4. This skill does not check for prior procedures or threshold logic; it is intended to be called only if no recent procedure exists.\n",
+        "content": "service_request = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.ama-assn.org/go/cpt\",\n                \"code\": \"74177\",\n                \"display\": \"CT Abdomen and Pelvis with IV contrast\"\n            }\n        ]\n    },\n    \"authoredOn\": order_datetime,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority,\n    \"subject\": {\n        \"reference\": \"Patient/\" + patient_id\n    },\n    \"note\": {\n        \"text\": \"Renal mass follow-up\"\n    }\n}\nendpoint = base_url + \"/ServiceRequest\"\napis.fhir.post_request(endpoint, service_request)",
+        "tools": [
+          "apis.fhir.post_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533675",
+          "modified_at": "2026-05-19T13:36:57.534250"
+        }
+      },
+      {
+        "name": "fhir create service request for device removal",
+        "document": "Create a new FHIR ServiceRequest resource to request the removal of a medical device (e.g., urinary catheter) for a specified patient. The skill constructs the request body with all essential fields and submits it to the FHIR ServiceRequest endpoint.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient who needs the device removed.\ndevice_code : str\n    The FHIR code representing the device or procedure to be removed (e.g., code for urinary catheter removal).\nreason : str\n    The clinical rationale or justification for removal (e.g., 'Device present >48h, no removal order').\nrequester_id : str\n    The identifier of the person or system initiating the request.\n\nOutputs\n-------\ndict\n    The created FHIR ServiceRequest resource as returned by the server, including its unique identifier and status.\n\nNotes:\n-------\n1. Ensure device_code matches the appropriate removal procedure per institutional FHIR implementation.\n2. The request body should include minimal required fields: subject, code, status ('active'), intent ('order'), and reason.\n3. requester_id can be a practitioner, organization, or system id as appropriate to context.\n4. Use this skill only after confirming the criteria for device removal are met (e.g., device present > threshold, no removal order).",
+        "content": "service_request_body = {\n    'resourceType': 'ServiceRequest',\n    'status': 'active',\n    'intent': 'order',\n    'subject': { 'reference': f'Patient/{patient_id}' },\n    'code': { 'coding': [ { 'system': 'http://snomed.info/sct', 'code': device_code } ] },\n    'reasonCode': [ { 'text': reason } ],\n    'requester': { 'reference': f'Practitioner/{requester_id}' }\n}\nendpoint = 'http://localhost:8080/fhir/ServiceRequest'\ncreated_sr = apis.http.post(url=endpoint, json=service_request_body)",
+        "tools": [
+          "apis.http.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533686",
+          "modified_at": "2026-05-19T13:36:57.534256"
+        }
+      },
+      {
+        "name": "fhir order medication request with coding and date",
+        "document": "Place a new medication request for a patient in a FHIR system, using a specified medication coding (e.g., CPT code), date, and optional details such as route and dosage.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient in the FHIR system.\nmedication_code : str\n    The standardized code for the medication (e.g., CPT or RxNorm code).\nmedication_display : str\n    Human-readable description of the medication.\nauthored_on : str\n    The date the request is authored, format 'YYYY-MM-DD'.\nroute_text : str\n    Administration route, e.g., 'IM', 'oral'.\ndosage_text : str (optional)\n    Free-text dosage instruction (optional; can be empty for defaults).\n\nOutputs\n-------\ndict\n    The FHIR MedicationRequest resource as posted, or a summary of the order details.\n\nNotes:\n------\n1. medication_code and medication_display should match for clarity and coding compliance.\n2. authored_on should always be set to the current date for accurate clinical documentation.\n3. Route and dosage can be customized or left as defaults per protocol; if dosage_text is not provided, only route is included.\n4. Use only for new orders, not for updating or canceling existing requests.\n5. This skill constructs and submits the FHIR MedicationRequest. The response can be logged or parsed for downstream systems.\n",
+        "content": "medication_request = {\n    \"resourceType\": \"MedicationRequest\",\n    \"medicationCodeableConcept\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.ama-assn.org/go/cpt\",\n                \"code\": medication_code,\n                \"display\": medication_display\n            }\n        ],\n        \"text\": medication_display\n    },\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"authoredOn\": authored_on,\n    \"dosageInstruction\": [\n        {\n            \"route\": {\"text\": route_text},\n            **({\"text\": dosage_text} if dosage_text else {})\n        }\n    ]\n}\nresponse = apis.fhir.post(endpoint=\"/fhir/MedicationRequest\", data=medication_request)\n# response contains the MedicationRequest resource as created.",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533697",
+          "modified_at": "2026-05-19T13:36:57.534262"
+        }
+      },
+      {
+        "name": "fhir get medication requests by patient",
+        "document": "Retrieve all MedicationRequest resources for a given patient using their patient identifier from a FHIR server.\n\nParameters\n----------\npatient_id : str\n    The FHIR-compliant patient identifier to search for medication requests.\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resource objects associated with the patient.\n\nNotes:\n------\n- Ensure the patient_id is correctly formatted for FHIR queries.\n- This will return all medication orders, including both active and inactive. Filtering for status or specific medication types (e.g., opioid) must be done post-fetch.\n- Pagination is not handled here; ensure the server returns all results as needed or extend as appropriate.",
+        "content": "medication_requests = apis.fhir.get(\n    resource='MedicationRequest',\n    params={'patient': patient_id}\n)\n# medication_requests is a list of MedicationRequest resource dicts for the given patient_id",
+        "tools": [
+          "apis.fhir.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533708",
+          "modified_at": "2026-05-19T13:36:57.534269"
+        }
+      },
+      {
+        "name": "fhir create naloxone medication request for opioid orders",
+        "document": "For each active opioid analgesic MedicationRequest in the provided list that lacks a matching active naloxone prescription, construct and submit a new MedicationRequest resource for naloxone using the FHIR API. \n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier for whom the naloxone prescription will be created.\nmissing_naloxone_opioid_orders : list[dict]\n    List of active opioid MedicationRequest resource dicts that do not have a matching naloxone order.\n\nOutputs\n-------\nnaloxone_requests : list[dict]\n    List of response dicts from the FHIR server for each created naloxone MedicationRequest.\n\nNotes:\n------\n- The created naloxone order should reference the patient and, if possible, be linked to the opioid order (e.g., via 'basedOn' or 'reasonReference').\n- Use standard RxNorm code (e.g., 727150) for naloxone in the MedicationRequest resource.\n- Customization of dosage, route, and other order details may be needed to meet institutional or clinical requirements.\n- Handle and collect all creation responses for downstream processing or auditing.\n- This skill does not deduplicate if multiple opioid orders for the same patient exist; it creates one naloxone prescription per missing opioid order unless further logic is added.\n",
+        "content": "# List to collect responses\nnaloxone_requests = []\nfor opioid_order in missing_naloxone_opioid_orders:\n    # Construct the MedicationRequest resource for naloxone\n    naloxone_med_request = {\n        \"resourceType\": \"MedicationRequest\",\n        \"status\": \"active\",\n        \"intent\": \"order\",\n        \"medicationCodeableConcept\": {\n            \"coding\": [{\n                \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n                \"code\": \"727150\",\n                \"display\": \"naloxone\"\n            }],\n            \"text\": \"naloxone\"\n        },\n        \"subject\": {\"reference\": f\"Patient/{patient_id}\"},\n        # Optionally link to opioid order\n        \"reasonReference\": [{\"reference\": f\"MedicationRequest/{opioid_order.get('id', '')}\"}]\n        # Additional fields such as dosageInstruction, authoredOn, requester can be added here as needed\n    }\n    # Submit the new MedicationRequest to the FHIR server\n    response = apis.fhir.post(resource='MedicationRequest', body=naloxone_med_request)\n    naloxone_requests.append(response)\n# naloxone_requests contains the FHIR responses for each created naloxone MedicationRequest",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533718",
+          "modified_at": "2026-05-19T13:36:57.534275"
+        }
+      },
+      {
+        "name": "fhir check for documented service request by code",
+        "document": "Determine whether any service request exists for a specific patient and procedure code, which can be used to verify if an order (such as catheter removal) has already been documented.\n\nParameters\n----------\npatient_id : str\n    The FHIR resource identifier for the patient (e.g., 'S0547588').\nprocedure_code : str\n    The procedure code for the service request to check (e.g., 'NUR1373' for urinary catheter removal).\n\nOutputs\n-------\nbool\n    True if at least one matching ServiceRequest is found, otherwise False.\nlist[dict]\n    A list of matching ServiceRequest resources for further inspection if needed.\n\nNotes:\n------\n1. This skill queries the FHIR ServiceRequest resource, filtering by patient and procedure code.\n2. Useful for clinical validation workflows that require confirmation of existing or prior orders.\n3. The boolean output allows for easy conditional logic, while the list output enables detailed inspection of request details (such as status or authoredOn timestamps).",
+        "content": "service_requests = apis.fhir.ServiceRequest.search(\n    patient=patient_id,\n    code=procedure_code\n)\nexists = bool(service_requests)  # True if there is at least one documented order\n# Both 'exists' and 'service_requests' are the outputs",
+        "tools": [
+          "apis.fhir.ServiceRequest.search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533729",
+          "modified_at": "2026-05-19T13:36:57.534281"
+        }
+      },
+      {
+        "name": "fhir create catheter removal service request with rationale",
+        "document": "Create a FHIR ServiceRequest resource to order removal of a urinary catheter for a specified patient, including a rationale note (e.g., catheter has been in place for over 48 hours without a documented removal order).\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient (FHIR resource reference, e.g., 'S0547588').\nprocedure_code : str\n    The procedure code for catheter removal (e.g., 'NUR1373').\nrationale : str\n    The clinical justification for the removal request (e.g., 'Urinary catheter has been in place for >48 hours without a documented removal order.').\nauthored_on : str\n    The ISO8601 timestamp representing when the request is authored.\noccurrence_datetime : str\n    The ISO8601 timestamp for the requested timing of the procedure.\n\nOutputs\n-------\ndict\n    The created ServiceRequest resource as a dictionary.\n\nNotes:\n------\n1. This skill constructs the ServiceRequest resource according to FHIR standards, with 'stat' priority and 'order' intent for urgent clinical action.\n2. The rationale is added in the 'note' field for auditability and transparency.\n3. The occurrenceDatetime should match clinical urgency and local workflow conventions.",
+        "content": "service_request = apis.fhir.ServiceRequest.create(\n    resource={\n        \"resourceType\": \"ServiceRequest\",\n        \"code\": {\n            \"coding\": [\n                {\n                    \"system\": \"http://www.ama-assn.org/go/cpt\",\n                    \"code\": procedure_code,\n                    \"display\": \"Remove Urinary Catheter\"\n                }\n            ]\n        },\n        \"authoredOn\": authored_on,\n        \"status\": \"active\",\n        \"intent\": \"order\",\n        \"priority\": \"stat\",\n        \"subject\": {\n            \"reference\": f\"Patient/{patient_id}\"\n        },\n        \"note\": [\n            {\n                \"text\": rationale\n            }\n        ],\n        \"occurrenceDateTime\": occurrence_datetime\n    }\n)\n# 'service_request' is the created ServiceRequest resource (dict)",
+        "tools": [
+          "apis.fhir.ServiceRequest.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533739",
+          "modified_at": "2026-05-19T13:36:57.534288"
+        }
+      },
+      {
+        "name": "fhir get procedures by patient and codes",
+        "document": "Retrieve all Procedure resources for a specified patient filtered by a list of procedure codes using the FHIR API.\n\nParameters\n----------\npatient_id : str\n    The identifier of the patient whose procedures are to be retrieved.\nprocedure_codes : list[str]\n    A list of procedure code strings (e.g., LOINC, CPT, or custom codes) to filter the search.\n\nOutputs\n-------\nlist[dict]\n    A list of Procedure resources (as dicts) matching the patient and codes criteria. If no procedures match, returns an empty list.\n\nNotes:\n------\n1. This skill only retrieves procedures that exactly match the provided codes—ensure codes are correct and comprehensive for the clinical use case.\n2. The result may include procedures from multiple dates and contexts; further filtering by date or status may be performed as needed.\n3. This skill does not perform paging. If a large number of results are expected, consider implementing paging logic.\n",
+        "content": "url = f\"/fhir/Procedure?patient={patient_id}&code={','.join(procedure_codes)}\"\nprocedures = apis.http.get(url)\nif not procedures or not isinstance(procedures, list):\n    procedures = []",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533750",
+          "modified_at": "2026-05-19T13:36:57.534294"
+        }
+      },
+      {
+        "name": "fhir order ct abdomen with indication",
+        "document": "Create a new ServiceRequest resource in the FHIR system to order a CT Abdomen (with or without Pelvis) with IV contrast for a specified patient. Allows setting the clinical indication as a note and customizing the authored date, request priority, and procedure code.\n\nParameters\n----------\npatient_id : str\n    The identifier of the patient for whom the order is being placed.\nauthored_datetime : str\n    The ISO8601 datetime string representing when the order is authored (e.g., '2023-11-07T22:47:00+00:00').\nindication_note : str\n    The clinical indication or reason for the study, to be included in the request note.\nprocedure_code : str\n    The CPT or FHIR code for the CT study (e.g., '74177' for CT Abdomen and Pelvis with IV contrast).\nprocedure_display : str\n    Human-readable display name for the procedure (e.g., 'CT Abdomen and Pelvis with IV contrast').\npriority : str\n    The priority for the order (e.g., 'stat', 'routine').\n\nOutputs\n-------\ndict\n    The created ServiceRequest resource as returned by the FHIR API.\n\nNotes:\n------\n1. This skill does not check for existing procedures or clinical appropriateness; it assumes the need has been established.\n2. The system code for the procedure is fixed to 'http://www.ama-assn.org/go/cpt'.\n3. The ServiceRequest is created with 'active' status and 'order' intent.\n4. If indication_note is empty, the note field will be omitted.\n",
+        "content": "service_request = {\n    'resourceType': 'ServiceRequest',\n    'code': {\n        'coding': [\n            {\n                'system': 'http://www.ama-assn.org/go/cpt',\n                'code': procedure_code,\n                'display': procedure_display\n            }\n        ]\n    },\n    'authoredOn': authored_datetime,\n    'status': 'active',\n    'intent': 'order',\n    'priority': priority,\n    'subject': {\n        'reference': f'Patient/{patient_id}'\n    }\n}\nif indication_note:\n    service_request['note'] = [{ 'text': indication_note }]\ncreated_request = apis.http.post('/fhir/ServiceRequest', service_request)",
+        "tools": [
+          "apis.http.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533760",
+          "modified_at": "2026-05-19T13:36:57.534301"
+        }
+      },
+      {
+        "name": "fhir check for existing service requests by patient and code",
+        "document": "Determine whether any ServiceRequest resources exist for a specific patient and procedure code, such as urinary catheter removal. This skill is used to verify if there is an existing or past documented order for a given procedure before taking further action.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient in the FHIR system.\nprocedure_code : str\n    The procedure code to filter ServiceRequests (e.g., urinary catheter removal).\n\nOutputs\n-------\nlist[dict]\n    A list of FHIR ServiceRequest resource objects for the patient and procedure code. List may be empty if no such orders exist.\n\nNotes:\n------\n- This skill is useful for confirming the absence of duplicate or prior orders before creating new ones.\n- Consumers of this skill should check the returned list's length to determine if prior orders exist.",
+        "content": "service_requests = apis.fhir.get(\n    resource='ServiceRequest',\n    params={\n        'patient': patient_id,\n        'code': procedure_code\n    }\n)\n# The 'service_requests' variable holds all ServiceRequest resources for this patient/code.",
+        "tools": [
+          "apis.fhir.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533771",
+          "modified_at": "2026-05-19T13:36:57.534326"
+        }
+      },
+      {
+        "name": "fhir create urgent service request for overdue procedure",
+        "document": "Create a new urgent ServiceRequest in FHIR for a patient if a procedure (e.g., catheter removal) is overdue and there is no existing documented order for that procedure.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., 'S2380121').\nprocedure_code : str\n    The procedure code to order (e.g., 'NUR1373' for urinary catheter removal).\nprocedure_display : str\n    Human-readable display for the procedure code (e.g., 'Urinary Catheter Removal').\nreason_text : str\n    Free-text note explaining the clinical justification for the urgent order (e.g., 'Catheter has been in place for more than 48 hours without documented removal order.').\noccurrence_datetime : str\n    ISO 8601 datetime string for when the removal should occur (e.g., '2023-11-11T09:00:00+00:00').\nauthored_on : str\n    ISO 8601 datetime string when the order is authored (typically now).\n\nOutputs\n-------\ndict\n    The created ServiceRequest FHIR resource as a dictionary, containing details of the new order.\n\nNotes:\n------\n- This skill should only be used after verifying that the procedure is overdue and no ServiceRequest for the procedure exists for the patient.\n- The ServiceRequest is created with 'active' status, 'order' intent, and 'stat' priority.\n- Always document the clinical reason in the note for audit and safety.\n- The occurrence_datetime should reflect when the action is to take place (often as soon as possible for overdue procedures).\n",
+        "content": "service_request_resource = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.ama-assn.org/go/cpt\",\n                \"code\": procedure_code,\n                \"display\": procedure_display\n            }\n        ]\n    },\n    \"authoredOn\": authored_on,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": \"stat\",\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"note\": [\n        {\n            \"text\": reason_text\n        }\n    ],\n    \"occurrenceDateTime\": occurrence_datetime\n}\ncreated_service_request = apis.fhir.post(\n    resource=\"ServiceRequest\",\n    body=service_request_resource\n)\n# created_service_request contains the FHIR ServiceRequest resource for the urgent procedure order.",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533781",
+          "modified_at": "2026-05-19T13:36:57.534333"
+        }
+      },
+      {
+        "name": "fhir order medication request for patient",
+        "document": "Place a medication order (MedicationRequest) for a patient with specified medication, date, and dosage instructions in FHIR format.\n\nParameters\n----------\npatient_id : str\n    Unique identifier of the patient for whom the medication is being ordered.\nmedication_code : str\n    The medication code (e.g., CPT code) representing the medication to be ordered.\nmedication_display : str\n    Human-readable display text for the medication code (e.g., 'COVID-19 vaccine, single-dose booster').\norder_date : str\n    The ISO 8601 date-time string representing when the medication was ordered (e.g., '2023-11-07T22:47:00+00:00').\ndosage_route : str\n    The route of administration for the medication (e.g., 'Intramuscular').\ndose_value : int or float\n    The quantity for the dose to be administered.\ndose_unit : str\n    The unit of the dose (e.g., 'dose').\n\nOutputs\n-------\nmedication_request : dict\n    The created MedicationRequest FHIR resource as confirmation of the order.\n\nNotes\n-----\n1. This skill constructs the FHIR resource body using all provided parameters and places the order via POST to /fhir/MedicationRequest.\n2. Ensure parameters are filled with current, context-appropriate values. Dose/route may need to be adapted for other medications.\n3. The medication code should match the appropriate coding system (e.g., CPT for vaccines).",
+        "content": "body = {\n    \"resourceType\": \"MedicationRequest\",\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"medicationCodeableConcept\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.ama-assn.org/go/cpt\",\n                \"code\": medication_code,\n                \"display\": medication_display\n            }\n        ],\n        \"text\": medication_display\n    },\n    \"authoredOn\": order_date,\n    \"dosageInstruction\": [\n        {\n            \"route\": {\n                \"text\": dosage_route\n            },\n            \"doseAndRate\": [\n                {\n                    \"doseQuantity\": {\n                        \"value\": dose_value,\n                        \"unit\": dose_unit\n                    }\n                }\n            ]\n        }\n    ]\n}\nmedication_request = apis.fhir.post(path=\"/fhir/MedicationRequest\", body=body)",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533793",
+          "modified_at": "2026-05-19T13:36:57.534340"
+        }
+      },
+      {
+        "name": "fhir order vaccine booster if overdue",
+        "document": "Check a patient's procedure records for a given vaccine, determine if the most recent dose is older than a specified interval, and if so, create a MedicationRequest for a vaccine booster in a FHIR-compatible EHR.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient in the FHIR system.\nprocedure_code : str\n    The code for the vaccine procedure to check (e.g., 'COVIDVACCINE').\nbooster_medication_code : str\n    The code for the vaccine booster to order (e.g., '91320' for COVID-19 booster).\ninterval_months : int\n    The number of months after which a booster is considered due.\ncurrent_datetime : str\n    The current date and time in ISO format (used for authoredOn field and interval calculation).\n\nOutputs\n-------\nmedication_request : dict or None\n    The MedicationRequest resource dict if a booster order is created; None if not needed.\n\nNotes\n-----\n1. This skill first checks for any existing procedures matching the vaccine code. If none exist, or the most recent procedure is older than the specified interval, it creates a new MedicationRequest for the booster.\n2. The 'authoredOn' time reflects the time of the order. Adjust the 'route', 'dose', and other MedicationRequest details as required for your local EHR's conventions.\n3. This skill assumes the use of CPT coding for vaccines and that the EHR accepts MedicationRequest resources with these fields.",
+        "content": "# Step 1: Retrieve vaccination procedures\nprocedures = apis.fhir.get(\n    resource='Procedure',\n    params={\n        'code': procedure_code,\n        'patient': patient_id\n    }\n)\n\n# Step 2: Find the most recent completed procedure date\nmost_recent_date = None\nif procedures:\n    for proc in procedures:\n        if proc.get('status') == 'completed':\n            date = proc.get('performedDateTime')\n            if date and (most_recent_date is None or date > most_recent_date):\n                most_recent_date = date\n\n# Step 3: Determine if booster is needed\nneed_booster = False\nif not most_recent_date:\n    need_booster = True  # No prior vaccine\nelse:\n    # Parse ISO dates to compare intervals (YYYY-MM-DD)\n    year_recent = int(most_recent_date[:4])\n    month_recent = int(most_recent_date[5:7])\n    year_now = int(current_datetime[:4])\n    month_now = int(current_datetime[5:7])\n    months_since = (year_now - year_recent) * 12 + (month_now - month_recent)\n    if months_since >= interval_months:\n        need_booster = True\n\n# Step 4: Compose booster order if needed\nmedication_request = None\nif need_booster:\n    medication_request = apis.fhir.post(\n        resource='MedicationRequest',\n        body={\n            'resourceType': 'MedicationRequest',\n            'medicationCodeableConcept': {\n                'coding': [\n                    {\n                        'system': 'http://www.ama-assn.org/go/cpt',\n                        'code': booster_medication_code\n                    }\n                ]\n            },\n            'subject': { 'reference': f'Patient/{patient_id}' },\n            'authoredOn': current_datetime,\n            'dosageInstruction': [\n                {\n                    'route': { 'text': 'Intramuscular' },\n                    'doseAndRate': [\n                        {\n                            'doseQuantity': {\n                                'value': 1,\n                                'unit': 'Dose'\n                            }\n                        }\n                    ]\n                }\n            ],\n            'status': 'active'\n        }\n    )\n# 'medication_request' is the MedicationRequest resource dict or None if not ordered.",
+        "tools": [
+          "apis.fhir.get",
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533804",
+          "modified_at": "2026-05-19T13:36:57.534346"
+        }
+      },
+      {
+        "name": "fhir get active medication requests for patient",
+        "document": "Retrieve all active medication requests for a given patient from a FHIR server.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient in the FHIR system.\n\nOutputs\n-------\nlist[dict]\n    A list of medication request resources with status 'active' for the specified patient.\n\nNotes\n-----\n- The status filter is set to 'active' to exclude discontinued or completed orders.\n- This skill retrieves all types of active medication requests; downstream filtering may be required to isolate specific medication types (e.g., DVT prophylaxis).\n- Be aware of server pagination if a patient has many active orders; additional logic may be required to fetch all results.",
+        "content": "endpoint = f\"/fhir/MedicationRequest?patient={patient_id}&status=active\"\nactive_med_requests = apis.fhir.get(endpoint=endpoint)\n# active_med_requests is a list[dict] of active MedicationRequest FHIR resources for the given patient.",
+        "tools": [
+          "apis.fhir.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533814",
+          "modified_at": "2026-05-19T13:36:57.534353"
+        }
+      },
+      {
+        "name": "fhir discontinue duplicate medication orders keep newest",
+        "document": "Discontinue all but the most recent medication orders matching a specified medication type (e.g., DVT prophylaxis) for a given patient, ensuring only the newest active order remains.\n\nParameters\n----------\npatient_id: str\n    Unique identifier for the patient in the FHIR system.\norders: list[dict]\n    List of active MedicationRequest FHIR resources for the patient, all corresponding to the relevant medication type (e.g., filtered for DVT prophylaxis).\n\nOutputs\n-------\nkept_order: dict\n    The MedicationRequest resource for the newest active order that was retained.\ndiscontinued_orders: list[dict]\n    List of MedicationRequest resources that were discontinued.\n\nNotes\n-----\n- The orders list must already be filtered for the target medication type (e.g., DVT prophylaxis) and be active.\n- 'AuthoredOn' or 'meta.lastUpdated' fields are used to determine which order is newest (prefer 'authoredOn', fallback to 'meta.lastUpdated').\n- Uses PATCH to update the status of duplicates to 'stopped' (FHIR convention for discontinuation). DELETE may be used if soft deletion is permitted by the system.\n- It is the caller's responsibility to ensure the user is authorized to discontinue orders.\n",
+        "content": "# Identify newest order\nnewest_order = None\nnewest_ts = None\nfor order in orders:\n    # Prefer authoredOn, fallback to meta.lastUpdated\n    ts = order.get('authoredOn') or (order.get('meta', {}).get('lastUpdated'))\n    if ts is not None and (newest_ts is None or ts > newest_ts):\n        newest_ts = ts\n        newest_order = order\n\nkept_order = newest_order\n\ndiscontinued_orders = []\nfor order in orders:\n    if order['id'] != kept_order['id']:\n        # PATCH status to 'stopped' to discontinue\n        patch_body = [{\n            'op': 'replace',\n            'path': '/status',\n            'value': 'stopped'\n        }]\n        apis.fhir.patch(endpoint=f\"/fhir/MedicationRequest/{order['id']}\", body=patch_body)\n        discontinued_orders.append(order)\n# kept_order is the newest active MedicationRequest; discontinued_orders is a list of orders changed to stopped.",
+        "tools": [
+          "apis.fhir.patch"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533825",
+          "modified_at": "2026-05-19T13:36:57.534360"
+        }
+      },
+      {
+        "name": "fhir check active device duration and removal order",
+        "document": "Determine whether a patient has a device (e.g., urinary catheter) with a placement procedure recorded, that has been in place for longer than a specified time threshold (such as 48 hours) and does not have any documented removal order. This involves examining procedures for placement, calculating time since placement, and searching for any completed or scheduled removal via ServiceRequest or removal Procedure records.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient in the FHIR system.\nplacement_code : str\n    The procedure code for device placement (e.g., urinary catheter insertion).\nremoval_code : str\n    The code for device removal order or removal procedure.\ntime_threshold_hours : int\n    The minimum duration (in hours) the device must have been in place to trigger action.\n\nOutputs\n-------\nbool\n    True if the device has been in place longer than the threshold and no removal order exists; else False.\n\nNotes\n-----\n- Placement date is determined from the Procedure resource's performedDateTime or performedPeriod fields; ensure correct parsing.\n- Check both ServiceRequest and Procedure for potential removal documentation.\n- Always check that the device is still active (i.e., no end/completion date).\n- Useful for triggering device removal workflows to minimize infection risk.\n",
+        "content": "# Get all placement procedures for the patient\nplacements = apis.fhir.Procedure.search(\n    patient=patient_id,\n    code=placement_code\n)\n\n# Filter to currently active placements (no end/completion date)\nactive_placements = []\nfor proc in placements:\n    if 'status' in proc and proc['status'] == 'in-progress':\n        active_placements.append(proc)\n\n# For each active placement, check duration and search for removal orders\nfrom datetime import datetime, timedelta\nhas_active_overdue_device = False\nnow = datetime.utcnow()\nfor proc in active_placements:\n    # Extract placement datetime\n    if 'performedDateTime' in proc:\n        placed_at = datetime.fromisoformat(proc['performedDateTime'].replace('Z', '+00:00'))\n    elif 'performedPeriod' in proc and 'start' in proc['performedPeriod']:\n        placed_at = datetime.fromisoformat(proc['performedPeriod']['start'].replace('Z', '+00:00'))\n    else:\n        continue  # skip if no timestamp\n    duration = (now - placed_at).total_seconds() / 3600\n    if duration < time_threshold_hours:\n        continue\n    # Check for removal order (ServiceRequest or Procedure)\n    removal_found = False\n    # Search ServiceRequests for removal\n    service_requests = apis.fhir.ServiceRequest.search(\n        patient=patient_id,\n        code=removal_code\n    )\n    for sr in service_requests:\n        if sr.get('status') not in ('cancelled', 'entered-in-error'):\n            removal_found = True\n            break\n    # Search Procedures for removal\n    removal_procs = apis.fhir.Procedure.search(\n        patient=patient_id,\n        code=removal_code\n    )\n    for rproc in removal_procs:\n        if rproc.get('status') in ('completed', 'in-progress'):\n            removal_found = True\n            break\n    if not removal_found:\n        has_active_overdue_device = True\n        break",
+        "tools": [
+          "apis.fhir.Procedure.search",
+          "apis.fhir.ServiceRequest.search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533835",
+          "modified_at": "2026-05-19T13:36:57.534367"
+        }
+      },
+      {
+        "name": "fhir create catheter removal service request",
+        "document": "Create a FHIR ServiceRequest resource to request removal of a urinary catheter for a specific patient. This skill is typically used when it is determined that a patient has a urinary catheter in place for longer than a clinically recommended duration (e.g., 48 hours) without a documented removal order. The skill constructs the ServiceRequest with appropriate codes and references to comply with FHIR standards.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient in the FHIR system.\nremoval_code : str\n    The standardized code representing the catheter removal request (e.g., NUR1374).\nrequester_practitioner_id : str\n    The identifier of the practitioner or system making the request (for audit and workflow routing).\nreason_text : str\n    The clinical reason or justification for requesting the removal (e.g., \"Catheter in place >48h, no removal order\").\n\nOutputs\n-------\ndict\n    The created FHIR ServiceRequest resource as a dictionary.\n\nNotes\n-----\n- Ensure the removal_code matches the institution's code for catheter removal.\n- Always provide a clear reason in reason_text for clinical traceability.\n- This skill does not submit the request for approval; it only creates the resource in the FHIR system.\n- The ServiceRequest will have status 'active' and intent 'order'.\n",
+        "content": "# Prepare ServiceRequest resource\nservice_request = {\n    \"resourceType\": \"ServiceRequest\",\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"code\": {\"coding\": [{\"system\": \"http://institution.example.org/procedure-codes\", \"code\": removal_code}]},\n    \"subject\": {\"reference\": f\"Patient/{patient_id}\"},\n    \"requester\": {\"reference\": f\"Practitioner/{requester_practitioner_id}\"},\n    \"reasonCode\": [{\"text\": reason_text}]\n}\n# Create ServiceRequest in FHIR\ncreated_request = apis.fhir.ServiceRequest.create(service_request)\n# created_request is the resulting FHIR ServiceRequest resource as a dict.",
+        "tools": [
+          "apis.fhir.ServiceRequest.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533846",
+          "modified_at": "2026-05-19T13:36:57.534374"
+        }
+      },
+      {
+        "name": "fhir get procedures by codes for patient",
+        "document": "Retrieve all procedure records for a specific patient matching a set of procedure codes, using the FHIR Procedure resource API.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient whose procedures are to be retrieved.\nprocedure_codes : list[str]\n    A list of procedure code strings (e.g., CPT or local codes) to filter the query (such as 'IMGCT0491', 'IMGIL0001').\n\nOutputs\n-------\nlist[dict]\n    A list of procedure objects (FHIR resources) corresponding to the patient and codes provided.\n\nNotes:\n-------\n1. The procedure_codes are joined by commas to match the API query requirements.\n2. The API may return results in pages or as a bundle; only the first page is retrieved in this implementation. For comprehensive retrieval, consider extending to handle paginated results.\n3. The output list may be empty if no matching procedures are found.\n4. This skill is general for any FHIR-compatible Procedure resource server.\n",
+        "content": "procedure_codes_str = ','.join(procedure_codes)\nurl = f\"http://localhost:8080/fhir/Procedure?code={procedure_codes_str}&patient={patient_id}\"\nprocedures = apis.requests.get(url)\nif isinstance(procedures, dict) and 'entry' in procedures:\n    results = [entry['resource'] for entry in procedures['entry']]\nelse:\n    results = []",
+        "tools": [
+          "apis.requests.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533858",
+          "modified_at": "2026-05-19T13:36:57.534382"
+        }
+      },
+      {
+        "name": "fhir get last procedure by code",
+        "document": "Retrieve the most recent (latest) Procedure resource for a specific patient and procedure code from a FHIR server. This is useful for determining the last time a particular procedure (e.g., vaccination) was performed.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient in the FHIR system.\nprocedure_code : str\n    The code (e.g., CPT, SNOMED) representing the procedure of interest.\n\nOutputs\n-------\ndict or None\n    The Procedure resource corresponding to the most recent instance of the given procedure code for the patient, or None if no matching procedure is found.\n\nNotes\n-----\n1. The result should be sorted by the procedure's performed date (descending) to ensure the most recent entry is returned.\n2. The skill assumes the FHIR Procedure resource contains a 'performedDateTime' or similar property for sorting.\n3. This skill only retrieves data; it does not infer clinical meaning or order new procedures.",
+        "content": "procedures = apis.fhir.search_procedure(\n    code=procedure_code,\n    patient=patient_id\n)\nlatest_procedure = None\nlatest_date = None\nfor proc in procedures:\n    performed = proc.get('performedDateTime')\n    if performed:\n        if (latest_date is None) or (performed > latest_date):\n            latest_date = performed\n            latest_procedure = proc\n# latest_procedure now holds the most recent Procedure resource or None if no procedures found.",
+        "tools": [
+          "apis.fhir.search_procedure"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533868",
+          "modified_at": "2026-05-19T13:36:57.534389"
+        }
+      },
+      {
+        "name": "fhir order new procedure for patient on date",
+        "document": "Create a new FHIR ServiceRequest resource to order a specific procedure (e.g., vaccine, lab test) for a given patient on a specified date.\n\nParameters\n----------\npatient_id : str\n    The unique FHIR identifier of the patient (e.g., 'S1478444').\nprocedure_code : str\n    The code (e.g., CPT, SNOMED) for the procedure (e.g., '90686' for influenza vaccine).\nprocedure_display : str\n    The human-readable display name of the procedure.\norder_date : str\n    The ISO 8601 date (YYYY-MM-DD) to use as the order date and occurrence date.\norder_note : str\n    Free-text note to include in the ServiceRequest to clarify the context or instructions (optional, can be '').\n\nOutputs\n-------\ndict\n    The created ServiceRequest resource as returned by the FHIR API.\n\nNotes\n-----\n1. The ServiceRequest will be created with status 'active', intent 'order', and priority 'stat'.\n2. The occurrenceDateTime and authoredOn fields are set to the provided order_date.\n3. The patient reference will be populated as 'Patient/{patient_id}'.\n4. The 'note' field is optional but can provide important clinical context for downstream systems/providers.\n5. This skill does not check for existing orders or prior procedures; it always creates a new order.",
+        "content": "servicerequest_payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.ama-assn.org/go/cpt\",\n                \"code\": procedure_code,\n                \"display\": procedure_display\n            }\n        ]\n    },\n    \"authoredOn\": order_date + \"T00:00:00+00:00\",\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": \"stat\",\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"occurrenceDateTime\": order_date + \"T00:00:00+00:00\"\n}\nif order_note:\n    servicerequest_payload[\"note\"] = [{\"text\": order_note}]\ncreated_servicerequest = apis.fhir.create_servicerequest(servicerequest_payload)\n# Output: created_servicerequest (dict)",
+        "tools": [
+          "apis.fhir.create_servicerequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533879",
+          "modified_at": "2026-05-19T13:36:57.534396"
+        }
+      },
+      {
+        "name": "get most recent thyroid labs for patient",
+        "document": "Retrieve the most recent TSH and free T4 (FT4) laboratory results for a specified patient using FHIR-compliant endpoints.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient whose labs are to be retrieved.\n\nOutputs\n-------\ndict\n    A dictionary with two keys: 'TSH' and 'FT4'. Each key maps to the most recent observation dictionary for that lab, or None if not available.\n\nNotes\n-----\n1. This skill fetches all available TSH and FT4 observation resources for the patient by making separate API calls, then selects the most recent result from each set (if any).\n2. The FHIR Observation resource may have multiple results; always choose the one with the latest effectiveDateTime or issued date.\n3. If a lab result is missing, the corresponding value in the output will be None.\n",
+        "content": "labs = {'TSH': None, 'FT4': None}\n\n# Fetch TSH observations\nTSH_obs = apis.fhir.get_observations(\n    patient_id=patient_id,\n    code='TSH'\n)\nif TSH_obs:\n    # Assume each observation has 'effectiveDateTime' or 'issued'. Sort for latest.\n    latest_TSH = sorted(TSH_obs, key=lambda o: o.get('effectiveDateTime', o.get('issued', '')), reverse=True)[0]\n    labs['TSH'] = latest_TSH\n\n# Fetch FT4 observations\nFT4_obs = apis.fhir.get_observations(\n    patient_id=patient_id,\n    code='FT4'\n)\nif FT4_obs:\n    latest_FT4 = sorted(FT4_obs, key=lambda o: o.get('effectiveDateTime', o.get('issued', '')), reverse=True)[0]\n    labs['FT4'] = latest_FT4",
+        "tools": [
+          "apis.fhir.get_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533890",
+          "modified_at": "2026-05-19T13:36:57.534404"
+        }
+      },
+      {
+        "name": "fhir get medication orders for patient",
+        "document": "Retrieve all medication orders (MedicationRequest resources) for a specified patient from a FHIR server.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient whose medication orders are to be retrieved.\n\nOutputs\n-------\nlist[dict]\n    A list of medication order resources (FHIR MedicationRequest objects) associated with the patient.\n\nNotes\n-----\n- This skill retrieves all orders regardless of status; filtering for active or specific categories should be done after retrieval.\n- Use patient_id as the query parameter.\n- The output will include both active and inactive orders; further processing may be needed depending on downstream requirements.",
+        "content": "response = apis.fhir.get(\n    resource_type=\"MedicationRequest\",\n    params={\"patient\": patient_id}\n)\nmedication_orders = response[\"entry\"] if \"entry\" in response else []",
+        "tools": [
+          "apis.fhir.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533900",
+          "modified_at": "2026-05-19T13:36:57.534411"
+        }
+      },
+      {
+        "name": "fhir create comparator orders for unmatched target orders",
+        "document": "For each medication order in a list of unmatched target medication orders (e.g., opioid analgesics without corresponding naloxone), submit a new comparator medication order (e.g., naloxone) for the same patient. This skill constructs a MedicationRequest for the comparator substance, using abstract parameters for dose, route, and prescriber as needed.\n\nParameters\n----------\nunmatched_target_orders : list[dict]\n    List of FHIR MedicationRequest resources for target substance that are missing a matching comparator order.\ncomparator_medication_coding : dict\n    Coding for the comparator medication (e.g., naloxone), with keys such as 'system', 'code', and 'display'.\nprescriber_id : str\n    Practitioner ID who will be set as the prescriber of the comparator medication request.\ndosage_instructions : dict\n    Dictionary of dosage instruction fields for the comparator medication (e.g., dose, route, frequency).\n\nOutputs\n-------\nlist[dict]\n    List of responses from the FHIR server for each created MedicationRequest resource (may include success/failure for each order).\n\nNotes\n-----\n- Each created MedicationRequest will be associated with the patient from the unmatched target order.\n- The implementation assumes a POST to /fhir/MedicationRequest and uses provided comparator_medication_coding and dosage_instructions for the prescription details.\n- If unmatched_target_orders is empty, no POST requests are made.\n- Dosage instructions and prescriber are specified as parameters for maximum flexibility; adjust as needed for local requirements.",
+        "content": "created_orders = []\nfor order in unmatched_target_orders:\n    patient_ref = order['subject']['reference'] if 'subject' in order and 'reference' in order['subject'] else None\n    if not patient_ref:\n        continue\n    comparator_request = {\n        'resourceType': 'MedicationRequest',\n        'status': 'active',\n        'intent': 'order',\n        'subject': {'reference': patient_ref},\n        'medicationCodeableConcept': {\n            'coding': [comparator_medication_coding]\n        },\n        'requester': {'reference': f'Practitioner/{prescriber_id}'},\n        'dosageInstruction': [dosage_instructions]\n    }\n    response = apis.fhir.post(\n        resource_type='MedicationRequest',\n        body=comparator_request\n    )\n    created_orders.append(response)",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533911",
+          "modified_at": "2026-05-19T13:36:57.534419"
+        }
+      },
+      {
+        "name": "fhir order covid vaccine booster if due",
+        "document": "Submit a new MedicationRequest order for a COVID-19 booster vaccine for a patient if no prior COVID-19 vaccine is found, or if the most recent dose was administered more than 12 months ago.\n\nParameters\n----------\npatient_id : str\n    The FHIR identifier for the patient.\nover_12_months : bool\n    Indicates whether the last COVID-19 vaccine dose was more than 12 months ago (or absent).\norder_date : str\n    The date (ISO8601 format, e.g., '2023-11-07') that the order is authored.\n\nOutputs\n-------\nmedication_request : dict or None\n    The created MedicationRequest resource if the booster is indicated and ordered; otherwise, None.\n\nNotes:\n------\n1. The skill checks the over_12_months flag to determine if a booster is due; if False, no order is placed.\n2. The MedicationRequest uses CPT code '91320' for a COVID-19 booster (mRNA, single dose) and includes standard fields for route and dose.\n3. If no booster is needed, the skill produces no action (medication_request=None).",
+        "content": "medication_request = None\nif over_12_months:\n    medication_request = {\n        \"resourceType\": \"MedicationRequest\",\n        \"subject\": {\"reference\": f\"Patient/{patient_id}\"},\n        \"medicationCodeableConcept\": {\n            \"coding\": [\n                {\n                    \"system\": \"http://www.ama-assn.org/go/cpt\",\n                    \"code\": \"91320\",\n                    \"display\": \"COVID-19 vaccine, mRNA, single dose\"\n                }\n            ],\n            \"text\": \"COVID-19 VAC BOOSTER (CPT 91320)\"\n        },\n        \"authoredOn\": order_date + \"T00:00:00+00:00\",\n        \"dosageInstruction\": [\n            {\n                \"route\": {\"text\": \"Intramuscular\"},\n                \"doseAndRate\": [\n                    {\"doseQuantity\": {\"value\": 1, \"unit\": \"dose\"}}\n                ]\n            }\n        ],\n        \"status\": \"active\",\n        \"intent\": \"order\"\n    }\n    apis.fhir.post('MedicationRequest', medication_request)",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533921",
+          "modified_at": "2026-05-19T13:36:57.534426"
+        }
+      },
+      {
+        "name": "fhir get active medication orders by patient and medication name",
+        "document": "Retrieve all active medication orders for a specific patient filtered by a given medication name from a FHIR server. This skill is useful for checking whether a particular medication (e.g., naloxone, morphine) is actively prescribed to the patient.\n\nParameters\n----------\npatient_id: str\n    Unique identifier of the patient whose medication orders are to be checked.\nmedication_name: str\n    The medication name (case-insensitive) used to filter orders (e.g., 'naloxone').\n\nOutputs\n-------\nfiltered_orders: list[dict]\n    A list of MedicationRequest resources (as dictionaries) that match the given medication name and are active for the patient.\n\nNotes:\n------\n- This skill assumes that the FHIR API can be queried with the 'medication' parameter as a name string; if a code is required, modify accordingly.\n- If the server response is paginated, this implementation only retrieves the first page.\n- Use this to validate the presence of specific drug prescriptions (e.g., for opioid risk mitigation workflows).",
+        "content": "orders = apis.fhir.get(\n    resource_type='MedicationRequest',\n    params={\n        'patient': patient_id,\n        'status': 'active',\n        'medication': medication_name\n    }\n)\nif 'entry' in orders:\n    filtered_orders = [entry['resource'] for entry in orders['entry']]\nelse:\n    filtered_orders = []",
+        "tools": [
+          "apis.fhir.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533932",
+          "modified_at": "2026-05-19T13:36:57.534434"
+        }
+      },
+      {
+        "name": "fhir ensure naloxone coverage for opioid orders",
+        "document": "For each active opioid analgesic order for a given patient, verify whether there is a matching active naloxone prescription. If any active opioid order does not have a corresponding naloxone prescription, create a new naloxone MedicationRequest order for the patient.\n\nParameters\n----------\npatient_id: str\n    The unique identifier for the patient to process.\nactive_opioid_orders: list[dict]\n    List of active MedicationRequest resources for opioid analgesics for the patient.\nactive_naloxone_orders: list[dict]\n    List of active MedicationRequest resources for naloxone for the patient.\nnaloxone_medication_code: str\n    Code for the naloxone medication to be ordered (e.g., RxNorm code).\nnaloxone_display: str\n    Human-readable display name for the naloxone product.\norder_time: str\n    ISO8601 timestamp for the authoredOn field (e.g., '2023-11-07T22:47:00+00:00').\n\nOutputs\n-------\nNone. (Performs FHIR POST for new naloxone orders as needed.)\n\nNotes:\n------\n1. Matching is performed by patient only (not by opioid type or provider). If any opioid order exists without any active naloxone order, a new naloxone order is created.\n2. This implementation does not deduplicate or attempt to match multiple opioid orders to a single naloxone prescription – as soon as at least one active naloxone prescription exists, no new order is created for that opioid order.\n3. The naloxone order includes code, display, and standard dose for nasal spray; parameters may be modified for local formulary or usage.\n",
+        "content": "needs_naloxone = False\nif not active_naloxone_orders:\n    needs_naloxone = True\nelse:\n    needs_naloxone = False\n\nif needs_naloxone and len(active_opioid_orders) > 0:\n    apis.fhir.post(\n        resource_type='MedicationRequest',\n        body={\n            'resourceType': 'MedicationRequest',\n            'medicationCodeableConcept': {\n                'coding': [\n                    {\n                        'system': 'http://www.nlm.nih.gov/research/umls/rxnorm',\n                        'code': naloxone_medication_code,\n                        'display': naloxone_display\n                    }\n                ],\n                'text': naloxone_display\n            },\n            'subject': {\n                'reference': f'Patient/{patient_id}'\n            },\n            'authoredOn': order_time,\n            'dosageInstruction': [\n                {\n                    'route': {\n                        'text': 'Nasal'\n                    },\n                    'doseAndRate': [\n                        {\n                            'doseQuantity': {\n                                'value': 4,\n                                'unit': 'mg'\n                            }\n                        }\n                    ],\n                    'text': 'Use as directed'\n                }\n            ],\n            'status': 'active',\n            'intent': 'order'\n        }\n    )",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533942",
+          "modified_at": "2026-05-19T13:36:57.534442"
+        }
+      },
+      {
+        "name": "fhir confirm single active dvt prophylaxis order",
+        "document": "Check that a given patient has exactly one active DVT prophylaxis order in the FHIR MedicationRequest resources. This skill retrieves all active MedicationRequests for the patient, filters for DVT prophylaxis orders using medication code or text, and verifies that exactly one such order remains active.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient whose DVT prophylaxis orders are checked.\ndvt_codes : list[str]\n    List of medication codes (e.g., RxNorm) corresponding to DVT prophylaxis medications to match against.\n\nOutputs\n-------\nbool\n    True if exactly one active DVT prophylaxis order exists for the patient, False otherwise.\n\nNotes:\n------\n1. The filtering checks both medicationCodeableConcept.coding.code and medicationCodeableConcept.text for DVT prophylaxis identifiers.\n2. If zero or more than one DVT prophylaxis order is found, this will return False.\n3. Useful for post-processing confirmation after order creation or deduplication logic.\n4. Ensure dvt_codes is kept up to date with all relevant institutionally approved DVT prophylaxis medication codes.",
+        "content": "# Retrieve all active MedicationRequests for the patient\nactive_orders = apis.fhir.get(\n    resource='MedicationRequest',\n    params={\n        'patient': patient_id,\n        'status': 'active'\n    }\n)\n\n# Filter for DVT prophylaxis orders by medication code or text\nmatching_orders = []\nfor order in active_orders:\n    med = order.get('medicationCodeableConcept', {})\n    codes = [c.get('code') for c in med.get('coding', []) if c.get('code')]\n    med_text = med.get('text', '').lower()\n    if any(code in dvt_codes for code in codes) or 'prophylaxis' in med_text:\n        matching_orders.append(order)\n\n# Confirm exactly one DVT prophylaxis order remains\nhas_single_order = (len(matching_orders) == 1)",
+        "tools": [
+          "apis.fhir.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533952",
+          "modified_at": "2026-05-19T13:36:57.534450"
+        }
+      },
+      {
+        "name": "fhir get procedures by code and patient",
+        "document": "Retrieve all Procedure resources for a specified patient filtered by a procedure code (e.g., for urinary catheter insertion).\n\nParameters\n----------\nprocedure_code : str\n    The code representing the desired procedure (e.g., SNOMED, LOINC, or local code for urinary catheter insertion).\npatient_id : str\n    The FHIR patient ID.\n\nOutputs\n-------\nlist[dict]\n    List of Procedure resource objects matching the patient and procedure code.\n\nNotes\n-----\n1. Supports any procedure code for generality, not limited to urinary catheterization.\n2. Multiple procedures may be returned; callers may need to further filter or analyze the list as appropriate.\n3. This is a search operation and does not modify any data.\n",
+        "content": "procedure_search_url = f\"/fhir/Procedure?code={procedure_code}&patient={patient_id}\"\nprocedure_response = apis.fhir.GET(url=procedure_search_url)\nprocedure_list = []\nif procedure_response and 'entry' in procedure_response:\n    for entry in procedure_response['entry']:\n        if 'resource' in entry:\n            procedure_list.append(entry['resource'])",
+        "tools": [
+          "apis.fhir.GET"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533963",
+          "modified_at": "2026-05-19T13:36:57.534459"
+        }
+      },
+      {
+        "name": "fhir check indwelling device duration and removal order",
+        "document": "Analyze all Procedure resources for a given patient and device procedure code to determine if any device has been in place for more than a specified time threshold (in hours) without a documented removal order.\n\nParameters\n----------\nprocedure_list : list[dict]\n    List of Procedure resource objects (e.g., urinary catheter insertions) for a single patient.\nremoval_procedure_code : str\n    Code used to identify device removal procedures (e.g., removal of urinary catheter).\nservice_request_code : str\n    Code used to identify ServiceRequest resources that order device removal.\npatient_id : str\n    The FHIR patient ID.\ncurrent_datetime : str\n    Current datetime in ISO8601 format (e.g., '2023-11-11T09:00:00+00:00').\nduration_hours : int\n    Time threshold in hours (e.g., 48).\n\nOutputs\n-------\nlist[dict]\n    List of original device insertion Procedure resources that have exceeded the specified duration without a documented removal order.\n\nNotes\n-----\n1. This skill checks both Procedure (removal) and ServiceRequest (removal order) resources for evidence of device removal.\n2. Date calculations should use only string manipulation and basic arithmetic (no external libraries).\n3. Intended for any indwelling device, not just urinary catheters, by specifying codes appropriately.\n4. Procedure 'status' field may help filter completed or cancelled insertions.\n5. The returned list can be used to trigger further actions (e.g., generating a new removal ServiceRequest).\n",
+        "content": "devices_exceeding_duration = []\nfor proc in procedure_list:\n    if 'performedDateTime' not in proc or 'id' not in proc:\n        continue\n    insertion_time = proc['performedDateTime']\n    # Calculate hours elapsed\n    insertion_dt = insertion_time[:13].replace('T', ' ')\n    current_dt = current_datetime[:13].replace('T', ' ')\n    insertion_yr, insertion_mo, insertion_day, insertion_hr = int(insertion_dt[:4]), int(insertion_dt[5:7]), int(insertion_dt[8:10]), int(insertion_dt[11:13])\n    current_yr, current_mo, current_day, current_hr = int(current_dt[:4]), int(current_dt[5:7]), int(current_dt[8:10]), int(current_dt[11:13])\n    # Very basic duration calculation (ignores minutes/seconds, assumes same timezone)\n    days_elapsed = (current_yr - insertion_yr)*365 + (current_mo - insertion_mo)*30 + (current_day - insertion_day)\n    hours_elapsed = days_elapsed*24 + (current_hr - insertion_hr)\n    if hours_elapsed < duration_hours:\n        continue\n    # Check for Procedure (removal) for this patient\n    removal_url = f\"/fhir/Procedure?code={removal_procedure_code}&patient={patient_id}\" \n    removal_response = apis.fhir.GET(url=removal_url)\n    found_removal = False\n    if removal_response and 'entry' in removal_response:\n        for entry in removal_response['entry']:\n            rem_proc = entry['resource']\n            if 'basedOn' in rem_proc:\n                for ref in rem_proc['basedOn']:\n                    if 'reference' in ref and proc['id'] in ref['reference']:\n                        found_removal = True\n                        break\n            if found_removal:\n                break\n    # Check for ServiceRequest (removal order)\n    sr_url = f\"/fhir/ServiceRequest?code={service_request_code}&patient={patient_id}\"\n    sr_response = apis.fhir.GET(url=sr_url)\n    if sr_response and 'entry' in sr_response:\n        for entry in sr_response['entry']:\n            sr = entry['resource']\n            if 'basedOn' in sr:\n                for ref in sr['basedOn']:\n                    if 'reference' in ref and proc['id'] in ref['reference']:\n                        found_removal = True\n                        break\n            if found_removal:\n                break\n    if not found_removal:\n        devices_exceeding_duration.append(proc)",
+        "tools": [
+          "apis.fhir.GET"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533974",
+          "modified_at": "2026-05-19T13:36:57.534467"
+        }
+      },
+      {
+        "name": "fhir create service request for procedure code",
+        "document": "Construct and submit a new FHIR ServiceRequest resource to order a procedure for a patient, including custom note and urgency settings.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient in the FHIR system.\nprocedure_code : str\n    The procedure code to order (e.g., 'NUR1373' for catheter removal).\nprocedure_display : str\n    Human-readable display name for the procedure code (e.g., 'Remove Foley Retention Catheter').\nnote_text : str\n    Free-text note describing the reason or context for the request.\nauthored_on : str\n    ISO8601-formatted timestamp for when the request is authored (e.g., '2023-11-07T22:47:00+00:00').\npriority : str\n    ServiceRequest priority (e.g., 'stat', 'routine').\n\nOutputs\n-------\ndict\n    The created FHIR ServiceRequest resource as returned by the API.\n\nNotes\n-----\n- This skill creates a new ServiceRequest; ensure all required fields are filled to comply with your FHIR implementation.\n- The code and display should match the FHIR code system in use for your domain.\n- AuthoredOn should be the current or intended request datetime in ISO8601 format.\n- Use a clear, actionable note to justify the procedure order for downstream review.",
+        "content": "service_request_payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.ama-assn.org/go/cpt\",\n                \"code\": procedure_code,\n                \"display\": procedure_display\n            }\n        ]\n    },\n    \"authoredOn\": authored_on,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority,\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"note\": {\n        \"text\": note_text\n    }\n}\nendpoint = \"http://localhost:8080/fhir/ServiceRequest\"\ncreated_request = apis.http.post(endpoint, service_request_payload)",
+        "tools": [
+          "apis.http.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533984",
+          "modified_at": "2026-05-19T13:36:57.534476"
+        }
+      },
+      {
+        "name": "fhir get last vaccine procedure date by patient",
+        "document": "Retrieve the most recent administration date for a specific vaccine type for a patient using the FHIR Procedure resource.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient whose vaccine history is to be retrieved.\nvaccine_code : str\n    The standardized code for the vaccine (e.g., '90686' for influenza).\n\nOutputs\n-------\nlast_date : str or None\n    The ISO date string (YYYY-MM-DD) of the most recent vaccine procedure for the given code, or None if no records exist.\n\nNotes:\n------\n- Only FHIR Procedure records with the given vaccine code and patient ID are considered.\n- The results are assumed to be chronologically unsorted; the skill must determine the latest date.\n- If there are multiple administrations, select the most recent one by comparing the 'performedDateTime' fields.\n- If no procedures are found, output should be None.",
+        "content": "procedures = apis.fhir.get_procedure(\n    code=vaccine_code,\n    patient=patient_id\n)\n\nlast_date = None\nfor proc in procedures:\n    date = proc.get('performedDateTime')\n    if date:\n        if (last_date is None) or (date > last_date):\n            last_date = date",
+        "tools": [
+          "apis.fhir.get_procedure"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.533995",
+          "modified_at": "2026-05-19T13:36:57.534484"
+        }
+      },
+      {
+        "name": "fhir check vaccine interval and order if overdue",
+        "document": "Determine whether a patient is overdue for a specific vaccine based on the last administration date, and order the vaccine if overdue.\n\nParameters\n----------\nlast_admin_date : str or None\n    The ISO date string (YYYY-MM-DD) of the most recent vaccine administration, or None if never administered.\nvaccine_code : str\n    The standardized code for the vaccine to be ordered (e.g., '90686' for influenza).\npatient_id : str\n    The unique patient identifier.\ninterval_days : int\n    The minimum required days between doses (e.g., 365 for annual vaccines).\ncurrent_date : str\n    The current date in ISO format (YYYY-MM-DD) to use as a reference.\n\nOutputs\n-------\norder_placed : bool\n    True if a new vaccine order was placed, False otherwise.\norder_response : dict or None\n    The API response from placing the order, or None if no order was placed.\n\nNotes:\n------\n- If last_admin_date is None, the vaccine should always be ordered.\n- If more than interval_days have elapsed since last_admin_date, order the vaccine by posting a new Procedure with today's date.\n- Handles basic date comparison logic without external packages; expects date strings in 'YYYY-MM-DD' format.",
+        "content": "order_placed = False\norder_response = None\n\n# Convert dates to comparable values (YYYY-MM-DD as integers)\nif last_admin_date is None:\n    overdue = True\nelse:\n    y1, m1, d1 = [int(x) for x in last_admin_date.split('-')]\n    y2, m2, d2 = [int(x) for x in current_date.split('-')]\n    # Simple date difference calculation (not accounting for leap years or calendar variances)\n    days1 = y1 * 365 + m1 * 30 + d1\n    days2 = y2 * 365 + m2 * 30 + d2\n    overdue = (days2 - days1) > interval_days\n\nif overdue:\n    order_response = apis.fhir.post_procedure(\n        patient=patient_id,\n        code=vaccine_code,\n        performedDateTime=current_date\n    )\n    order_placed = True",
+        "tools": [
+          "apis.fhir.post_procedure"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534006",
+          "modified_at": "2026-05-19T13:36:57.534493"
+        }
+      },
+      {
+        "name": "fhir order vaccine by code and date",
+        "document": "Place a new vaccine order for a patient using a FHIR ServiceRequest, specifying the vaccine by CPT (or SNOMED) code and the intended administration date.\n\nParameters\n----------\npatient_id : str\n    The FHIR Patient identifier for whom the vaccine order is being placed.\nvaccine_code : str\n    The CPT (or SNOMED) code representing the vaccine (e.g., '90686' for influenza).\norder_date : str\n    The date the vaccine is to be administered or ordered, in ISO format (YYYY-MM-DD).\n\nOutputs\n-------\nservice_request_response : dict\n    The response from the FHIR server after placing the ServiceRequest, typically including the created resource or a status message.\n\nNotes:\n------\n1. The ServiceRequest will be constructed using the patient reference, vaccine code, and provided date.\n2. Order intent is set to 'order', status is set to 'active', and priority is 'stat' for immediate attention.\n3. The code system is assumed to be CPT (http://www.ama-assn.org/go/cpt). If another code system is needed, adjust accordingly.\n4. Include a descriptive note for clinical context if required.",
+        "content": "service_request_payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.ama-assn.org/go/cpt\",\n                \"code\": vaccine_code\n            }\n        ]\n    },\n    \"authoredOn\": order_date + \"T00:00:00+00:00\",\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": \"stat\",\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"note\": [\n        {\n            \"text\": f\"Order for vaccine code {vaccine_code} placed for patient {patient_id} on {order_date}.\"\n        }\n    ]\n}\nservice_request_response = apis.fhir.post(\n    endpoint=\"/ServiceRequest\",\n    json=service_request_payload\n)",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534015",
+          "modified_at": "2026-05-19T13:36:57.534502"
+        }
+      },
+      {
+        "name": "fhir get most recent lab results by codes and patient",
+        "document": "Retrieve the most recent laboratory results for a specified patient and a list of laboratory test codes (e.g., TSH, FT4) via FHIR Observation queries.\n\nParameters\n----------\npatient_id: str\n    Unique identifier for the patient whose results are sought.\ntest_codes: list[str]\n    List of laboratory test codes (e.g., LOINC, short names) to retrieve results for.\n\nOutputs\n-------\nresults: dict[str, dict]\n    Dictionary mapping each test code to the most recent Observation resource (as a dict), or None if no result found for that code.\n\nNotes:\n------\n1. The skill issues one FHIR GET request per test code for the specified patient, using the pattern `/fhir/Observation?code={code}&patient={patient_id}`.\n2. If multiple results are returned for a code, the skill identifies the most recent result by comparing observation effectiveDateTime fields.\n3. If no result is found for a code, None is stored for that code in the output dictionary.\n4. This skill does not assume any specific laboratory test codes and is reusable for any lab values supported by the backend.\n",
+        "content": "results = {}\nfor code in test_codes:\n    observations = apis.fhir.get_observation(\n        query_params={\n            'code': code,\n            'patient': patient_id\n        }\n    )\n    if observations:\n        # Sort by date descending (assume 'effectiveDateTime' field exists)\n        sorted_obs = sorted(\n            observations,\n            key=lambda obs: obs.get('effectiveDateTime', ''),\n            reverse=True\n        )\n        results[code] = sorted_obs[0]\n    else:\n        results[code] = None",
+        "tools": [
+          "apis.fhir.get_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534026",
+          "modified_at": "2026-05-19T13:36:57.534512"
+        }
+      },
+      {
+        "name": "fhir order imaging study with indication",
+        "document": "Place a new imaging study order for a patient using the FHIR ServiceRequest resource, specifying the procedure code, study description, and clinical indication. This skill is suitable for clinical workflows where a new imaging order (e.g., CT/MRI/X-ray) is needed due to absent or outdated prior studies.\n\nParameters\n----------\npatient_id : str\n    The FHIR identifier for the patient (e.g., 'S1152319').\nprocedure_code : str\n    The CPT or relevant code for the imaging procedure (e.g., '74177').\ndisplay_name : str\n    The human-readable name of the procedure (e.g., 'CT Abdomen and Pelvis with IV contrast').\nindication_note : str\n    The clinical indication or reason for the study (e.g., 'Renal mass follow-up').\norder_date : str\n    ISO8601 date-time string representing when the order is placed (e.g., '2023-11-07T22:47:00+00:00').\n\nOutputs\n-------\nservice_request : dict\n    The resulting FHIR ServiceRequest resource as a dict representing the order placed.\n\nNotes:\n------\n1. Status is set to 'active', intent to 'order', and priority can be adjusted as needed.\n2. The resourceType must be set to 'ServiceRequest'.\n3. The indication is stored in the 'note' field.\n4. The system for procedure_code should match coding standards (e.g., AMA for CPT codes).\n5. Adjust priority if needed for non-urgent studies.\n",
+        "content": "service_request = apis.fhir.ServiceRequest.create(\n    resource={\n        \"resourceType\": \"ServiceRequest\",\n        \"code\": {\n            \"coding\": [\n                {\n                    \"system\": \"http://www.ama-assn.org/go/cpt\",\n                    \"code\": procedure_code,\n                    \"display\": display_name\n                }\n            ]\n        },\n        \"authoredOn\": order_date,\n        \"status\": \"active\",\n        \"intent\": \"order\",\n        \"priority\": \"stat\",\n        \"subject\": {\n            \"reference\": f\"Patient/{patient_id}\"\n        },\n        \"note\": {\n            \"text\": indication_note\n        }\n    }\n)\n# service_request is the FHIR ServiceRequest resource (dict)",
+        "tools": [
+          "apis.fhir.ServiceRequest.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534036",
+          "modified_at": "2026-05-19T13:36:57.534520"
+        }
+      },
+      {
+        "name": "fhir order covid booster if overdue",
+        "document": "Place a COVID-19 booster order via the FHIR MedicationRequest resource if the patient is overdue for a booster based on the last COVID-19 vaccine date and a required interval.\n\nParameters\n----------\npatient_id : str\n    The unique FHIR identifier of the patient for whom the order is to be placed.\ndue_for_booster : bool\n    Indicator whether the patient is due for a COVID-19 booster (as determined by prior processing).\norder_date : str\n    The ISO 8601 date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS) when the booster order is to be created.\n\nOutputs\n-------\norder_result : dict or None\n    The response payload from the FHIR MedicationRequest POST if an order is placed, otherwise None if not due.\n\nNotes\n-----\n1. Only submits a MedicationRequest for a COVID-19 booster if due_for_booster is True; otherwise, no order is placed.\n2. Uses CPT code '91320' for the COVID-19 booster, with a standard single-dose IM instruction in accordance with CDC guidelines as of 2023.\n3. The composed MedicationRequest resource includes route, dose, and patient reference fields; ensure these formats comply with your FHIR server's requirements.",
+        "content": "order_result = None\nif due_for_booster:\n    medication_request = {\n        \"resourceType\": \"MedicationRequest\",\n        \"medicationCodeableConcept\": {\n            \"coding\": [\n                {\n                    \"system\": \"http://www.ama-assn.org/go/cpt\",\n                    \"code\": \"91320\",\n                    \"display\": \"COVID-19 vaccine, booster, single dose\"\n                }\n            ],\n            \"text\": \"COVID-19 VAC Booster (CPT 91320)\"\n        },\n        \"subject\": {\n            \"reference\": f\"Patient/{patient_id}\"\n        },\n        \"authoredOn\": order_date,\n        \"dosageInstruction\": [\n            {\n                \"route\": {\n                    \"text\": \"IM\"\n                },\n                \"doseAndRate\": [\n                    {\n                        \"doseQuantity\": {\n                            \"value\": 1,\n                            \"unit\": \"dose\"\n                        }\n                    }\n                ]\n            }\n        ],\n        \"intent\": \"order\"\n    }\n    order_result = apis.fhir.post(\n        resource_type=\"MedicationRequest\",\n        data=medication_request\n    )",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534046",
+          "modified_at": "2026-05-19T13:36:57.534529"
+        }
+      },
+      {
+        "name": "fhir get latest procedure date by code",
+        "document": "Retrieve the most recent administration date for a specific procedure code for a given patient using the FHIR Procedure search API.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient in the FHIR system.\nprocedure_code : str\n    The CPT or procedure code to filter procedures (e.g., '90686' for influenza vaccine).\n\nOutputs\n-------\nlatest_date : str or None\n    The date (in ISO 8601 format) of the most recently recorded Procedure with the specified code, or None if no matching procedure is found.\n\nNotes:\n-------\n1. The skill assumes the FHIR API endpoint supports filtering by 'code' and 'patient'.\n2. If multiple procedures are found, compare their 'performedDateTime' or equivalent date field to select the most recent one.\n3. If no procedures are found, output should be None.\n4. Only retrieves the date, not the full procedure record.\n5. Always check for missing or incomplete date fields in the response.\n",
+        "content": "results = apis.fhir.search_procedure(\n    code=procedure_code,\n    patient=patient_id\n)\nlatest_date = None\nif results and 'entry' in results:\n    latest = None\n    for entry in results['entry']:\n        proc = entry['resource']\n        if 'performedDateTime' in proc:\n            date = proc['performedDateTime']\n            if latest is None or date > latest:\n                latest = date\n    latest_date = latest",
+        "tools": [
+          "apis.fhir.search_procedure"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534057",
+          "modified_at": "2026-05-19T13:36:57.534539"
+        }
+      },
+      {
+        "name": "fhir get active patient medication orders by indication",
+        "document": "Retrieve all active MedicationRequest resources for a patient filtered by clinical indication (e.g., DVT prophylaxis) using the FHIR API.\n\nParameters\n----------\npatient_id : str\n    Patient identifier (e.g., MRN or FHIR Patient resource ID).\nindication_text : str\n    Text or code indicating the clinical reason for the medication (e.g., 'DVT prophylaxis').\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resources matching the indication and active status for the patient.\n\nNotes\n-----\n1. The skill queries the FHIR MedicationRequest endpoint for the given patient.\n2. It filters results by indication, typically by inspecting the medicationCodeableConcept (display, text, or coding) or supportingInformation fields for keywords or codes related to the indication.\n3. Only MedicationRequests with status 'active' are included.\n4. Always confirm the output structure of the returned MedicationRequest resources for downstream processing.\n5. If the FHIR server supports direct indication-based search, use that; otherwise, filtering is performed client-side after retrieving all MedicationRequest resources for the patient.\n",
+        "content": "all_orders = apis.fhir.get_medication_requests(patient_id=patient_id)\nactive_dvt_orders = []\nfor order in all_orders:\n    if order.get('status') != 'active':\n        continue\n    med = order.get('medicationCodeableConcept', {})\n    # Check for indication keyword in display or text\n    display = ''\n    if 'coding' in med and len(med['coding']) > 0:\n        display = med['coding'][0].get('display', '').lower()\n    text = med.get('text', '').lower()\n    if indication_text.lower() in display or indication_text.lower() in text:\n        active_dvt_orders.append(order)",
+        "tools": [
+          "apis.fhir.get_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534069",
+          "modified_at": "2026-05-19T13:36:57.534547"
+        }
+      },
+      {
+        "name": "fhir create medication order for indication",
+        "document": "Create a new FHIR MedicationRequest resource for a patient for a specified clinical indication (such as DVT prophylaxis), with customizable medication, dosage, and timing.\n\nParameters\n----------\npatient_id : str\n    Identifier for the patient (e.g., MRN or FHIR Patient resource ID).\nmedication_code : str\n    The code of the medication to order (e.g., RxNorm code).\nmedication_display : str\n    Human-readable display name for the medication.\nindication_text : str\n    The clinical indication or reason for the order (e.g., 'DVT prophylaxis').\ndosage_route : str\n    Route of administration (e.g., 'Subcutaneous').\ndosage_value : float\n    Dose amount (e.g., 5000).\ndosage_unit : str\n    Unit of dose (e.g., 'units').\ndosage_frequency : str\n    Frequency of administration in free-text (e.g., 'q8h').\ndate_time : str\n    The authoredOn date-time for the order (ISO 8601 format).\n\nOutputs\n-------\ndict\n    The created MedicationRequest FHIR resource as a dictionary.\n\nNotes\n-----\n1. The skill constructs all required fields for a DVT prophylaxis order, using the given parameters for medication and dosage.\n2. Ensure all parameter values are appropriate for the patient's clinical context; this implementation is generic and does not perform clinical validation.\n3. This skill does not check for pre-existing orders; call only after confirming no active orders exist for the indication.\n4. The output is the full MedicationRequest resource returned by the FHIR server after creation.\n",
+        "content": "new_order = {\n    \"resourceType\": \"MedicationRequest\",\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"subject\": {\"reference\": f\"Patient/{patient_id}\"},\n    \"medicationCodeableConcept\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n                \"code\": medication_code,\n                \"display\": medication_display\n            }\n        ],\n        \"text\": f\"{medication_display} {indication_text}\"\n    },\n    \"authoredOn\": date_time,\n    \"dosageInstruction\": [\n        {\n            \"route\": {\"text\": dosage_route},\n            \"doseAndRate\": [\n                {\n                    \"doseQuantity\": {\n                        \"value\": dosage_value,\n                        \"unit\": dosage_unit\n                    }\n                }\n            ],\n            \"text\": f\"{dosage_value} {dosage_unit} {dosage_route} {dosage_frequency} {indication_text}\"\n        }\n    ]\n}\ncreated_order = apis.fhir.create_medication_request(new_order)",
+        "tools": [
+          "apis.fhir.create_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534079",
+          "modified_at": "2026-05-19T13:36:57.534557"
+        }
+      },
+      {
+        "name": "fhir discontinue duplicate medication orders keeping newest",
+        "document": "Given a list of active MedicationRequest resources for a patient with the same clinical indication, retain only the newest order and discontinue all others (duplicates) via the FHIR API.\n\nParameters\n----------\norders : list[dict]\n    List of active MedicationRequest resources for the patient and indication, each as a FHIR resource dict. All entries should have status 'active'.\n\nOutputs\n-------\ndict\n    A dictionary with two keys: 'kept_order' (the newest retained order as dict) and 'discontinued_orders' (a list of dicts for each order discontinued).\n\nNotes\n-----\n1. The newest order is determined by the 'authoredOn' timestamp; if timestamps are identical, the order with the highest resource id (lexicographically) is retained.\n2. Discontinuation is performed by updating the 'status' field of the MedicationRequest to 'stopped' via PATCH or PUT (as appropriate for the FHIR server).\n3. The skill assumes all orders are for the same clinical indication and already filtered for 'active' status.\n4. The 'kept_order' is not modified; only the duplicates are updated.\n5. Always confirm FHIR API support for PATCH vs PUT, and adjust accordingly.\n",
+        "content": "if not orders or len(orders) == 1:\n    # Nothing to do if zero or one order\n    kept_order = orders[0] if orders else None\n    discontinued_orders = []\nelse:\n    # Sort orders by authoredOn descending, then id descending\n    sorted_orders = sorted(orders, key=lambda o: (o.get('authoredOn', ''), str(o.get('id', ''))), reverse=True)\n    kept_order = sorted_orders[0]\n    discontinued_orders = []\n    for duplicate in sorted_orders[1:]:\n        patch_body = {\"status\": \"stopped\"}\n        # PATCH (or PUT) as appropriate\n        discontinued = apis.fhir.patch_medication_request(medication_request_id=duplicate['id'], patch_body=patch_body)\n        discontinued_orders.append(discontinued)\noutput = {'kept_order': kept_order, 'discontinued_orders': discontinued_orders}",
+        "tools": [
+          "apis.fhir.patch_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534090",
+          "modified_at": "2026-05-19T13:36:57.534565"
+        }
+      },
+      {
+        "name": "fhir confirm single active medication order by indication",
+        "document": "Verify that exactly one active MedicationRequest for a given clinical indication exists for a patient using the FHIR API.\n\nParameters\n----------\npatient_id : str\n    Patient identifier (e.g., MRN or FHIR Patient resource ID).\nindication_text : str\n    Text or code indicating the clinical reason for the medication (e.g., 'DVT prophylaxis').\n\nOutputs\n-------\nbool\n    True if exactly one active MedicationRequest exists for the given indication for the patient, False otherwise.\n\nNotes\n-----\n1. The skill retrieves all MedicationRequest resources for the patient and filters for 'active' status and indication match (by medicationCodeableConcept or text fields).\n2. This check is typically used after creation or discontinuation steps to ensure only the correct order remains active.\n3. If the FHIR server supports direct indication-based search, use that; otherwise, filter client-side.\n4. Always check the MedicationRequest resource structure if the FHIR server's response format changes.\n",
+        "content": "all_orders = apis.fhir.get_medication_requests(patient_id=patient_id)\nactive_orders = []\nfor order in all_orders:\n    if order.get('status') != 'active':\n        continue\n    med = order.get('medicationCodeableConcept', {})\n    display = ''\n    if 'coding' in med and len(med['coding']) > 0:\n        display = med['coding'][0].get('display', '').lower()\n    text = med.get('text', '').lower()\n    if indication_text.lower() in display or indication_text.lower() in text:\n        active_orders.append(order)\nexactly_one_active = len(active_orders) == 1",
+        "tools": [
+          "apis.fhir.get_medication_requests"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-19T13:36:57.534100",
+          "modified_at": "2026-05-19T13:36:57.534576"
+        }
+      }
+    ],
+    "atomic": []
+  },
+  "embeddings": {
+    "model": "Qwen3-Embedding-8B",
+    "index_type": "FAISS-HNSW"
+  }
+}

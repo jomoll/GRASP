@@ -1,0 +1,18 @@
+{
+  "unnecessary_service_request_created": "Agent created a ServiceRequest order when only a value answer was required.",
+  "missing_fhir_query_before_answer": "Provided reasoning or answer without performing required FHIR query actions.",
+  "patient_not_found_incorrect": "Incorrectly reported patient not found despite patient existing.",
+  "answer_format_wrong_type_string": "Returned a narrative string when a structured list or specific format was expected.",
+  "answer_format_includes_text": "Returned combined value and date in a single string instead of separate elements.",
+  "answer_format_wrong_type_number": "Returned numeric answer as a string instead of the expected numeric type (or wrong format).",
+  "quantity_unit_mismatch_missing": "Returned numeric value without required unit of measurement.",
+  "placeholder_minus_one_returned": "Returned sentinel '-1' placeholder instead of actual observation value/date.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "answer_format_wrong_type": "answer format wrong type",
+  "condition_met_no_order_created": "Failed to create the required order when the clinical condition (e.g., low potassium) was met.",
+  "answer_missing_timestamp": "Returned the numeric observation value without the required timestamp component.",
+  "medication_order_without_condition_check": "Agent placed a medication order without first evaluating the observation to determine if the condition (e.g., low potassium) was met.",
+  "answer_missing_after_order_created": "Agent created the required ServiceRequest but returned an empty answer instead of confirming or providing the created resource.",
+  "unexpected_answer_returned": "Agent returned a textual answer (e.g., \"ServiceRequest created\") when the task expected no answer output.",
+  "observation_bp_wrong_representation": "Blood pressure Observation recorded using an incorrect field (valueString) or missing systolic/diastolic components instead of the required structured representation."
+}

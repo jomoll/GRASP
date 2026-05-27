@@ -1,0 +1,7 @@
+{
+  "split": "id_test",
+  "score": 0.734375,
+  "n_correct": 47,
+  "n_total": 64,
+  "skills_dir": "../MedAgentBench/outputs/skill_cycle-5epochs/run_001/skills/best"
+}

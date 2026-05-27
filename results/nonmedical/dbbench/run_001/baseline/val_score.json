@@ -1,0 +1,7 @@
+{
+  "epoch": "baseline",
+  "score": 0.6532258064516129,
+  "n_correct": 81,
+  "n_total": 124,
+  "dev_score": null
+}

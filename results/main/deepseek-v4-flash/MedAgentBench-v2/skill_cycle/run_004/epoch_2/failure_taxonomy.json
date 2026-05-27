@@ -1,0 +1,16 @@
+{
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "naloxone_matching_omitted": "agent identified opioid orders but did not check for matching naloxone prescription before concluding action needed",
+  "no_active_orders_found_incorrectly": "agent reported no active DVT prophylaxis orders despite query returning results or failing to filter by status",
+  "duplicate_orders_not_resolved": "agent found multiple active orders but could not discontinue duplicates, failing to resolve the situation",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "opioid_analgesic_misclassification": "agent failed to identify opioid analgesics in active medication list, concluding none present when they were",
+  "heart_rate_not_filtered_from_vitals": "agent retrieved vital-signs category but did not filter for heart rate code, concluding no heart rate data",
+  "answer_format_wrong_type": "answer format wrong type",
+  "catheter_code_not_in_results": "agent searched for urinary catheter procedure but did not find the code in results, failing to check insertion date or duration",
+  "correct_procedure_date_returned": "agent found and returned the correct procedure date but the evaluator marked it as incorrect due to format or field mismatch",
+  "date_filter_omitted": "date filter omitted",
+  "no_recent_procedure_found_incorrectly": "agent searched for procedures with a date filter but concluded none existed when results were actually returned or the filter was too restrictive",
+  "no_procedure_found_incorrectly": "Agent searched for a procedure with a date/code filter but concluded none existed when results were actually present or the filter was too restrictive.",
+  "no_vaccine_records_found_incorrectly": "Agent searched for vaccine records (MedicationRequest or Procedure) but concluded none existed despite data being available or using wrong resource type."
+}

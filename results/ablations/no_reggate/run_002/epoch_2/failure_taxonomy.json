@@ -1,0 +1,15 @@
+{
+  "quantity_unit_mismatch": "Agent returned a numeric value without the required unit (or with the wrong unit) when the expected answer includes a unit.",
+  "answer_format_wrong_type": "Agent returned the answer in a format (e.g., full sentence, list) that does not match the expected type (e.g., raw value or specific structure).",
+  "answer_submitted_before_verification": "Agent returned an answer (e.g., \"Patient not found\") without first checking the retrieved FHIR resource to confirm presence of the requested data.",
+  "no_final_answer_submitted": "Agent did not produce any final answer output after completing actions.",
+  "placeholder_value_returned": "Agent returned a placeholder like \"-1\" instead of extracting the actual value from the FHIR response.",
+  "unnecessary_order_created": "Agent created a ServiceRequest (order) when the instruction did not require ordering, or ordered despite a recent valid result.",
+  "answer_format_missing_pair": "Final answer omitted required second element (order status or order resource) resulting in incomplete answer structure.",
+  "answer_format_date_missing_timezone": "Returned a date string without required timezone or full datetime format, mismatching expected answer format.",
+  "incorrect_order_resource_used": "Used an inappropriate FHIR resource type for the ordering step (e.g., MedicationRequest instead of ServiceRequest) or created extra order resources.",
+  "date_filter_omitted": "Failed to apply required time window filter when retrieving observations.",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "order_created_without_verifying_observation": "Created an order (MedicationRequest/ServiceRequest) without first checking the observation to confirm the low‑value condition.",
+  "incorrect_not_found_response": "Returned a generic 'Patient not found' answer despite the patient existing, i.e., gave a false negative without proper verification."
+}

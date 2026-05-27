@@ -1,0 +1,14 @@
+{
+  "quantity_unit_missing": "Returned a numeric value without the required unit.",
+  "no_action_performed_before_answer": "Provided reasoning but performed no FHIR actions before final answer.",
+  "required_service_request_missing": "Failed to create a ServiceRequest when the lab result was outdated.",
+  "missing_followup_order_pair": "Did not include the required paired follow‑up order as instructed.",
+  "placeholder_value_returned": "Returned a placeholder like -1 instead of the actual value.",
+  "observation_not_created": "Did not create the required Observation resource for recording a measurement.",
+  "age_computation_error": "Calculated or returned an incorrect patient age.",
+  "patient_lookup_not_performed": "Failed to query patient resource before attempting to answer.",
+  "unnecessary_service_request_created": "Created a ServiceRequest order when the task did not require ordering.",
+  "answer_format_wrong_type": "Returned answer in wrong data type/structure (e.g., sentence vs list).",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "date_filter_omitted": "date filter omitted"
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When a task asks for a derived value like age, calculate it from the retrieved source data and the provided current time instead of relying on rough year subtraction.",
+    "counter": 2
+  },
+  {
+    "text": "Before finishing, verify boundary conditions for date calculations, such as whether the birthday has already occurred in the reference year.",
+    "counter": 2
+  },
+  {
+    "text": "Use the most direct patient search parameter available for the given identifier or demographics, then extract the needed field from the returned Patient resource.",
+    "counter": 2
+  },
+  {
+    "text": "If the response format constrains the final output type, ensure the answer is both factually correct and formatted exactly as required before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "Return exactly one allowed action per turn; never combine an API call with FINISH in the same response.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving multiple matching observations, compare their timestamps and use the most recent result that satisfies the requested time window.",
+    "counter": 2
+  },
+  {
+    "text": "When a task asks for a specific output format or unit, extract the value from the resource and convert or format it before finishing.",
+    "counter": 2
+  },
+  {
+    "text": "Use API date parameters in a clean FHIR-compatible format and verify the request succeeded before concluding that no result exists.",
+    "counter": 2
+  },
+  {
+    "text": "For time-bounded lab queries, search with the given code and date window, then select the result with the latest effectiveDateTime (or issued time if needed) before answering.",
+    "counter": 2
+  },
+  {
+    "text": "Always inspect returned Observation values and units; convert to the unit requested by the task before producing the final numeric answer.",
+    "counter": 2
+  },
+  {
+    "text": "If no qualifying measurement exists in the requested time window, return the task’s specified fallback value exactly as instructed.",
+    "counter": 2
+  },
+  {
+    "text": "Match the final response format to the prompt precisely; if a single numeric value is requested, return only that value.",
+    "counter": 2
+  },
+  {
+    "text": "Issue exactly one API action per turn; never combine multiple GET/POST/FINISH actions in a single response.",
+    "counter": 2
+  },
+  {
+    "text": "When a task includes a conditional follow-up action, complete that action before calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "Match the required output schema exactly, including value types; if a sentinel like -1 is requested, return it as the specified type, not a quoted string.",
+    "counter": 2
+  },
+  {
+    "text": "For time-sensitive clinical tasks, explicitly compare the most recent relevant result date with the given current time and act on the result of that comparison.",
+    "counter": 2
+  },
+  {
+    "text": "When asked for the most recent result, do not assume the first page or returned order is chronological; compare timestamps across all returned entries and follow pagination if needed before deciding.",
+    "counter": 2
+  },
+  {
+    "text": "Use available date filters to narrow clinical searches to the relevant time window whenever possible, especially when determining the latest lab or order.",
+    "counter": 2
+  },
+  {
+    "text": "Distinguish between conditional and unconditional follow-up actions: place linked orders only when the triggering condition is met, but complete all requested linked actions when it is met.",
+    "counter": 2
+  },
+  {
+    "text": "Base treatment decisions on the explicit threshold or dosing rule given in the task, and avoid adding assumptions beyond the provided instructions.",
+    "counter": 2
+  }
+]

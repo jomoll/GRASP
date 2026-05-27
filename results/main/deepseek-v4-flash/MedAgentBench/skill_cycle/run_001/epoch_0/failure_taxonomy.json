@@ -1,0 +1,10 @@
+{
+  "replacement_not_needed_but_lab_ordered": "ordered follow-up lab even though replacement was not needed",
+  "date_filter_omitted": "date filter omitted",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "fhir_resource_wrong_field_extracted": "used valueString instead of proper component structure for blood pressure",
+  "answer_format_wrong_type": "answer format wrong type",
+  "age_computation_incorrect": "computed age incorrectly from patient birth date",
+  "patient_not_found_incorrectly": "returned 'Patient not found' when patient actually exists in system",
+  "no_lab_found_returned_minus_one": "returned -1 when no lab result found instead of appropriate null/not found"
+}

@@ -1,0 +1,7 @@
+{
+  "skills": "baseline",
+  "score": 0.2,
+  "n_correct": 4,
+  "n_total": 20,
+  "test_split": "data/alfworld/split_test.json"
+}

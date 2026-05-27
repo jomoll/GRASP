@@ -1,0 +1,22 @@
+{
+  "unnecessary_service_request_created": "Agent created a ServiceRequest (order) when the task only required retrieving existing data.",
+  "patient_reference_format_invalid": "Agent used an invalid patient reference format in the query (e.g., 'Patient/ID' instead of just the ID).",
+  "missing_fhir_query_before_answer": "Agent stopped after reasoning without issuing any FHIR request before producing an answer.",
+  "answer_format_wrong_type": "Agent returned answer in an incorrect data structure or textual format instead of the expected type (e.g., list vs string).",
+  "sentinel_value_used_instead_of_null": "Agent returned a placeholder sentinel like -1 instead of proper null/absence handling.",
+  "age_not_computed_from_birthdate": "Agent returned a static age value without calculating it from the patient's birthDate.",
+  "date_filter_incorrect": "Agent applied an incorrect date filter parameter, failing to retrieve records within the required time window.",
+  "conditional_order_missing": "Did not place a follow‑up order when the lab result date met the conditional criteria.",
+  "order_without_verifying_low_value": "Issued a replacement medication order without first confirming the lab value is low.",
+  "patient_not_found_incorrectly": "Returned 'Patient not found' despite the patient existing in the FHIR data.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "paired_order_missing": "Failed to create the required paired lab ServiceRequest when ordering a replacement medication.",
+  "date_filter_omitted": "date filter omitted",
+  "order_missing_for_outdated_result": "Failed to create a follow‑up order when the retrieved lab result is older than the required time window",
+  "order_missing_for_low_value": "Failed to place a replacement medication order despite the lab value being below the low‑threshold.",
+  "unnecessary_paired_order_created": "Created a paired repeat lab ServiceRequest when it was not required (e.g., when the lab value was not low).",
+  "missing_free_text_details_in_answer": "The final answer omitted the required free‑text clinical details that should be included in the referral ServiceRequest.",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "wrong_order_resource_type_used": "Used MedicationRequest instead of ServiceRequest for a replacement medication order",
+  "answer_missing_unit_and_timestamp": "Returned a numeric value without the required unit and timestamp information."
+}

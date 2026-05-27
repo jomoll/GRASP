@@ -1,0 +1,32 @@
+_resume: true
+agent:
+  module: src.client.agents.VertexAgent
+  parameters:
+    location: us-central1
+    max_output_tokens: 32768
+    model: gemini-3.1-flash-lite-preview
+    project_id: <REDACTED>
+    temperature: 0.0
+cycle:
+  batch_concurrency: 5
+  epochs: 10
+  grpo_eval_n: 36
+  grpo_k: 4
+  max_learned_skills: 10
+  max_proposals: 1
+  run_baseline: true
+  seed: 3
+  update_every: 48
+data:
+  dev: data/medagentbench/split_dev.json
+  full: data/medagentbench/test_data_v2.json
+  id_test: data/medagentbench/split_id_test.json
+  test: data/medagentbench/split_test.json
+  val: data/medagentbench/split_val.json
+output_dir: outputs_gemini-3.1-flash-lite/skill_cycle
+skills:
+  base_dir: skills/base
+task:
+  controller_address: http://localhost:5050/api
+  fhir_api_base: http://localhost:8080/fhir/
+  name: medagentbench-skill

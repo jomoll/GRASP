@@ -1,0 +1,21 @@
+{
+  "age_computation_incorrect": "Calculated patient age incorrectly from the birthdate.",
+  "duplicate_order_created": "Model created duplicate medication or service request orders for the same clinical need.",
+  "answer_format_wrong_type": "Final answer returned as free‑text string/list when a structured format (specific fields, units, or JSON) was expected.",
+  "patient_lookup_failed_missing_result": "Model reported \"Patient not found\" despite the patient existing in the dataset.",
+  "answer_submitted_without_fhir_query": "Model returned a final answer without performing any FHIR GET request to retrieve required data.",
+  "placeholder_minus_one_returned": "Model returned a sentinel value \"-1\" instead of a real measurement or appropriate message.",
+  "quantity_unit_mismatch": "Returned a numeric value without the required unit or with an incorrect unit.",
+  "missing_paired_order_when_no_replacement_needed": "Failure to include required paired order (e.g., follow‑up test) when potassium level is not low and no replacement is ordered.",
+  "observation_bp_wrong_field": "Blood pressure Observation used an incorrect field (valueString) instead of proper component coding for systolic/diastolic values.",
+  "date_format_missing_time": "Returned date string is missing the required time component or timezone information.",
+  "condition_evaluation_incorrect": "Model evaluated clinical condition incorrectly, leading to a wrong decision (e.g., stating no replacement when replacement was needed).",
+  "unnecessary_answer_returned": "Model returned a textual answer when no action or response was required.",
+  "answer_format_missing_resource_id": "Final answer omitted the required resource identifier or structured response, providing only a generic confirmation string.",
+  "service_request_note_not_array": "ServiceRequest 'note' field was provided as an object instead of an array of Annotation objects.",
+  "conditional_logic_not_applied": "Model ignored the conditional clause in the instruction and returned data without evaluating the condition.",
+  "unnecessary_order_created": "Model created an order despite the clinical condition not being met.",
+  "missing_final_answer_after_query": "Model performed a FHIR GET request (or intended to) but did not return a final answer after the query.",
+  "observation_not_recorded_after_measurement": "Model failed to create an Observation resource to record a measured vital sign, returning only reasoning instead of a POST action.",
+  "incorrect_order_type_created": "Created an order for the wrong resource type (e.g., a lab test) instead of the required replacement medication."
+}

@@ -1,0 +1,272 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-18T21:37:06.945564",
+  "rules": [
+    "[P1] Explicitly recommend obtaining missing data before proceeding.",
+    "[P1] Withhold protocol-driven actions if required lab values or data are missing.",
+    "[P1] Explicitly verify absence of relevant procedures, vaccinations, or orders before initiating new ones. When absence is confirmed, order protocol-required interventions.",
+    "[P1] Do not calculate statistical averages on single data points; flag such intervals as insufficient data for averaging.",
+    "[P1] Confirm procedure presence before initiating removal or discontinuation requests.",
+    "[P1] Explicitly handle missing data scenarios and state if protocol dictates an alternative workflow.",
+    "[P1] Verify presence or absence of existing future lab orders before placing new ones.",
+    "[P1] Cross-reference multiple data types and sources to confirm presence or absence of protocol-relevant orders, procedures, or interventions; do not assume absence of documentation equals absence of procedure.",
+    "[P1] Explicitly discontinue all but the newest duplicate orders when protocol requires a single active order; after placement, confirm no duplicates remain.",
+    "[P1] Confirm required data is present and protocol thresholds are met before initiating protocol actions or ordering interventions.",
+    "[P1] For each active order in a protocol-relevant class, ensure all required safety counter-orders (e.g., opioid–naloxone pairing) are present; create them if absent.",
+    "[P1] Explicitly enumerate and review all possible active orders matching the target class."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_a2e524f88a86",
+      "text": "[P1] Explicitly recommend obtaining missing data before proceeding.",
+      "tags": [
+        "missing_data",
+        "protocol_adherence",
+        "lab_results",
+        "explicitly",
+        "recommend",
+        "obtaining",
+        "missing",
+        "data",
+        "before",
+        "proceeding"
+      ],
+      "shown": 1,
+      "success": 0,
+      "failure": 1,
+      "created_at": "2026-05-18T21:30:37.014437",
+      "updated_at": "2026-05-18T21:30:48.374778"
+    },
+    {
+      "id": "rule_2df8589ed751",
+      "text": "[P1] Withhold protocol-driven actions if required lab values or data are missing.",
+      "tags": [
+        "missing-data",
+        "lab-results",
+        "protocol-decision",
+        "withhold",
+        "protocol",
+        "driven",
+        "actions",
+        "required",
+        "values",
+        "data"
+      ],
+      "shown": 11,
+      "success": 8,
+      "failure": 3,
+      "created_at": "2026-05-18T21:26:21.877159",
+      "updated_at": "2026-05-18T21:30:48.374362"
+    },
+    {
+      "id": "rule_b10f5ce288b5",
+      "text": "[P1] Explicitly verify absence of relevant procedures, vaccinations, or orders before initiating new ones. When absence is confirmed, order protocol-required interventions.",
+      "tags": [
+        "vaccine",
+        "protocol",
+        "procedural",
+        "documentation",
+        "explicitly",
+        "verify",
+        "absence",
+        "relevant",
+        "procedures",
+        "vaccinations"
+      ],
+      "shown": 12,
+      "success": 9,
+      "failure": 3,
+      "created_at": "2026-05-18T21:27:32.339291",
+      "updated_at": "2026-05-18T21:30:48.374437"
+    },
+    {
+      "id": "rule_d589e578b43e",
+      "text": "[P1] Do not calculate statistical averages on single data points; flag such intervals as insufficient data for averaging.",
+      "tags": [
+        "data-aggregation",
+        "missing-data",
+        "protocol-compliance",
+        "calculate",
+        "statistical",
+        "averages",
+        "single",
+        "data",
+        "points",
+        "flag"
+      ],
+      "shown": 14,
+      "success": 8,
+      "failure": 6,
+      "created_at": "2026-05-18T21:26:36.884700",
+      "updated_at": "2026-05-18T21:30:48.374498"
+    },
+    {
+      "id": "rule_ce328513c3c6",
+      "text": "[P1] Confirm procedure presence before initiating removal or discontinuation requests.",
+      "tags": [
+        "procedure_check",
+        "documentation",
+        "removal_request",
+        "confirm",
+        "procedure",
+        "presence",
+        "before",
+        "initiating",
+        "removal",
+        "discontinuation"
+      ],
+      "shown": 12,
+      "success": 6,
+      "failure": 3,
+      "created_at": "2026-05-18T21:24:50.170628",
+      "updated_at": "2026-05-18T21:30:48.374546"
+    },
+    {
+      "id": "rule_d9f5f25477cf",
+      "text": "[P1] Explicitly handle missing data scenarios and state if protocol dictates an alternative workflow.",
+      "tags": [
+        "missing-data",
+        "vitals",
+        "aggregation",
+        "explicitly",
+        "handle",
+        "missing",
+        "data",
+        "scenarios",
+        "state",
+        "protocol"
+      ],
+      "shown": 30,
+      "success": 20,
+      "failure": 10,
+      "created_at": "2026-05-18T21:24:14.952043",
+      "updated_at": "2026-05-18T21:30:48.374598"
+    },
+    {
+      "id": "rule_0ce6ad9138d1",
+      "text": "[P1] Verify presence or absence of existing future lab orders before placing new ones.",
+      "tags": [
+        "labs",
+        "order-verification",
+        "protocol",
+        "verify",
+        "presence",
+        "absence",
+        "existing",
+        "future",
+        "orders",
+        "before"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-18T21:30:48.375069",
+      "updated_at": "2026-05-18T21:30:48.375072"
+    },
+    {
+      "id": "rule_17fb1a237fe2",
+      "text": "[P1] Cross-reference multiple data types and sources to confirm presence or absence of protocol-relevant orders, procedures, or interventions; do not assume absence of documentation equals absence of procedure.",
+      "tags": [
+        "procedure-check",
+        "order-placement",
+        "workflow",
+        "cross",
+        "reference",
+        "multiple",
+        "data",
+        "types",
+        "sources",
+        "confirm"
+      ],
+      "shown": 26,
+      "success": 16,
+      "failure": 10,
+      "created_at": "2026-05-18T21:24:06.823596",
+      "updated_at": "2026-05-18T21:30:48.374671"
+    },
+    {
+      "id": "rule_e3811354c984",
+      "text": "[P1] Explicitly discontinue all but the newest duplicate orders when protocol requires a single active order; after placement, confirm no duplicates remain.",
+      "tags": [
+        "order-management",
+        "protocol-compliance",
+        "deduplication",
+        "explicitly",
+        "discontinue",
+        "newest",
+        "duplicate",
+        "orders",
+        "when",
+        "protocol"
+      ],
+      "shown": 41,
+      "success": 28,
+      "failure": 11,
+      "created_at": "2026-05-18T21:22:23.498736",
+      "updated_at": "2026-05-18T21:30:48.374734"
+    },
+    {
+      "id": "rule_0007421f14b6",
+      "text": "[P1] Confirm required data is present and protocol thresholds are met before initiating protocol actions or ordering interventions.",
+      "tags": [
+        "order-management",
+        "protocol-compliance",
+        "deduplication",
+        "confirm",
+        "required",
+        "data",
+        "present",
+        "protocol",
+        "thresholds",
+        "before"
+      ],
+      "shown": 31,
+      "success": 19,
+      "failure": 12,
+      "created_at": "2026-05-18T21:22:23.498603",
+      "updated_at": "2026-05-18T21:30:48.374836"
+    },
+    {
+      "id": "rule_d2ce4a8b463c",
+      "text": "[P1] For each active order in a protocol-relevant class, ensure all required safety counter-orders (e.g., opioid–naloxone pairing) are present; create them if absent.",
+      "tags": [
+        "medication-safety",
+        "order-matching",
+        "each",
+        "active",
+        "order",
+        "protocol",
+        "relevant",
+        "class",
+        "ensure",
+        "required"
+      ],
+      "shown": 105,
+      "success": 66,
+      "failure": 39,
+      "created_at": "2026-05-18T20:56:34.491681",
+      "updated_at": "2026-05-18T21:30:48.374925"
+    },
+    {
+      "id": "rule_515f894be00b",
+      "text": "[P1] Explicitly enumerate and review all possible active orders matching the target class.",
+      "tags": [
+        "medication-reconciliation",
+        "order-verification",
+        "explicitly",
+        "enumerate",
+        "review",
+        "possible",
+        "active",
+        "orders",
+        "matching",
+        "target"
+      ],
+      "shown": 84,
+      "success": 43,
+      "failure": 35,
+      "created_at": "2026-05-18T20:55:19.798125",
+      "updated_at": "2026-05-18T21:30:48.374977"
+    }
+  ]
+}

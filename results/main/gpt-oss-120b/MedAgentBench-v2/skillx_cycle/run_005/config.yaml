@@ -1,0 +1,61 @@
+_resume: true
+agent:
+  module: src.client.agents.HTTPAgent
+  parameters:
+    body:
+      max_tokens: 8192
+      model: gpt-oss-120b
+      temperature: 0.0
+    headers:
+      Authorization: Bearer <REDACTED>
+      Content-Type: application/json
+    prompter:
+      args:
+        agent_role: assistant
+      name: role_content_dict
+    url: <REDACTED>
+cycle:
+  batch_concurrency: 5
+  epochs: 5
+  run_baseline: true
+  seed: 5
+  update_every: 48
+data:
+  dev: data/medagentbench/split_dev.json
+  full: data/medagentbench/new_patient_tasks.json
+  id_test: data/medagentbench/split_id_test.json
+  test: data/medagentbench/split_test.json
+  val: data/medagentbench/split_val.json
+output_dir: outputs/skillx_cycle
+skillx:
+  enable_llm_merge: true
+  extractor_max_retries: 2
+  filter_stage1: true
+  filter_stage2: false
+  max_action_chars: 600
+  max_actions: 12
+  max_history_messages: 24
+  max_message_chars: 1200
+  plan_extractor_max_retries: 1
+  retrieval_top_k: 5
+  skill_type: functional
+  use_plan_extraction: true
+task:
+  controller_address: http://localhost:5120/api
+  fhir_api_base: http://localhost:8080/fhir/
+  name: medagentbench-v2-skill
+updater:
+  module: src.client.agents.HTTPAgent
+  parameters:
+    body:
+      max_tokens: 32768
+      model: gpt-oss-120b
+      temperature: 0.7
+    headers:
+      Authorization: Bearer <REDACTED>
+      Content-Type: application/json
+    prompter:
+      args:
+        agent_role: assistant
+      name: role_content_dict
+    url: <REDACTED>

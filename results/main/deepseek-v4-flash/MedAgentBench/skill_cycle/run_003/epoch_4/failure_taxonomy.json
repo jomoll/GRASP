@@ -1,0 +1,15 @@
+{
+  "potassium_not_low_no_action_needed": "correctly determined potassium not low but final answer format or content mismatched expected",
+  "date_filter_too_restrictive_no_results": "applied a date filter that excluded all results, leading to no data found",
+  "age_returned_without_unit": "returned a numeric age value without the required unit (e.g., 'years')",
+  "observation_subject_reference_missing_prefix": "used bare patient ID instead of 'Patient/ID' in Observation subject reference",
+  "no_hba1c_found_returned_minus_one": "returned -1 when no HbA1C result was found instead of a proper not-found message",
+  "magnesium_value_returned_without_unit": "returned a numeric magnesium value without the required unit",
+  "patient_not_found_incorrectly": "returned 'Patient not found' when the patient actually exists in the system",
+  "magnesium_not_low_no_action_needed": "correctly determined magnesium not low but final answer format or content mismatched expected",
+  "missing_final_answer_after_action": "performed a POST action but did not return a FINISH with the final answer",
+  "correct_actions_but_answer_mismatch": "performed correct FHIR actions but final answer text did not match expected output",
+  "answer_format_wrong_type": "answer format wrong type",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "no_hba1c_found_ordered_new_test": "no HbA1C result found, so agent ordered a new test instead of returning -1 as instructed"
+}

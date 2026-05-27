@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Send exactly one API action per turn; never concatenate multiple requests into a single action.",
+    "counter": 2
+  },
+  {
+    "text": "Before broad pagination, use the task’s specific identifiers, codes, text filters, and date bounds to target only relevant records.",
+    "counter": 2
+  },
+  {
+    "text": "Stop searching once you have enough evidence to answer the question and perform the requested follow-up action; avoid exhausting irrelevant pages.",
+    "counter": 2
+  },
+  {
+    "text": "When checking for a specific medication or vaccine in a general medication list, scan returned entries for the required text pattern first before requesting more pages.",
+    "counter": 2
+  },
+  {
+    "text": "Issue exactly one API action per turn; never combine a request with FINISH or multiple requests in the same message.",
+    "counter": 2
+  },
+  {
+    "text": "For retrieval tasks, use the most specific supported search parameters for the target data (for example, the requested observation code and an explicit time range) instead of relying only on broad category searches.",
+    "counter": 2
+  },
+  {
+    "text": "Do not conclude that data is absent or calculations are impossible until at least one valid API response has been received and checked.",
+    "counter": 2
+  },
+  {
+    "text": "If a broad search does not show the requested item, perform a targeted follow-up query for that exact item before finishing.",
+    "counter": 2
+  },
+  {
+    "text": "When the response format requires exactly one action per turn, output only a single API call or FINISH—never combine multiple actions in one message.",
+    "counter": 2
+  },
+  {
+    "text": "identify the patient first, inspect the relevant clinical evidence next, and only create an order after the required criteria are confirmed.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating a new clinical order or service request, explicitly verify that available data does not already document the cancelling, removal, or completion event requested by the task.",
+    "counter": 2
+  },
+  {
+    "text": "Use task-provided timestamps to calculate temporal thresholds precisely, and base decisions on the most recent relevant event when multiple matching records exist.",
+    "counter": 2
+  },
+  {
+    "text": "Issue exactly one API action per turn, and verify the request string is well-formed before sending.",
+    "counter": 2
+  },
+  {
+    "text": "Follow the API schema exactly for search parameters and resource references; use the patient identifier or reference format the endpoint expects.",
+    "counter": 2
+  },
+  {
+    "text": "For time-based clinical decisions, first retrieve the relevant historical record with an appropriate date filter, then compare the returned date to the decision threshold before ordering.",
+    "counter": 2
+  },
+  {
+    "text": "When creating an order, populate required fields with the expected coding system, status/intent, and a correctly formatted patient subject reference.",
+    "counter": 2
+  },
+  {
+    "text": "When the response format requires exactly one action per turn, never combine an API call with FINISH or any other text in the same message.",
+    "counter": 2
+  },
+  {
+    "text": "Use the task’s stated effective current time to define lookback windows, and compute each requested window separately rather than reusing a broader query result without checking membership.",
+    "counter": 2
+  },
+  {
+    "text": "When querying broad vital-sign data, verify the observation code/value matches the target measurement before calculating; ignore unrelated observations.",
+    "counter": 2
+  },
+  {
+    "text": "Before finalizing a computed summary, confirm all relevant results have been retrieved, including following pagination when a search response includes a next link.",
+    "counter": 2
+  }
+]

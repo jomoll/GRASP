@@ -1,0 +1,13 @@
+# Start the ALFWorld task worker for the skill-learning cycle.
+#
+# Usage:
+#   python -m src.start_task -a --config configs/start_skill_task_alfworld.yaml --controller-port 5060 --base-port 5061
+#
+# Then in a separate terminal:
+#   python -m src.grasp --config configs/grasp_alfworld.yaml --run-name run_001
+
+definition:
+  import: tasks/alfworld.yaml
+
+start:
+  alfworld-skill: 1

@@ -1,0 +1,338 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-20T17:22:26.445647",
+  "rules": [
+    "[P1] Base protocol decisions on the charted result plus reference range or explicit task/protocol threshold; apply thresholds exactly, including boundary values, and do not assume generic cutoffs.",
+    "[P1] Complete all requested steps, including conditional follow-up actions, not just the initial lookup.",
+    "[P1] For patient-specific tasks, verify the patient in the authoritative chart using all provided identifiers/demographics, exhaust reasonable search methods including identifier-format variations (e.g., prefixed/unprefixed MRN), and explicitly report not found only after no match is found.",
+    "[P1] When asked for a lab result, return the requested value and its recorded datetime.",
+    "[P1] For lab-result retrieval, verify the patient first, confirm the exact requested analyte and specimen, search relevant aliases/result sources, apply any stated time window, and use the latest qualifying result by exact timestamp; if none qualifies, explicitly report unavailable.",
+    "[P1] For write actions, execute the requested chart/order action for the verified patient, record user-provided measurements exactly as given, and confirm completion only after success; do not substitute a note or restate intent.",
+    "[P1] When an action depends on a lab-driven protocol, map the verified most recent qualifying result to the exact protocol dosing/action table before deciding.",
+    "[P1] Verify any required recency window before acting; if the latest qualifying result is too old, place the protocol-specified repeat/follow-up lab order instead of treating it as current.",
+    "[P1] When protocol criteria are unmet, withhold the action and state explicitly that no order was placed.",
+    "[P1] Apply conditional treatment only when the required trigger is confirmed on the most recent qualifying result; when triggered, place the treatment and any protocol-linked follow-up orders with the exact specified timing.",
+    "[P1] Anchor relative scheduling instructions to the relevant event datetime and convert them to the exact intended calendar datetime before finalizing.",
+    "[P1] Do not guess or infer requested values or demographic details; report unavailable when not explicitly in the chart.",
+    "[P1] Include all mandated free-text elements verbatim and preserve the requested structure when specified.",
+    "[P1] Compute age from the charted date of birth at answer time.",
+    "[P1] Match the requested order type exactly."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_2555d93347bd",
+      "text": "[P1] Base protocol decisions on the charted result plus reference range or explicit task/protocol threshold; apply thresholds exactly, including boundary values, and do not assume generic cutoffs.",
+      "tags": [
+        "lab-retrieval",
+        "potassium-replacement",
+        "protocol-mapping",
+        "follow-up-order",
+        "base",
+        "protocol",
+        "decisions",
+        "charted",
+        "result",
+        "plus"
+      ],
+      "shown": 8,
+      "success": 2,
+      "failure": 6,
+      "created_at": "2026-05-20T17:16:07.816129",
+      "updated_at": "2026-05-20T17:22:11.851969"
+    },
+    {
+      "id": "rule_81e34feea4fc",
+      "text": "[P1] Complete all requested steps, including conditional follow-up actions, not just the initial lookup.",
+      "tags": [
+        "lab-retrieval",
+        "potassium-replacement",
+        "protocol-mapping",
+        "follow-up-order",
+        "complete",
+        "requested",
+        "steps",
+        "including",
+        "conditional",
+        "follow"
+      ],
+      "shown": 5,
+      "success": 0,
+      "failure": 5,
+      "created_at": "2026-05-20T17:16:07.817188",
+      "updated_at": "2026-05-20T17:22:11.851657"
+    },
+    {
+      "id": "rule_90f66e51d3f6",
+      "text": "[P1] For patient-specific tasks, verify the patient in the authoritative chart using all provided identifiers/demographics, exhaust reasonable search methods including identifier-format variations (e.g., prefixed/unprefixed MRN), and explicitly report not found only after no match is found.",
+      "tags": [
+        "patient-search",
+        "referral-order",
+        "premature-abandonment",
+        "patient",
+        "specific",
+        "tasks",
+        "verify",
+        "authoritative",
+        "chart",
+        "using"
+      ],
+      "shown": 12,
+      "success": 3,
+      "failure": 9,
+      "created_at": "2026-05-20T17:18:22.702048",
+      "updated_at": "2026-05-20T17:22:26.436473"
+    },
+    {
+      "id": "rule_8f262791baba",
+      "text": "[P1] When asked for a lab result, return the requested value and its recorded datetime.",
+      "tags": [
+        "lab-retrieval",
+        "potassium-replacement",
+        "protocol-mapping",
+        "follow-up-order",
+        "when",
+        "asked",
+        "result",
+        "return",
+        "requested",
+        "value"
+      ],
+      "shown": 13,
+      "success": 4,
+      "failure": 9,
+      "created_at": "2026-05-20T17:16:07.815993",
+      "updated_at": "2026-05-20T17:22:11.852612"
+    },
+    {
+      "id": "rule_2c306c6828f1",
+      "text": "[P1] For lab-result retrieval, verify the patient first, confirm the exact requested analyte and specimen, search relevant aliases/result sources, apply any stated time window, and use the latest qualifying result by exact timestamp; if none qualifies, explicitly report unavailable.",
+      "tags": [
+        "lab-retrieval",
+        "recency-check",
+        "patient-verification",
+        "result-selection",
+        "result",
+        "retrieval",
+        "verify",
+        "patient",
+        "first",
+        "confirm"
+      ],
+      "shown": 16,
+      "success": 4,
+      "failure": 12,
+      "created_at": "2026-05-20T17:16:32.889501",
+      "updated_at": "2026-05-20T17:22:26.436560"
+    },
+    {
+      "id": "rule_14ecb10f6fcc",
+      "text": "[P1] For write actions, execute the requested chart/order action for the verified patient, record user-provided measurements exactly as given, and confirm completion only after success; do not substitute a note or restate intent.",
+      "tags": [
+        "lab-retrieval",
+        "potassium-replacement",
+        "protocol-mapping",
+        "follow-up-order",
+        "write",
+        "actions",
+        "execute",
+        "requested",
+        "chart",
+        "order"
+      ],
+      "shown": 16,
+      "success": 4,
+      "failure": 12,
+      "created_at": "2026-05-20T17:16:07.816915",
+      "updated_at": "2026-05-20T17:22:26.436590"
+    },
+    {
+      "id": "rule_eaca8316db30",
+      "text": "[P1] When an action depends on a lab-driven protocol, map the verified most recent qualifying result to the exact protocol dosing/action table before deciding.",
+      "tags": [
+        "lab-retrieval",
+        "potassium-replacement",
+        "protocol-mapping",
+        "follow-up-order",
+        "when",
+        "action",
+        "depends",
+        "driven",
+        "protocol",
+        "verified"
+      ],
+      "shown": 9,
+      "success": 1,
+      "failure": 8,
+      "created_at": "2026-05-20T17:16:07.816259",
+      "updated_at": "2026-05-20T17:22:11.852397"
+    },
+    {
+      "id": "rule_249262623b9f",
+      "text": "[P1] Verify any required recency window before acting; if the latest qualifying result is too old, place the protocol-specified repeat/follow-up lab order instead of treating it as current.",
+      "tags": [
+        "lab-retrieval",
+        "potassium-replacement",
+        "protocol-mapping",
+        "follow-up-order",
+        "verify",
+        "required",
+        "recency",
+        "window",
+        "before",
+        "acting"
+      ],
+      "shown": 13,
+      "success": 2,
+      "failure": 11,
+      "created_at": "2026-05-20T17:16:07.816410",
+      "updated_at": "2026-05-20T17:22:26.436528"
+    },
+    {
+      "id": "rule_7f469f4b4997",
+      "text": "[P1] When protocol criteria are unmet, withhold the action and state explicitly that no order was placed.",
+      "tags": [
+        "lab-recheck-window",
+        "protocol-gating",
+        "no-action",
+        "when",
+        "protocol",
+        "criteria",
+        "unmet",
+        "withhold",
+        "action",
+        "state"
+      ],
+      "shown": 36,
+      "success": 14,
+      "failure": 22,
+      "created_at": "2026-05-20T16:55:20.494921",
+      "updated_at": "2026-05-20T17:22:11.852848"
+    },
+    {
+      "id": "rule_b0260d17fdcf",
+      "text": "[P1] Apply conditional treatment only when the required trigger is confirmed on the most recent qualifying result; when triggered, place the treatment and any protocol-linked follow-up orders with the exact specified timing.",
+      "tags": [
+        "lab-retrieval",
+        "potassium-replacement",
+        "protocol-mapping",
+        "follow-up-order",
+        "apply",
+        "conditional",
+        "treatment",
+        "only",
+        "when",
+        "required"
+      ],
+      "shown": 13,
+      "success": 2,
+      "failure": 11,
+      "created_at": "2026-05-20T17:16:07.816557",
+      "updated_at": "2026-05-20T17:22:11.852266"
+    },
+    {
+      "id": "rule_6d799fac2736",
+      "text": "[P1] Anchor relative scheduling instructions to the relevant event datetime and convert them to the exact intended calendar datetime before finalizing.",
+      "tags": [
+        "patient-lookup",
+        "write-action",
+        "vitals",
+        "mrn-matching",
+        "anchor",
+        "relative",
+        "scheduling",
+        "instructions",
+        "relevant",
+        "event"
+      ],
+      "shown": 67,
+      "success": 28,
+      "failure": 39,
+      "created_at": "2026-05-20T16:53:15.594045",
+      "updated_at": "2026-05-20T17:22:26.436440"
+    },
+    {
+      "id": "rule_70ae40c21e6e",
+      "text": "[P1] Do not guess or infer requested values or demographic details; report unavailable when not explicitly in the chart.",
+      "tags": [
+        "patient-lookup",
+        "write-action",
+        "vitals",
+        "mrn-matching",
+        "guess",
+        "infer",
+        "requested",
+        "values",
+        "demographic",
+        "details"
+      ],
+      "shown": 52,
+      "success": 19,
+      "failure": 33,
+      "created_at": "2026-05-20T16:53:15.593804",
+      "updated_at": "2026-05-20T17:22:26.436412"
+    },
+    {
+      "id": "rule_a59e9c3a1935",
+      "text": "[P1] Include all mandated free-text elements verbatim and preserve the requested structure when specified.",
+      "tags": [
+        "referral-order",
+        "instruction-following",
+        "free-text",
+        "include",
+        "mandated",
+        "free",
+        "text",
+        "elements",
+        "verbatim",
+        "preserve"
+      ],
+      "shown": 199,
+      "success": 102,
+      "failure": 97,
+      "created_at": "2026-05-20T14:06:47.263929",
+      "updated_at": "2026-05-20T17:22:11.853153"
+    },
+    {
+      "id": "rule_11df2b80ebc3",
+      "text": "[P1] Compute age from the charted date of birth at answer time.",
+      "tags": [
+        "patient-lookup",
+        "age-calculation",
+        "chart-verification",
+        "compute",
+        "from",
+        "charted",
+        "date",
+        "birth",
+        "answer",
+        "time"
+      ],
+      "shown": 64,
+      "success": 23,
+      "failure": 41,
+      "created_at": "2026-05-20T16:51:48.901027",
+      "updated_at": "2026-05-20T17:22:26.436370"
+    },
+    {
+      "id": "rule_3575adaf9ad6",
+      "text": "[P1] Match the requested order type exactly.",
+      "tags": [
+        "referral-order",
+        "instruction-following",
+        "free-text",
+        "match",
+        "requested",
+        "order",
+        "type",
+        "exactly",
+        "demographics",
+        "patient-lookup"
+      ],
+      "shown": 268,
+      "success": 83,
+      "failure": 184,
+      "created_at": "2026-05-20T14:06:47.263818",
+      "updated_at": "2026-05-20T17:22:26.436497"
+    }
+  ]
+}

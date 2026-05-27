@@ -1,0 +1,20 @@
+{
+  "observation_value_placeholder_returned": "Returned a placeholder value such as \"-1\" instead of the actual observation value.",
+  "service_request_subject_reference_invalid": "Used an invalid subject reference in a ServiceRequest (missing the \"Patient/\" prefix).",
+  "missing_paired_order_creation": "Did not create the required paired order that should accompany the primary action.",
+  "fhir_query_not_executed": "Provided reasoning without performing any FHIR query or action.",
+  "date_filter_omitted": "Omitted the required date range filter when querying for recent observations.",
+  "answer_format_missing_prefix": "Returned the answer without the required leading text or prefix.",
+  "date_filter_incorrect_used": "Used an incorrect date filter (e.g., a single timestamp) causing the query to miss relevant records.",
+  "observation_not_recorded": "Failed to record the required Observation (e.g., blood pressure) after identifying the need.",
+  "wrong_resource_type_used_for_referral": "Used an incorrect FHIR resource type (ServiceRequest) for a referral that should be a ReferralRequest.",
+  "date_filter_incomplete": "Provided only a lower bound (ge) or upper bound (le) for the date filter, missing the complementary bound.",
+  "mrn_not_extracted_from_patient_resource": "Failed to retrieve the MRN from the Patient resource and returned 'Patient not found' instead.",
+  "age_computation_incorrect": "Calculated the patient's age incorrectly (off by one year or more).",
+  "unnecessary_service_request_created": "Created a ServiceRequest (order) when the instruction did not require it.",
+  "quantity_unit_mismatch": "Returned a numeric value without the required unit or with an incorrect unit.",
+  "answer_format_extra_explanatory_text": "Included extra explanatory text beyond the expected answer format.",
+  "conditional_order_not_created": "Did not create the required medication replacement order when the lab value satisfied the low‑threshold condition.",
+  "answer_missing_after_successful_action": "Did not return the required answer payload (e.g., resource ID or confirmation) after successfully performing a FHIR action.",
+  "lab_result_not_evaluated_before_order": "Did not examine the retrieved lab observation before deciding to place a replacement order."
+}

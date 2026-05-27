@@ -1,0 +1,22 @@
+{
+  "quantity_unit_omitted": "Returned the numeric lab value without the required measurement unit.",
+  "boundary_threshold_misapplied": "Applied the replacement threshold incorrectly at the cutoff value, treating a borderline low result as normal.",
+  "omitted_conditional_followup_order": "Reported the lab result but failed to place the required follow-up order when the date condition was met.",
+  "patient_identifier_used_as_resource_reference": "Used the patient's external identifier/MRN directly in a FHIR reference field instead of the resolved Patient resource id.",
+  "answer_format_split_across_multiple_items": "Returned the answer fragmented across multiple list items instead of the expected consolidated format.",
+  "datetime_precision_dropped": "Returned only a date string after retrieving a timestamped result, losing required time precision.",
+  "patient_age_miscalculated": "Computed the patient's age incorrectly from the Patient resource demographics.",
+  "overwrote_correct_value_with_wrong_one": "After reaching a plausible answer, replaced it with a different final value.",
+  "answer_format_narrative_instead_of_fields": "Returned a free-text summary where the task expected discrete answer fields/values.",
+  "premature_no_result_conclusion": "Queried the likely correct resource but concluded '-1' without extracting the returned value.",
+  "required_write_action_skipped_after_lookup": "After performing the prerequisite lookup, the agent failed to issue the required create/write request and instead returned an error.",
+  "patient_reference_prefix_omitted": "Used a bare patient resource id in a reference field instead of the required Patient/{id} reference format.",
+  "patient_id_resolution_inconsistently_applied": "Mixed resolved patient ids and raw patient identifiers across queries, with the final lookup using the unresolved identifier.",
+  "omitted_no_action_status_field": "Returned only the lab value/date and omitted the required explicit statement that no follow-up order was needed.",
+  "patient_id_not_resolved_before_query": "Used the external patient identifier in a clinical resource query instead of the resolved Patient resource id.",
+  "patient_id_not_extracted_from_lookup": "Performed patient lookup but failed to extract/populate the resolved Patient.id into the subsequent write request.",
+  "observation_lookup_skipped_after_patient_lookup": "Stopped after Patient lookup and returned no result without querying the needed Observation resource.",
+  "write_attempted_before_patient_resolution": "Issued the create/write request using a placeholder or unknown patient reference before completing patient lookup and filling the resolved Patient id.",
+  "replacement_order_placed_despite_normal_lab": "Issued a potassium replacement MedicationRequest even though the visible final lab value was normal and should not have triggered treatment.",
+  "omitted_repeat_potassium_order_status": "Returned the potassium result and no-replacement status but omitted the required explicit status of the paired repeat potassium order."
+}

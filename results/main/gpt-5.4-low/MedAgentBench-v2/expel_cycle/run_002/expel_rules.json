@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When a targeted search returns no data, do not conclude absence immediately; retry with a broader but still relevant query and inspect returned fields before finishing.",
+    "counter": 2
+  },
+  {
+    "text": "For time-window calculations, fetch data covering the largest required window once, then compute each smaller window from that same result set.",
+    "counter": 2
+  },
+  {
+    "text": "Match the query style to the resource’s supported search pattern; if multiple search variants exist for similar data, use the one explicitly aligned with the needed data type and code.",
+    "counter": 2
+  },
+  {
+    "text": "Before finalizing “no data available,” verify that search parameters—especially date filters and codes—are formatted correctly and actually supported by the endpoint.",
+    "counter": 2
+  },
+  {
+    "text": "Issue exactly one API action per turn, formatted precisely as required; never combine multiple requests or a request plus FINISH in one response.",
+    "counter": 2
+  },
+  {
+    "text": "When a task references a patient identifier, first resolve or verify the patient with the Patient search, then use the confirmed patient ID/reference consistently in later calls.",
+    "counter": 2
+  },
+  {
+    "text": "Do not claim a task is impossible unless you have first checked the available operations and confirmed the missing capability prevents all compliant completion paths.",
+    "counter": 2
+  },
+  {
+    "text": "verify current state, act only if needed, then finish with the completed outcome.",
+    "counter": 2
+  },
+  {
+    "text": "Output exactly one API action per turn; never combine multiple GET/POST/FINISH actions in a single response.",
+    "counter": 2
+  },
+  {
+    "text": "After resolving a patient, use the patient ID/reference in the exact format that the target endpoint expects, and keep that format consistent across related requests.",
+    "counter": 2
+  },
+  {
+    "text": "For retrieval tasks over multiple possible codes, query all relevant codes before concluding that no prior record exists or deciding to place a new order.",
+    "counter": 2
+  },
+  {
+    "text": "When creating a linked resource such as an order, populate the subject/reference using the standard resource reference form (for example, ResourceType/id) unless the API clearly requires a different format.",
+    "counter": 2
+  },
+  {
+    "text": "Emit exactly one API action per turn; never combine multiple requests or duplicate URLs in a single response.",
+    "counter": 2
+  },
+  {
+    "text": "When a direct code-based search returns no results, switch to the broader relevant resource query allowed by the API and then filter returned records by observation name/text and time window.",
+    "counter": 2
+  },
+  {
+    "text": "For time-window calculations, define the reference time first, include only observations whose timestamps fall within each requested window, and compute each window’s average from that exact subset.",
+    "counter": 2
+  },
+  {
+    "text": "Before finishing, verify that the selected observations match the requested measurement, are numerically usable, and that the reported averages are consistent with the included data points.",
+    "counter": 2
+  },
+  {
+    "text": "Output exactly one API action per turn; never combine a request with FINISH or any other text.",
+    "counter": 2
+  },
+  {
+    "text": "When a search parameter format is uncertain or an endpoint rejects a query, fall back to a simpler valid query and filter the returned data locally rather than stopping early.",
+    "counter": 2
+  },
+  {
+    "text": "For time-window calculations, use the task’s stated reference time, include only observations whose timestamps fall within the requested window, and exclude later out-of-range results even if the API returns them.",
+    "counter": 2
+  },
+  {
+    "text": "Before finalizing a computed answer, verify that the retrieved records actually match the requested code, patient, and date range.",
+    "counter": 2
+  }
+]

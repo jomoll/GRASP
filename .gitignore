@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Environments / secrets
+.env
+*.log
+*.log.tmp
+config.yml
+
+# Local run artifacts written by the reusable core / examples.
+# NOTE: per-benchmark outputs are governed by each benchmarks/*/.gitignore
+# (FHIR-AgentBench ignores its outputs/; AgentBench intentionally tracks a
+# released subset), so we do NOT blanket-ignore outputs/ here.
+runs/
+examples/quickstart/runs/
+
+# Tooling / editor / machine-specific
+.claude/settings.local.json
+.idea/
+.vscode/
+.DS_Store
+.tool_cache/

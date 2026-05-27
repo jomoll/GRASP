@@ -1,0 +1,4 @@
+# gpt-oss-120b via an OpenAI-compatible endpoint (LiteLLM "openai/" route).
+# Required env: OSS_API_BASE. Optional: OSS_MODEL (default gpt-oss-120b).
+model: "openai/${OSS_MODEL:-gpt-oss-120b}"
+base_url: "${OSS_API_BASE}"

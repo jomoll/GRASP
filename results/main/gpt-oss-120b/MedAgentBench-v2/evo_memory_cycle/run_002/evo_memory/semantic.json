@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-13T11:43:13.870805",
+  "rules": [
+    "[P1] When deriving a value from queried data (e.g., computing an average), calculate the appropriate statistic and include a brief rationale in the FINISH payload describing the method or noting absence of data.",
+    "[P1] Include a concise rationale in the FINISH payload explaining why an order was placed, modified, discontinued, or why no action was taken.",
+    "[P1] When creating an order, include all required clinical details (e.g., CPT code, contrast specification, indication) as defined by the protocol.",
+    "[P1] Before creating any order, query active orders that could conflict; if an active order exists, skip creation or reconcile (keep newest, discontinue others).",
+    "[P1] Never finish with only a textual summary; required create/discontinue actions must be performed.",
+    "[P1] Query the relevant FHIR endpoint (Observation, Procedure, Immunization, MedicationRequest, etc.) using the specific code (CPT/LOINC) and an explicit time‑window filter; retrieve all matches, sort by date/timestamp, work with the newest record, verify units and reference ranges, discard incomplete entries, and for aggregate calculations compute the metric.",
+    "[P1] Only create a new order when no recent appropriate result exists or when the result meets a protocol‑defined trigger; otherwise skip creation.",
+    "[P1] Use the appropriate FHIR resource type for the clinical question (e.g., Immunization for vaccination status, Observation for labs).",
+    "[P1] When retrieved data are present, evaluate them against protocol‑defined thresholds or criteria to decide on interventions.",
+    "[P1] After any create, update, or discontinue action, and throughout verification loops, re‑query to confirm the final order state; only issue FINISH once all required conditions are satisfied.",
+    "[P1] Output only the exact API call string as the next action; keep calls separate from FINISH.",
+    "[P1] If the filtered result set is empty, explicitly state the absence and treat time‑based requirements as elapsed (i.e., intervention is due).",
+    "[P1] Verify companion safety orders for each primary active order; create missing ones and re‑query before FINISH."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_a16c2ec78e87",
+      "text": "[P1] When deriving a value from queried data (e.g., computing an average), calculate the appropriate statistic and include a brief rationale in the FINISH payload describing the method or noting absence of data.",
+      "tags": [
+        "observation_query",
+        "time-window_aggregation",
+        "average_calculation",
+        "heart_rate",
+        "fhir",
+        "when",
+        "deriving",
+        "value",
+        "from",
+        "queried"
+      ],
+      "shown": 11,
+      "success": 9,
+      "failure": 2,
+      "created_at": "2026-05-13T11:19:40.766233",
+      "updated_at": "2026-05-13T11:43:13.863465"
+    },
+    {
+      "id": "rule_6f24087b6112",
+      "text": "[P1] Include a concise rationale in the FINISH payload explaining why an order was placed, modified, discontinued, or why no action was taken.",
+      "tags": [
+        "observation",
+        "lab-retrieval",
+        "time-window",
+        "protocol",
+        "failure",
+        "include",
+        "concise",
+        "rationale",
+        "finish",
+        "payload"
+      ],
+      "shown": 11,
+      "success": 8,
+      "failure": 3,
+      "created_at": "2026-05-13T11:12:28.732079",
+      "updated_at": "2026-05-13T11:43:13.863501"
+    },
+    {
+      "id": "rule_772f609b2fc3",
+      "text": "[P1] When creating an order, include all required clinical details (e.g., CPT code, contrast specification, indication) as defined by the protocol.",
+      "tags": [
+        "observation",
+        "lab-retrieval",
+        "time-window",
+        "protocol",
+        "failure",
+        "when",
+        "creating",
+        "order",
+        "include",
+        "required"
+      ],
+      "shown": 10,
+      "success": 7,
+      "failure": 3,
+      "created_at": "2026-05-13T11:12:28.732340",
+      "updated_at": "2026-05-13T11:43:13.863612"
+    },
+    {
+      "id": "rule_eb1fbcaa40fa",
+      "text": "[P1] Before creating any order, query active orders that could conflict; if an active order exists, skip creation or reconcile (keep newest, discontinue others).",
+      "tags": [
+        "observation",
+        "lab-retrieval",
+        "time-window",
+        "protocol",
+        "failure",
+        "before",
+        "creating",
+        "order",
+        "query",
+        "active"
+      ],
+      "shown": 9,
+      "success": 6,
+      "failure": 3,
+      "created_at": "2026-05-13T11:12:28.732000",
+      "updated_at": "2026-05-13T11:43:13.863422"
+    },
+    {
+      "id": "rule_34dbdf565cfc",
+      "text": "[P1] Never finish with only a textual summary; required create/discontinue actions must be performed.",
+      "tags": [
+        "observation",
+        "lab-retrieval",
+        "time-window",
+        "protocol",
+        "failure",
+        "never",
+        "finish",
+        "with",
+        "only",
+        "textual"
+      ],
+      "shown": 8,
+      "success": 5,
+      "failure": 3,
+      "created_at": "2026-05-13T11:12:28.732231",
+      "updated_at": "2026-05-13T11:43:13.863376"
+    },
+    {
+      "id": "rule_5875c06c9d61",
+      "text": "[P1] Query the relevant FHIR endpoint (Observation, Procedure, Immunization, MedicationRequest, etc.) using the specific code (CPT/LOINC) and an explicit time‑window filter; retrieve all matches, sort by date/timestamp, work with the newest record, verify units and reference ranges, discard incomplete entries, and for aggregate calculations compute the metric.",
+      "tags": [
+        "lab-retrieval",
+        "interpretation",
+        "no-intervention",
+        "tsh",
+        "free_t4",
+        "query",
+        "relevant",
+        "fhir",
+        "endpoint",
+        "observation"
+      ],
+      "shown": 11,
+      "success": 7,
+      "failure": 4,
+      "created_at": "2026-05-13T11:14:31.040181",
+      "updated_at": "2026-05-13T11:43:13.863577"
+    },
+    {
+      "id": "rule_b69b9ab45616",
+      "text": "[P1] Only create a new order when no recent appropriate result exists or when the result meets a protocol‑defined trigger; otherwise skip creation.",
+      "tags": [
+        "observation",
+        "lab-retrieval",
+        "time-window",
+        "protocol",
+        "failure",
+        "only",
+        "create",
+        "order",
+        "when",
+        "recent"
+      ],
+      "shown": 15,
+      "success": 10,
+      "failure": 5,
+      "created_at": "2026-05-13T11:12:28.731961",
+      "updated_at": "2026-05-13T11:43:13.863657"
+    },
+    {
+      "id": "rule_dd58528e486a",
+      "text": "[P1] Use the appropriate FHIR resource type for the clinical question (e.g., Immunization for vaccination status, Observation for labs).",
+      "tags": [
+        "observation",
+        "lab-retrieval",
+        "time-window",
+        "protocol",
+        "failure",
+        "appropriate",
+        "fhir",
+        "resource",
+        "type",
+        "clinical"
+      ],
+      "shown": 9,
+      "success": 4,
+      "failure": 5,
+      "created_at": "2026-05-13T11:12:28.732146",
+      "updated_at": "2026-05-13T11:43:13.863749"
+    },
+    {
+      "id": "rule_71716ac0e752",
+      "text": "[P1] When retrieved data are present, evaluate them against protocol‑defined thresholds or criteria to decide on interventions.",
+      "tags": [
+        "observation",
+        "lab_retrieval",
+        "protocol_evaluation",
+        "query_correctness",
+        "when",
+        "retrieved",
+        "data",
+        "present",
+        "evaluate",
+        "them"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-13T11:21:34.466758",
+      "updated_at": "2026-05-13T11:43:13.863788"
+    },
+    {
+      "id": "rule_dbc1d56f59f5",
+      "text": "[P1] After any create, update, or discontinue action, and throughout verification loops, re‑query to confirm the final order state; only issue FINISH once all required conditions are satisfied.",
+      "tags": [
+        "lab-retrieval",
+        "interpretation",
+        "no-intervention",
+        "tsh",
+        "free_t4",
+        "after",
+        "create",
+        "update",
+        "discontinue",
+        "action"
+      ],
+      "shown": 8,
+      "success": 3,
+      "failure": 5,
+      "created_at": "2026-05-13T11:14:31.040064",
+      "updated_at": "2026-05-13T11:43:13.863717"
+    },
+    {
+      "id": "rule_39e842688eb2",
+      "text": "[P1] Output only the exact API call string as the next action; keep calls separate from FINISH.",
+      "tags": [
+        "order_verification",
+        "companion_safety",
+        "empty_result_handling",
+        "output",
+        "only",
+        "exact",
+        "call",
+        "string",
+        "next",
+        "action"
+      ],
+      "shown": 21,
+      "success": 12,
+      "failure": 9,
+      "created_at": "2026-05-13T09:35:44.960943",
+      "updated_at": "2026-05-13T11:43:13.863818"
+    },
+    {
+      "id": "rule_030a8c669916",
+      "text": "[P1] If the filtered result set is empty, explicitly state the absence and treat time‑based requirements as elapsed (i.e., intervention is due).",
+      "tags": [
+        "observation",
+        "lab-retrieval",
+        "time-window",
+        "protocol",
+        "failure",
+        "filtered",
+        "result",
+        "empty",
+        "explicitly",
+        "state"
+      ],
+      "shown": 7,
+      "success": 2,
+      "failure": 5,
+      "created_at": "2026-05-13T11:12:28.731914",
+      "updated_at": "2026-05-13T11:43:13.863862"
+    },
+    {
+      "id": "rule_a54bf388470b",
+      "text": "[P1] Verify companion safety orders for each primary active order; create missing ones and re‑query before FINISH.",
+      "tags": [
+        "observation",
+        "lab-retrieval",
+        "time-window",
+        "protocol",
+        "failure",
+        "verify",
+        "companion",
+        "safety",
+        "orders",
+        "each"
+      ],
+      "shown": 8,
+      "success": 2,
+      "failure": 6,
+      "created_at": "2026-05-13T11:12:28.732303",
+      "updated_at": "2026-05-13T11:43:13.863900"
+    }
+  ]
+}

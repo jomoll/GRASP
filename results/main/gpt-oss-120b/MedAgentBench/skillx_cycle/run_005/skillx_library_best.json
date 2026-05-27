@@ -1,0 +1,588 @@
+{
+  "version": "1.0",
+  "benchmark": "appworld",
+  "created_at": "2026-05-18T00:38:49.062162",
+  "skills": {
+    "planning": {},
+    "functional": [
+      {
+        "name": "fhir get patient by family, given, and birthdate",
+        "document": "Retrieve Patient resources from a FHIR server that exactly match a supplied family name, given name, and birthdate.\n\nParameters\n----------\nbase_url: str\n    The root URL of the FHIR server (e.g., \"http://localhost:8080/fhir\").\nfamily: str\n    Exact family (last) name of the patient to search for.\ngiven: str\n    Exact given (first) name of the patient to search for.\nbirthdate: str\n    Patient's birthdate in ISO format (YYYY-MM-DD).\n\nOutputs\n-------\nlist[dict]\n    A list of Patient resource dictionaries that match the query. Returns an empty list if no matches are found or if the request fails.\n\nNotes\n-----\n1. The request uses the standard FHIR Patient search parameters `family`, `given`, and `birthdate`.\n2. The skill parses the FHIR Bundle response and extracts the `resource` field from each entry.\n3. If the server returns a non‑200 status code, the skill treats the result as empty rather than raising an exception.\n4. No pagination handling is performed; it assumes the result fits within a single page (common for exact name+DOB look‑ups).",
+        "content": "url = f\"{base_url}/Patient?family={family}&given={given}&birthdate={birthdate}\"\n\nresponse = apis.http.get(url=url)\n\n# Initialize empty result list\npatients = []\n\n# Verify successful response\nif isinstance(response, dict) and response.get(\"status\") == 200:\n    bundle = response.get(\"body\", {})\n    # FHIR bundles contain an 'entry' list where each entry holds a 'resource'\n    entries = bundle.get(\"entry\", [])\n    for entry in entries:\n        resource = entry.get(\"resource\")\n        if isinstance(resource, dict) and resource.get(\"resourceType\") == \"Patient\":\n            patients.append(resource)\n# If response is not successful or bundle missing, patients remains empty\n",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848550",
+          "modified_at": "2026-05-18T01:08:11.848745"
+        }
+      },
+      {
+        "name": "fhir extract patient mrn",
+        "document": "Extract the Medical Record Number (MRN) from a list of Patient resources returned by a FHIR search.\n\nParameters\n----------\npatients : list[dict]\n    List of Patient resource dictionaries as returned by the `fhir get patient by family, given, and birthdate` skill. May be empty if no matching patient was found.\nmrn_coding_code : str, optional\n    The coding code that identifies an MRN identifier (commonly \"MR\"). If not supplied, the skill will fall back to the first identifier in the array.\n\nOutputs\n-------\nstr\n    The MRN value if a matching identifier is found, otherwise the literal string \"Patient not found\".\n\nNotes\n-----\n1. The Patient resource's `identifier` field is an array of identifier objects. Each identifier may contain a `type` object with a `coding` array; the first coding's `code` is often used to indicate the identifier type.\n2. The skill prefers an identifier whose `type.coding[0].code` matches the supplied `mrn_coding_code`. If none match, it returns the `value` of the first identifier.\n3. If the `patients` list is empty or identifiers are missing, the function returns \"Patient not found\".\n4. No external APIs are called; the skill works purely with in‑memory JSON structures.",
+        "content": "result = \"Patient not found\"\n\nif patients:\n    # Use the first patient returned (exact name+DOB searches should yield at most one)\n    patient = patients[0]\n    identifiers = patient.get(\"identifier\", [])\n    if identifiers:\n        # Try to find an identifier explicitly marked as MRN\n        mrn = None\n        for ident in identifiers:\n            type_info = ident.get(\"type\", {})\n            coding = type_info.get(\"coding\", [])\n            if coding:\n                code = coding[0].get(\"code\")\n                if mrn_coding_code and code == mrn_coding_code:\n                    mrn = ident.get(\"value\")\n                    break\n        # Fallback to the first identifier's value if no explicit MRN found\n        if mrn is None:\n            mrn = identifiers[0].get(\"value\")\n        if isinstance(mrn, str) and mrn:\n            result = mrn\n",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848569",
+          "modified_at": "2026-05-18T01:08:11.848749"
+        }
+      },
+      {
+        "name": "fhir get observations by code and patient after timestamp",
+        "document": "Retrieve every Observation resource of a given LOINC (or other) code for a specific patient that was recorded after a provided ISO‑8601 timestamp. The function pages through a FHIR server's Bundle responses until no further `next` link is present.\n\nParameters\n----------\nbase_url: str\n    Root URL of the FHIR server (e.g., \"http://localhost:8080/fhir\").\ncode: str\n    Observation code to filter on (e.g., \"MG\" for serum magnesium).\npatient_id: str\n    Identifier of the patient whose observations are being requested.\nafter_timestamp: str\n    ISO‑8601 UTC timestamp string ending with \"Z\". The query will use the `date=ge{after_timestamp}` filter.\n\nOutputs\n-------\nlist[dict]\n    A list containing the `resource` dictionaries of all matching Observation objects.\n\nNotes\n-----\n1. The function builds the query parameters dictionary and performs an HTTP GET request using the `apis.http.get` tool.\n2. FHIR servers return results in a Bundle; pagination is handled by following the `next` link when present.\n3. No assumptions are made about the size of the result set – the loop continues until the Bundle contains no further `next` link.\n4. The skill does not assume any specific authentication method; if the server requires headers, they can be added to the `request_headers` dictionary.\n",
+        "content": "observations = []\n\n# Initial request URL and parameters\nrequest_url = f\"{base_url}/Observation\"\nparams = {\n    \"code\": code,\n    \"patient\": patient_id,\n    \"date\": f\"ge{after_timestamp}\"\n}\n\nwhile request_url:\n    # Perform the GET request; the tool returns a response object with a .json() method\n    response = apis.http.get(url=request_url, params=params)\n    bundle = response.json()\n\n    # Extract Observation resources from the bundle entries\n    for entry in bundle.get(\"entry\", []):\n        resource = entry.get(\"resource\")\n        if resource:\n            observations.append(resource)\n\n    # Look for a pagination link with relation \"next\"\n    next_url = None\n    for link in bundle.get(\"link\", []):\n        if link.get(\"relation\") == \"next\":\n            next_url = link.get(\"url\")\n            break\n\n    # Prepare for the next iteration; after the first page the server already encodes query params in the next URL\n    request_url = next_url\n    params = {}  # clear params because they are now part of the next URL",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848575",
+          "modified_at": "2026-05-18T01:08:11.848751"
+        }
+      },
+      {
+        "name": "task_finish_if_measurement_not_below_threshold",
+        "document": "Finish the current workflow when a quantitative measurement is not below a specified clinical threshold. The skill formats a concise status message that includes the patient identifier, the observation type, the measured value with its unit, and the reason why no further action is taken, then signals task completion via the supervisor API.\n\nParameters\n----------\nmeasurement: dict\n    Dictionary containing the keys \"value\" (float | None), \"unit\" (str | None), and optionally other metadata. Represents the latest quantitative observation for the patient.\nthreshold: float\n    Clinical threshold below which the measurement is considered low and would require an intervention.\npatient_id: str\n    Identifier of the patient for whom the measurement was obtained.\nobservation_name: str\n    Human‑readable name of the observation (e.g., \"serum magnesium level\").\n\nOutputs\n-------\nNone (the skill invokes `apis.supervisor.complete_task` which terminates the workflow).\n\nNotes\n-----\n1. If ``measurement['value']`` is ``None`` the skill treats it as unavailable and does **not** finish; callers should handle the missing‑data case separately.\n2. The skill is generic and can be reused for any laboratory or vital‑sign measurement by adjusting the ``threshold`` and ``observation_name`` arguments.\n3. The message is intentionally brief for supervisor consumption but includes all relevant details for auditability.",
+        "content": "value = measurement.get(\"value\")\nunit = measurement.get(\"unit\") or \"\"\n\n# Only finish when a numeric value is present and it is NOT below the threshold\nif value is not None and value >= threshold:\n    # Build a clear status message for the supervisor\n    status_msg = (\n        f\"Patient {patient_id} has {observation_name} of {value}{unit} \"\n        f\"which is not low (threshold: {threshold}{unit}). No replacement needed.\"\n    )\n    # Signal task completion with the constructed message\n    apis.supervisor.complete_task(message=status_msg)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848580",
+          "modified_at": "2026-05-18T01:08:11.848752"
+        }
+      },
+      {
+        "name": "http get json response",
+        "document": "Perform an HTTP GET request to a specified endpoint with optional query parameters, handle common error conditions, and return the parsed JSON payload.\n\nParameters\n----------\nurl : str\n    Full URL of the target endpoint (including scheme and host).\nparams : dict | None, optional (default=None)\n    Mapping of query‑string keys to values that will be URL‑encoded and sent with the request.\ntimeout_seconds : int, optional (default=30)\n    Maximum number of seconds to wait for a response before aborting.\n\nOutputs\n-------\ndict\n    The JSON object returned by the server if the request succeeds (HTTP 200). If the server returns a non‑200 status, an empty dictionary is returned and the error is logged.\n\nNotes\n-----\n1. The skill uses the domain‑specific tool `apis.http.get` which abstracts the low‑level HTTP client.\n2. Basic error handling is performed: network errors, timeouts, and non‑200 status codes are caught and result in an empty dict rather than raising an exception, allowing downstream logic to decide how to proceed.\n3. The function does **not** make any assumptions about the shape of the JSON; callers are responsible for interpreting the payload.\n",
+        "content": "response = apis.http.get(\n    url=url,\n    params=params or {},\n    timeout=timeout_seconds\n)\n\n# Initialise an empty result in case of failure\nresult: dict = {}\n\n# Check that a response was received and that the status code indicates success\nif response is not None:\n    # Some HTTP wrappers expose `status_code` directly; adapt if the tool differs\n    status = getattr(response, \"status_code\", None)\n    if status == 200:\n        # Attempt to parse JSON; if parsing fails, keep result empty\n        try:\n            result = response.json()\n        except Exception:\n            result = {}\n    else:\n        # Non‑200 responses are logged for debugging purposes\n        apis.logging.warn(\n            f\"GET request to {url} returned status {status}. Returning empty dict.\"\n        )\nelse:\n    apis.logging.error(f\"GET request to {url} failed to return a response.\")\n\n# `result` now holds the parsed JSON payload or an empty dict if something went wrong",
+        "tools": [
+          "apis.http.get",
+          "apis.logging"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848585",
+          "modified_at": "2026-05-18T01:08:11.848754"
+        }
+      },
+      {
+        "name": "present observation result",
+        "document": "Create a human‑readable sentence that reports the value of a clinical observation (e.g., magnesium) for a specific patient and send the result back to the supervising system.\n\nParameters\n----------\npatient_id : str\n    Identifier of the patient whose observation is being reported.\ncode : str\n    The observation code (e.g., \"MG\" for magnesium). Used only for wording.\nvalue : float | None\n    Numeric measurement extracted from the Observation. May be ``None`` if the observation is missing.\nunit : str | None\n    Unit string associated with ``value`` (e.g., \"mmol/L\"). May be ``None``.\n\nOutputs\n-------\nNone (the skill calls ``apis.supervisor.complete_task`` to finish the interaction). The function does not return a Python value; its side‑effect is sending the formatted message back to the user.\n\nNotes\n-----\n1. If ``value`` is ``None`` the sentence states that no recent measurement was found.\n2. The observation ``code`` is mapped to a more readable name when possible (e.g., \"MG\" → \"magnesium\"). Unknown codes are used verbatim.\n3. The skill uses the domain‑specific tool ``apis.supervisor.complete_task`` which expects a ``message`` parameter containing the final response string.\n4. No external libraries are imported; all logic is pure Python.\n",
+        "content": "observation_names = {\n    \"MG\": \"magnesium\",\n    \"NA\": \"sodium\",\n    \"K\": \"potassium\",\n    # extend as needed\n}\n\n# Resolve a friendly name for the code; fall back to the raw code if unknown\nfriendly_name = observation_names.get(code.upper(), code)\n\nif value is None:\n    # No measurement found within the time window\n    response_text = (\n        f\"I could not find a recent {friendly_name} measurement for patient {patient_id} \"\n        \"in the last 24 hours.\"\n    )\nelse:\n    # Build a concise, readable sentence\n    # Round the value to a sensible number of decimal places (2) for display\n    display_value = round(value, 2)\n    unit_part = f\" {unit}\" if unit else \"\"\n    response_text = (\n        f\"The most recent {friendly_name} level for patient {patient_id} \"\n        f\"is {display_value}{unit_part}.\"\n    )\n\n# Send the final response back to the supervising system\napis.supervisor.complete_task(message=response_text)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848590",
+          "modified_at": "2026-05-18T01:08:11.848755"
+        }
+      },
+      {
+        "name": "fhir verify response and complete task",
+        "document": "Validate the result of a FHIR operation (e.g., ServiceRequest creation) and signal task completion to the supervising workflow engine.\n\nParameters\n----------\nresult: dict\n    The dictionary returned by a FHIR‑related skill (e.g., `fhir submit service request`). Expected keys include:\n    - ``success`` (bool): True when the FHIR server responded with a success status.\n    - ``resource_ref`` (str | None): Canonical reference of the created resource (e.g., \"ServiceRequest/abc123\").\n    - ``error`` (str | None): Human‑readable error message when ``success`` is False.\n\ntask_id: str\n    Identifier of the current supervisory task that must be marked complete.\n\nsuccess_message_template: str = \"Referral created successfully: {ref}\"\n    Template used when the operation succeeds. ``{ref}`` will be replaced with ``result[\"resource_ref\"]``.\n\nerror_message_template: str = \"Referral creation failed: {error}\"\n    Template used when the operation fails. ``{error}`` will be replaced with ``result[\"error\"]``.\n\nOutputs\n-------\nNone (the skill performs side‑effects only).\n\nNotes\n-----\n* The skill does **not** perform any network request other than the final call to ``apis.supervisor.complete_task``.\n* It is deliberately generic – it can be reused for any FHIR create/update operation whose result follows the ``{'success': bool, 'resource_ref': str|None, 'error': str|None}`` convention.\n* If ``result['success']`` is False, the skill still calls ``complete_task`` but includes the error message so that downstream workflow logic can record the failure.\n* No external Python packages are imported; the implementation relies solely on basic Python constructs and the ``apis.supervisor.complete_task`` tool.",
+        "content": "if result.get('success'):\n    # Successful creation – build a positive confirmation\n    ref = result.get('resource_ref') or 'unknown'\n    message = success_message_template.format(ref=ref)\nelse:\n    # Failure – include the error details\n    err = result.get('error') or 'unspecified error'\n    message = error_message_template.format(error=err)\n\n# Signal the supervising workflow that the task is finished\napis.supervisor.complete_task(task_id=task_id, outcome=message)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848595",
+          "modified_at": "2026-05-18T01:08:11.848757"
+        }
+      },
+      {
+        "name": "fhir get latest observation value",
+        "document": "Retrieve the most recent value of a specific Observation code for a patient from a FHIR server within a given time window.\n\nParameters\n----------\npatient_id: str\n    Identifier of the patient in the FHIR system (e.g., \"S1311412\").\nobservation_code: str\n    The LOINC or custom code for the desired observation (e.g., \"MG\" for magnesium).\nstart_iso: str\n    ISO‑8601 UTC timestamp marking the start of the search interval (inclusive), formatted with a trailing \"Z\".\nend_iso: str\n    ISO‑8601 UTC timestamp marking the end of the search interval (inclusive), formatted with a trailing \"Z\".\nbase_url: str, optional\n    Base URL of the FHIR server. Defaults to \"http://localhost:8080/fhir\".\n\nOutputs\n-------\nfloat | None\n    The numeric value of the most recent Observation matching the criteria, or ``None`` if no matching observations are found.\n\nNotes\n-----\n* The skill builds the query string manually and uses ``apis.http.get`` to issue the request.\n* It handles paging by following the ``link`` array in the Bundle response where ``relation`` is \"next\".\n* Only the first component of ``valueQuantity`` is returned (the numeric value). If the Observation uses a different value representation, the skill will ignore it.\n* No authentication handling is included; if the FHIR endpoint requires headers, they can be added to the ``headers`` dict.\n* The function does not raise exceptions; any unexpected response yields ``None``.\n",
+        "content": "observations = []\nurl = f\"{base_url}/Observation\"\nparams = {\n    \"code\": observation_code,\n    \"patient\": patient_id,\n    \"date\": f\"ge{start_iso}\",\n    \"date\": f\"le{end_iso}\"\n}\n# initial request\nresponse = apis.http.get(url=url, params=params)\nif not response or response.get('resourceType') != 'Bundle':\n    latest_value = None\nelse:\n    # collect entries from the first bundle\n    entries = response.get('entry', [])\n    for entry in entries:\n        resource = entry.get('resource')\n        if resource and resource.get('resourceType') == 'Observation':\n            observations.append(resource)\n    # follow pagination links if present\n    while True:\n        next_link = None\n        for link in response.get('link', []):\n            if link.get('relation') == 'next':\n                next_link = link.get('url')\n                break\n        if not next_link:\n            break\n        response = apis.http.get(url=next_link)\n        if not response or response.get('resourceType') != 'Bundle':\n            break\n        for entry in response.get('entry', []):\n            resource = entry.get('resource')\n            if resource and resource.get('resourceType') == 'Observation':\n                observations.append(resource)\n    # determine the most recent observation by effectiveDateTime\n    latest_obs = None\n    latest_dt = None\n    for obs in observations:\n        dt_str = obs.get('effectiveDateTime')\n        if not dt_str:\n            continue\n        # ISO‑8601 strings compare lexicographically for ordering\n        if latest_dt is None or dt_str > latest_dt:\n            latest_dt = dt_str\n            latest_obs = obs\n    if latest_obs:\n        value_qty = latest_obs.get('valueQuantity', {})\n        latest_value = value_qty.get('value')\n    else:\n        latest_value = None",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848601",
+          "modified_at": "2026-05-18T01:08:11.848758"
+        }
+      },
+      {
+        "name": "fhir create service request with free‑text note",
+        "document": "Create a FHIR ServiceRequest resource of any type, embedding supplied free‑text into the `note.text` field and linking it to a patient. The skill assembles the JSON payload, applies sensible defaults, and sends it via a POST request to the FHIR server.\n\nParameters\n----------\nservice_code_system : str\n    The coding system URI for the requested service (e.g., \"http://snomed.info/sct\").\nservice_code : str\n    The code representing the specific service to be ordered.\nservice_display : str\n    Human‑readable display text for the service code.\npatient_id : str\n    Identifier of the patient to reference (e.g., \"S6550627\").\nnote_text : str\n    Free‑text to place inside `note.text` (typically a Situation‑Background‑Assessment‑Recommendation block).\nauthored_on : str, optional\n    ISO‑8601 datetime string for when the request was authored. If omitted, the current time is not set and the server may apply its default.\nstatus : str, optional\n    Lifecycle status of the request (default \"active\").\nintent : str, optional\n    Intent of the request (default \"order\").\npriority : str, optional\n    Priority of the request (default \"routine\").\n\nOutputs\n-------\ndict\n    The JSON response returned by the FHIR server after creating the ServiceRequest.\n\nNotes\n-----\n* The skill does **not** import any external packages; it relies solely on the provided `apis.fhir.post` tool.\n* All values are parameterised – the skill can be reused for any service request, not only orthopedic referrals.\n* The `note` element is constructed as a list containing a single dictionary with the supplied free‑text.\n* The patient reference follows the FHIR pattern `Patient/{patient_id}`.\n* The skill performs two logical steps: (1) build the payload, (2) invoke the POST API.\n",
+        "content": "payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": service_code_system,\n                \"code\": service_code,\n                \"display\": service_display\n            }\n        ]\n    },\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"note\": [\n        {\n            \"text\": note_text\n        }\n    ]\n}\n# optional fields – add only if a value is supplied\nif authored_on:\n    payload[\"authoredOn\"] = authored_on\npayload[\"status\"] = status if status else \"active\"\npayload[\"intent\"] = intent if intent else \"order\"\npayload[\"priority\"] = priority if priority else \"routine\"\n\n# send the request to the local FHIR server\nresponse = apis.fhir.post(\n    url=\"http://localhost:8080/fhir/ServiceRequest\",\n    json=payload\n)\n",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848608",
+          "modified_at": "2026-05-18T01:08:11.848760"
+        }
+      },
+      {
+        "name": "fhir post json with validation",
+        "document": "Send a POST request with a JSON payload to a specified FHIR endpoint, capture the server's response, and perform basic validation to ensure the resource was created successfully.\n\nParameters\n----------\nurl : str\n    Full URL of the FHIR endpoint to which the POST request should be sent (e.g., \"http://localhost:8080/fhir/ServiceRequest\").\njson_payload : dict\n    The JSON body to be transmitted in the POST request.\n\nOutputs\n-------\nresponse_json : dict\n    The parsed JSON response returned by the FHIR server when the request succeeds.\n\nNotes\n-----\n* The skill relies on the provided ``apis.fhir.post`` tool; no external libraries are imported.\n* After the POST call the skill checks that a response was received and that the response contains an ``id`` field, which is typical for a successfully created FHIR resource. If validation fails, the skill raises a ``ValueError`` with a helpful message.\n* The skill is deliberately generic – it can be used for any FHIR resource creation, not only ServiceRequest objects.\n* No printing or logging is performed; the caller can handle the returned dictionary as needed.",
+        "content": "response = apis.fhir.post(\n    url=url,\n    json=json_payload\n)\n# Basic validation – a successful FHIR create usually returns a resource with an 'id'\nif not response:\n    raise ValueError(f\"No response received from POST to {url}\")\nif isinstance(response, dict) and \"id\" not in response:\n    raise ValueError(f\"Response from {url} does not contain an 'id' field; possible failure: {response}\")\nresponse_json = response\n",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848613",
+          "modified_at": "2026-05-18T01:08:11.848761"
+        }
+      },
+      {
+        "name": "supervisor complete task",
+        "document": "Notify the orchestrator that the current task has finished, optionally providing a result payload. This skill abstracts the completion signalling so it can be reused for any task managed by the supervisor.\n\nParameters\n----------\ntask_id : str\n    Unique identifier of the task being completed (as provided by the orchestrator).\nresult : any, optional (default=None)\n    Optional data describing the outcome of the task (e.g., a success message, created resource ID, etc.).\n\nOutputs\n-------\ndict\n    A dictionary summarising the completion call with keys:\n    - \"success\" (bool): True if the supervisor acknowledged the completion without error.\n    - \"response\" (any): Raw response object returned by the supervisor API.\n    - \"error\" (any, optional): Error details if the call failed.\n\nNotes\n-----\n* The skill builds the minimal payload expected by `apis.supervisor.complete_task` and interprets the response to provide a clear success flag.\n* No external libraries are imported; the function relies solely on the provided API tool.\n* If `result` is None, the payload omits the result field, keeping the call lightweight.\n",
+        "content": "payload = {\"task_id\": task_id}\nif result is not None:\n    payload[\"result\"] = result\n\n# Invoke the supervisor's completion endpoint\nraw_response = apis.supervisor.complete_task(**payload)\n\n# Normalise the response for downstream consumption\ncompletion = {\n    \"success\": raw_response.get(\"status\") == \"ok\",\n    \"response\": raw_response.get(\"content\"),\n    \"error\": raw_response.get(\"error\")\n}\n# The variable `completion` now holds the outcome of the task‑completion signalling.\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848618",
+          "modified_at": "2026-05-18T01:08:11.848763"
+        }
+      },
+      {
+        "name": "supervisor complete task with validated result",
+        "document": "Validate a result value and signal task completion using the supervisor API. The skill ensures the provided result is a non‑empty string; if the validation fails, a fallback string is used instead. This abstracts the common pattern of finishing a task after processing data (e.g., after extracting an MRN) without embedding domain‑specific logic.\n\nParameters\n----------\nresult: str | None\n    The primary value to return to the user. May be ``None`` or an empty string if extraction failed.\nfallback: str = \"Patient not found\"\n    The literal string to use when ``result`` is missing or invalid.\n\nOutputs\n-------\nNone\n    The skill invokes ``apis.supervisor.complete_task`` which terminates the current task. No value is returned to the caller.\n\nNotes\n-----\n1. The skill performs a simple validation (type check and non‑emptiness) before calling the supervisor.\n2. It does **not** raise exceptions; any unexpected input results in the ``fallback`` being sent.\n3. This skill is reusable for any situation where a processed value must be returned to the user, not only patient MRN look‑ups.",
+        "content": "def _is_valid_string(value: any) -> bool:\n    \"\"\"Return True if *value* is a non‑empty string.\"\"\"\n    return isinstance(value, str) and bool(value.strip())\n\n# Validate the primary result\nif _is_valid_string(result):\n    final_result = result.strip()\nelse:\n    final_result = fallback\n\n# Signal task completion with the chosen result\napis.supervisor.complete_task(result=final_result)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848623",
+          "modified_at": "2026-05-18T01:08:11.848764"
+        }
+      },
+      {
+        "name": "fhir get latest observation by code",
+        "document": "Retrieve the most recent Observation of a specific code (e.g., LOINC) for a given patient from a FHIR server.\n\nParameters\n----------\npatient_id : str\n    The identifier of the patient (e.g., \"S6550627\").\nobservation_code : str\n    The code of the observation to search for (e.g., \"A1C\").\n\nOutputs\n-------\nlatest_observation : dict\n    A dictionary containing at least two keys:\n    - \"value\": the observation result (float, int, or str depending on the resource).\n    - \"date\": the ISO‑8601 date/time string when the observation was recorded (the most recent one).\n\nNotes\n-----\n1. The FHIR server may paginate results; this skill iterates through pages until no further entries are returned.\n2. Observations are sorted by their ``effectiveDateTime`` (or ``effectivePeriod.end`` if the former is missing) to determine the newest record.\n3. The skill extracts the result from ``valueQuantity.value`` when present; otherwise it falls back to ``valueString``.\n4. No external Python packages are imported; all processing is done with native constructs.\n5. The skill does **not** perform any ordering of new lab tests – it only returns the latest observation data for downstream logic.",
+        "content": "latest_observation = {}\nobservations = []\npage = 0\npage_limit = 50  # reasonable page size to avoid over‑fetching\nwhile True:\n    response = apis.fhir.get(\n        url=\"http://localhost:8080/fhir/Observation\",\n        params={\n            \"code\": observation_code,\n            \"patient\": patient_id,\n            \"page\": page,\n            \"_count\": page_limit\n        }\n    )\n    # FHIR bundles place resources under the 'entry' list\n    entries = response.get(\"entry\", [])\n    if not entries:\n        break\n    for entry in entries:\n        resource = entry.get(\"resource\", {})\n        observations.append(resource)\n    page += 1\n\n# Identify the most recent observation\nmost_recent_date = None\nmost_recent_obs = None\nfor obs in observations:\n    # Prefer effectiveDateTime; fallback to effectivePeriod.end\n    date = obs.get(\"effectiveDateTime\") or obs.get(\"effectivePeriod\", {}).get(\"end\")\n    if not date:\n        continue\n    if (most_recent_date is None) or (date > most_recent_date):\n        most_recent_date = date\n        most_recent_obs = obs\n\nif most_recent_obs:\n    # Extract the measurement value\n    if \"valueQuantity\" in most_recent_obs:\n        value = most_recent_obs[\"valueQuantity\"].get(\"value\")\n    else:\n        value = most_recent_obs.get(\"valueString\")\n    latest_observation = {\"value\": value, \"date\": most_recent_date}\nelse:\n    latest_observation = {\"value\": None, \"date\": None}",
+        "tools": [
+          "apis.fhir.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848628",
+          "modified_at": "2026-05-18T01:08:11.848766"
+        }
+      },
+      {
+        "name": "fhir create lab service request",
+        "document": "Create a FHIR ServiceRequest resource for ordering a laboratory test (identified by a LOINC code) for a specific patient.\n\nParameters\n----------\npatient_id : str\n    Identifier of the patient (e.g., \"S6550627\").\nloinc_code : str\n    LOINC code of the lab test to order (e.g., \"4548-4\" for Hemoglobin A1c).\nauthored_on : str\n    ISO‑8601 datetime string indicating when the order is authored (e.g., \"2023-11-13T10:15:00+00:00\").\nstatus : str, optional (default=\"active\")\n    The status of the ServiceRequest (e.g., \"active\", \"draft\").\nintent : str, optional (default=\"order\")\n    The intent of the request (e.g., \"order\", \"plan\").\npriority : str, optional (default=\"routine\")\n    Priority of the request (e.g., \"stat\", \"routine\").\nadditional_fields : dict, optional (default={})\n    Any extra key‑value pairs to merge into the final ServiceRequest payload (useful for extensions).\n\nOutputs\n-------\nservice_request : dict\n    The FHIR ServiceRequest resource as returned by the server after creation.\n\nNotes\n-----\n1. The skill builds the minimal required ServiceRequest structure according to the FHIR specification, then posts it to the local FHIR server.\n2. It does not perform validation beyond ensuring required keys are present; callers should supply a correctly formatted ``authored_on``.\n3. The skill uses the ``apis.fhir.post`` tool; no external Python packages are imported.\n4. Multiple processing steps are performed: (a) assemble the coding block, (b) assemble the full request body, (c) merge any additional custom fields, (d) execute the POST request.\n",
+        "content": "payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://loinc.org\",\n                \"code\": loinc_code,\n                \"display\": \"Lab test\"\n            }\n        ]\n    },\n    \"authoredOn\": authored_on,\n    \"status\": status if status is not None else \"active\",\n    \"intent\": intent if intent is not None else \"order\",\n    \"priority\": priority if priority is not None else \"routine\",\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    }\n}\n\n# Merge any user‑provided extra fields (e.g., extensions or notes)\nif additional_fields:\n    payload.update(additional_fields)\n\n# POST the ServiceRequest to the FHIR server\nservice_request = apis.fhir.post(\n    url=\"http://localhost:8080/fhir/ServiceRequest\",\n    json=payload\n)\n",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848632",
+          "modified_at": "2026-05-18T01:08:11.848768"
+        }
+      },
+      {
+        "name": "fhir finish if observation not low",
+        "document": "Check a numeric observation value against a configurable low‑threshold. If the value is **greater than or equal to** the threshold, signal task completion with a clear, human‑readable message via the supervisor API. This is useful for clinical decision‑support flows where a replacement or intervention is only required when a lab result falls below a defined limit.\n\nParameters\n----------\nobservation_value : float\n    The numeric result of the observation (e.g., serum magnesium concentration).\nlow_threshold : float\n    The threshold below which the observation is considered low and further action is required.\npatient_id : str\n    Identifier of the patient for whom the observation belongs.\nobservation_name : str\n    Human‑readable name of the observation (e.g., \"serum magnesium level\").\nunit : str, optional\n    Unit of the observation value (e.g., \"mg/dL\"). If omitted, the unit is omitted from the message.\n\nOutputs\n-------\nNone (the function calls ``apis.supervisor.finish`` which terminates the current workflow when the condition is met).\n\nNotes\n-----\n1. The skill **does nothing** when the observation is below the threshold; the caller can continue with ordering or other logic.\n2. The message is formatted to include patient ID, observation name, value, unit (if provided), and the threshold for auditability.\n3. This skill does not perform any rounding; callers should provide values in the desired precision.\n",
+        "content": "if observation_value >= low_threshold:\n    # Build a readable message; include unit only when supplied.\n    unit_str = f\"{unit}\" if unit else \"\"\n    message = (\n        f\"{observation_name} of {observation_value}{unit_str} for patient {patient_id} \"\n        f\"is not below the low threshold of {low_threshold}{unit_str}. \"\n        \"No replacement ordered.\"\n    )\n    apis.supervisor.finish([message])",
+        "tools": [
+          "apis.supervisor.finish"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848637",
+          "modified_at": "2026-05-18T01:08:11.848770"
+        }
+      },
+      {
+        "name": "fhir finish after medication order",
+        "document": "Signal successful completion of a workflow after a MedicationRequest (or any order) has been created. The skill builds a concise, human‑readable confirmation message that includes the patient identifier and, when available, the order identifier or medication name, then calls the supervisor API to finish the task.\n\nParameters\n----------\norder_resource : dict\n    The FHIR resource dictionary that was returned from the order‑creation call (e.g., a MedicationRequest). It should contain at least an ``id`` field; if not present, the message will omit the order id.\npatient_id : str\n    Identifier of the patient for whom the order was placed.\nmedication_name : str, optional\n    Human‑readable name of the medication (e.g., \"IV magnesium\"). If omitted, the message will refer generically to \"the order\".\n\nOutputs\n-------\nNone (the function invokes ``apis.supervisor.finish`` which terminates the current workflow).\n\nNotes\n-----\n1. This skill does **not** perform any additional validation of the order; it assumes the caller has already ensured the order is appropriate.\n2. The confirmation message is intentionally brief to keep logs readable while still providing audit‑able details.\n3. If ``order_resource`` lacks an ``id`` key, the message will omit the order identifier.\n",
+        "content": "order_id = order_resource.get('id')\nif medication_name:\n    med_part = f\"{medication_name}\"\nelse:\n    med_part = \"the order\"\nif order_id:\n    message = f\"{med_part} (ID: {order_id}) has been placed for patient {patient_id}.\"\nelse:\n    message = f\"{med_part} has been placed for patient {patient_id}.\"\napis.supervisor.finish([message])",
+        "tools": [
+          "apis.supervisor.finish"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848640",
+          "modified_at": "2026-05-18T01:08:11.848771"
+        }
+      },
+      {
+        "name": "fhir get patient mrn by name and birthdate",
+        "document": "Search a FHIR server for a patient using family name, given name, and birthdate, then extract the patient's Medical Record Number (MRN) if present.\n\nParameters\n----------\nbase_url: str\n    The root URL of the FHIR server (e.g., \"http://localhost:8080/fhir\").\nfamily: str\n    Patient's family (last) name.\ngiven: str\n    Patient's given (first) name.\nbirthdate: str\n    Patient's birthdate in ISO format (YYYY-MM-DD).\n\nOutputs\n-------\nmrn: str | None\n    The MRN value extracted from the first matching patient resource, or ``None`` if no patient is found or the patient has no MRN identifier.\n\nNotes\n-----\n1. The function builds the query string ``?family=...&given=...&birthdate=...`` and performs an HTTP GET request using ``apis.http.get``.\n2. It expects the FHIR server to return a Bundle resource. The first entry's ``resource`` field is examined for an ``identifier`` array.\n3. The MRN is assumed to be the first identifier's ``value``; if the identifier list is empty, ``None`` is returned.\n4. No authentication handling is performed – callers should embed any required auth tokens in the ``base_url`` or configure the HTTP client separately.\n",
+        "content": "import json\n\n# Build query parameters\nquery = f\"family={family}&given={given}&birthdate={birthdate}\"\n# Assemble full URL\nurl = f\"{base_url}/Patient?{query}\"\n\n# Perform GET request\nresponse = apis.http.get(url=url)\n\n# Default output\nmrn = None\n\n# Basic validation of response\nif response and isinstance(response, str):\n    try:\n        data = json.loads(response)\n    except Exception:\n        data = None\n    if data and data.get('resourceType') == 'Bundle':\n        entries = data.get('entry', [])\n        if entries:\n            patient = entries[0].get('resource', {})\n            identifiers = patient.get('identifier', [])\n            if identifiers:\n                # Take the first identifier's value as MRN\n                mrn = identifiers[0].get('value')\n        # If no entries, mrn stays None (patient not found)\n\n# ``mrn`` now holds the extracted MRN or None\n",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848645",
+          "modified_at": "2026-05-18T01:08:11.848773"
+        }
+      },
+      {
+        "name": "fhir get patient mrn from search url",
+        "document": "Retrieve the Medical Record Number (MRN) for a patient by performing an HTTP GET request to a FHIR Patient search URL and parsing the returned Bundle.\n\nParameters\n----------\nsearch_url: str\n    Fully‑qualified FHIR Patient search URL (e.g., \"http://localhost:8080/fhir/Patient?family=Reid&given=Tina&birthdate=1953-10-18\").\n\nOutputs\n-------\nmrn: str\n    The MRN value extracted from the first matching patient resource. If no patient matches, the string \"Patient not found\" is returned.\n\nNotes\n-----\n* The function expects the server to return a FHIR Bundle in JSON format.\n* It looks for an identifier whose `type.coding[0].code` equals \"MR\" (the typical code for a medical record number). Adjust the code check if your FHIR implementation uses a different system.\n* Only the first matching patient entry is examined; additional entries are ignored.\n* No exceptions are raised – network errors or malformed responses result in \"Patient not found\".\n",
+        "content": "response = apis.http.get(url=search_url)\n# Guard against request failures\nif not response or not hasattr(response, \"json\"):\n    mrn = \"Patient not found\"\nelse:\n    try:\n        bundle = response.json()\n    except Exception:\n        bundle = {}\n    mrn = \"Patient not found\"\n    for entry in bundle.get(\"entry\", []):\n        resource = entry.get(\"resource\", {})\n        for identifier in resource.get(\"identifier\", []):\n            coding = identifier.get(\"type\", {}).get(\"coding\", [])\n            if coding and coding[0].get(\"code\") == \"MR\":\n                mrn = identifier.get(\"value\", \"Patient not found\")\n                break\n        if mrn != \"Patient not found\":\n            break",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848650",
+          "modified_at": "2026-05-18T01:08:11.848775"
+        }
+      },
+      {
+        "name": "fhir get observations by code and patient within time window",
+        "document": "Retrieve all FHIR Observation resources for a specific patient that match a given observation code (e.g., serum magnesium) and that were recorded on or after a supplied start timestamp. The request automatically follows FHIR pagination links until no further pages remain.\n\nParameters\n----------\nbase_url: str\n    The root URL of the FHIR server (e.g., \"http://localhost:8080/fhir\").\ncode: str\n    The LOINC or other code identifying the observation type to retrieve (e.g., \"MG\" for serum magnesium).\npatient_id: str\n    Identifier of the patient whose observations are being queried.\nstart_timestamp: str\n    ISO‑8601 UTC timestamp marking the beginning of the search window (e.g., \"2023-11-12T10:15:00Z\").\n\nOutputs\n-------\nlist[dict]\n    A list containing the Observation resources (as dictionaries) that satisfy the query.\n\nNotes\n-----\n1. The skill handles FHIR pagination via the \"next\" link in the bundle response.\n2. If the server returns no entries, an empty list is returned.\n3. The skill does not perform any domain‑specific interpretation of the observation values; callers should inspect the returned resources.\n",
+        "content": "observations = []\n\n# Initial request URL\nurl = f\"{base_url}/Observation?code={code}&patient={patient_id}&date=ge{start_timestamp}\"\n\nwhile url:\n    # Perform the HTTP GET request\n    response = apis.http.get(url=url)\n    bundle = response.json()\n\n    # Extract Observation resources from the bundle entries\n    for entry in bundle.get('entry', []):\n        resource = entry.get('resource')\n        if resource and resource.get('resourceType') == 'Observation':\n            observations.append(resource)\n\n    # Find the next pagination link, if any\n    next_link = None\n    for link in bundle.get('link', []):\n        if link.get('relation') == 'next':\n            next_link = link.get('url')\n            break\n    url = next_link  # Continue loop if a next page exists, otherwise exit",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848655",
+          "modified_at": "2026-05-18T01:08:11.848777"
+        }
+      },
+      {
+        "name": "supervisor finish with result",
+        "document": "Send the final answer to the user by invoking the supervisor's FINISH API. The skill accepts any value (typically a string such as an MRN or a not‑found message), ensures it is a non‑empty string, and passes it to `apis.supervisor.finish` wrapped in a list, as required by the platform.\n\nParameters\n----------\nresult : str\n    The value to be returned to the user. If the value is empty, ``None`` or evaluates to ``False``, the skill substitutes the literal string ``\"Patient not found\"``.\n\nOutputs\n-------\nNone (the skill triggers the final response via the supervisor API).\n\nNotes\n-----\n1. The platform expects the argument to ``apis.supervisor.finish`` to be a list of strings; this skill handles the wrapping.\n2. Minimal sanitisation is performed – leading/trailing whitespace is stripped and the result is coerced to ``str``.\n3. No network calls other than the supervisor finish are made.\n",
+        "content": "def supervisor_finish(result: str):\n    # Ensure we have a string and strip whitespace\n    if not isinstance(result, str):\n        result = str(result) if result is not None else \"\"\n    cleaned = result.strip()\n    # Default to not‑found message if empty\n    if not cleaned:\n        cleaned = \"Patient not found\"\n    # The FINISH API expects a list of strings\n    apis.supervisor.finish([cleaned])\n\n# Example usage (the calling code would simply invoke the function):\n# supervisor_finish(mrn_value)\n",
+        "tools": [
+          "apis.supervisor.finish"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848659",
+          "modified_at": "2026-05-18T01:08:11.848779"
+        }
+      },
+      {
+        "name": "workflow complete with order confirmation",
+        "document": "Finish a clinical workflow by sending a confirmation that a medication order was placed, including a human‑readable summary of the order details. This skill is generic and can be used for any medication order (e.g., IV magnesium, potassium, antibiotics).\n\nParameters\n----------\norder_details : dict\n    The dictionary representing the medication request that was previously built (e.g., the output of `fhir build medication request`). Expected keys include at least:\n    - \"medicationCodeableConcept\" → coding → code/display\n    - \"dosageInstruction\" → list with a single dict containing \"doseAndRate\" (doseQuantity/value & unit, rateQuantity/value & unit) and optional \"route\".\n    - Any other fields the caller wishes to expose in the confirmation.\nmessage_prefix : str | None, optional\n    Optional text to prepend to the generated summary (e.g., \"Order placed successfully:\"). If ``None`` a default prefix is used.\n\nOutputs\n-------\nNone (the skill invokes the `supervisor.complete_task` tool, which ends the workflow and returns the supplied payload to the supervising system).\n\nNotes\n-----\n1. The skill extracts the most relevant pieces of information from ``order_details`` and formats them into a concise, readable string. Missing sub‑fields are gracefully omitted.\n2. The payload sent to ``supervisor.complete_task`` is a dictionary with a single key ``\"message\"`` whose value is the formatted summary. This structure matches the expected input of the supervisory system in the current environment.\n3. No external libraries are imported; the implementation relies only on basic Python constructs and the ``supervisor.complete_task`` tool.\n4. Because the skill performs data extraction, string construction, and the final task‑completion call, it satisfies the requirement of involving multiple processing steps rather than being a thin wrapper around a single tool.",
+        "content": "summary_parts = []\n\n# Optional prefix\nif message_prefix is None:\n    message_prefix = \"IV medication order placed:\"\nsummary_parts.append(message_prefix)\n\n# Medication name / code\nmed_cc = order_details.get('medicationCodeableConcept', {})\ncoding = med_cc.get('coding', [])\nif coding:\n    first = coding[0]\n    med_name = first.get('display') or first.get('code')\n    if med_name:\n        summary_parts.append(f\"Medication: {med_name}\")\n\n# Dosage and rate\ndosage_instr = order_details.get('dosageInstruction', [])\nif dosage_instr:\n    instr = dosage_instr[0]\n    dose_rate = instr.get('doseAndRate', [])\n    if dose_rate:\n        dr = dose_rate[0]\n        dose_qty = dr.get('doseQuantity', {})\n        rate_qty = dr.get('rateQuantity', {})\n        dose_val = dose_qty.get('value')\n        dose_unit = dose_qty.get('unit')\n        rate_val = rate_qty.get('value')\n        rate_unit = rate_qty.get('unit')\n        if dose_val is not None and dose_unit:\n            summary_parts.append(f\"Dose: {dose_val} {dose_unit}\")\n        if rate_val is not None and rate_unit:\n            summary_parts.append(f\"Rate: {rate_val} {rate_unit}\")\n    # Route\n    route = instr.get('route', {}).get('coding', [])\n    if route:\n        route_display = route[0].get('display') or route[0].get('code')\n        if route_display:\n            summary_parts.append(f\"Route: {route_display}\")\n\n# Combine into a single message string\nconfirmation_message = \", \".join(summary_parts)\n\n# Send the confirmation to the supervising system\nsupervisor.complete_task({\"message\": confirmation_message})",
+        "tools": [
+          "supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848664",
+          "modified_at": "2026-05-18T01:08:11.848781"
+        }
+      },
+      {
+        "name": "fhir verify post response success",
+        "document": "Validate that a response returned from a FHIR POST request indicates successful resource creation. The skill checks the HTTP status code, optionally verifies the presence of a `Location` header, extracts the newly created resource identifier if available, and raises an informative error when the request failed.\n\nParameters\n----------\nresponse: dict\n    The dictionary returned by the `apis.http.post` tool. It must contain at least a `status` key (int) and may include `headers` (dict) and `json` (dict) representing the server's payload.\n\nOutputs\n-------\nsuccess: bool\n    True if the response indicates success (status 200‑299).\nresource_id: str | None\n    The identifier of the created FHIR resource, extracted from the `Location` header or the response body if present. None when the ID cannot be determined.\n\nNotes\n-----\n1. Acceptable success status codes are 200 (OK) and 201 (Created). Any other status triggers a RuntimeError with details.\n2. The `Location` header, when present, typically contains the full URL of the newly created resource; the ID is the segment after the final '/'.\n3. If the header is missing, the skill falls back to looking for an `id` field in the JSON payload.\n4. This skill does **not** perform any network calls; it only processes the already‑received response.\n",
+        "content": "status = response.get('status')\n\n# Verify HTTP success range (200‑299)\nif not (200 <= status < 300):\n    raise RuntimeError(\n        f\"FHIR POST failed with status {status}: {response.get('text', '')}\"\n    )\n\n# Initialise result variables\nsuccess = True\nresource_id = None\n\n# Try to obtain the resource ID from the Location header\nheaders = response.get('headers', {})\nlocation = headers.get('Location') or headers.get('location')\nif location:\n    # The ID is the substring after the last '/' in the URL\n    resource_id = location.rstrip('/').split('/')[-1]\nelse:\n    # Fallback: look for an 'id' field in the JSON body\n    json_body = response.get('json', {})\n    if isinstance(json_body, dict):\n        resource_id = json_body.get('id')\n\n# The variables `success` and `resource_id` now hold the verification outcome.\n",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848668",
+          "modified_at": "2026-05-18T01:08:11.848783"
+        }
+      },
+      {
+        "name": "fhir verify response and extract identifier",
+        "document": "Validate that a FHIR POST response indicates successful resource creation and retrieve the newly‑assigned identifier from the response payload.\n\nParameters\n----------\nresponse: dict\n    The dictionary returned by `apis.http.post` containing at least the keys `status_code` (int) and `json` (dict) representing the server's response body.\nsuccess_status_codes: list[int], optional\n    HTTP status codes that are considered a successful creation. Default is ``[200, 201]``.\nidentifier_path: list[str], optional\n    Sequence of keys that leads to the identifier within the JSON payload. For typical FHIR resources this is ``[\"id\"]`` but callers can supply a deeper path (e.g., ``[\"resource\", \"id\"]``).\n\nOutputs\n-------\ncreation_success: bool\n    ``True`` if the response status code is in ``success_status_codes`` and an identifier could be located, otherwise ``False``.\nresource_id: str | None\n    The extracted identifier when ``creation_success`` is ``True``; ``None`` otherwise.\n\nNotes\n-----\n* The skill performs no network I/O; it only inspects the already‑received response.\n* If the status code is not a success code, the function logs the unexpected code and leaves ``resource_id`` as ``None``.\n* The identifier extraction walks the JSON object following ``identifier_path``; if any intermediate key is missing the extraction stops and ``resource_id`` is set to ``None``.\n* This skill is deliberately generic – it can be used for any FHIR resource type, not just ServiceRequest.",
+        "content": "creation_success = False\nresource_id = None\n\n# 1. Verify HTTP status code\nstatus = response.get(\"status_code\")\nif status in success_status_codes:\n    # 2. Attempt to locate the identifier in the JSON payload\n    payload = response.get(\"json\", {})\n    current = payload\n    for key in identifier_path:\n        if isinstance(current, dict) and key in current:\n            current = current[key]\n        else:\n            current = None\n            break\n    if isinstance(current, (str, int)):\n        resource_id = str(current)\n        creation_success = True\n    else:\n        # Identifier not found despite successful status\n        creation_success = False\nelse:\n    # Non‑success status; keep defaults (False, None)\n    creation_success = False",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848673",
+          "modified_at": "2026-05-18T01:08:11.848785"
+        }
+      },
+      {
+        "name": "supervisor complete task with concise message",
+        "document": "Signal task completion to the supervising system while providing a short, validated message.\n\nParameters\n----------\nmessage: str\n    The human‑readable success or status message to be sent to the supervisor. Must be non‑empty after stripping whitespace.\ntask_id: str, optional\n    Identifier of the specific task to complete, if required by the supervisor API.\n\nOutputs\n-------\nNone\n    The skill performs a side‑effect call to `apis.supervisor.complete_task`. It raises an exception on validation failure.\n\nNotes\n-----\n* The function validates that `message` is a non‑empty string and trims leading/trailing whitespace.\n* If the message exceeds 200 characters it is truncated to avoid overly long payloads.\n* The payload is assembled as a dictionary and passed as keyword arguments to `apis.supervisor.complete_task`.\n* No network I/O is performed directly in this skill beyond the supervisor API call.\n* This skill is generic and can be reused for any task‑completion scenario that requires a concise status message.",
+        "content": "if not isinstance(message, str) or not message.strip():\n    raise ValueError(\"message must be a non‑empty string\")\n\n# Clean and limit length of the message\nclean_msg = message.strip()\nMAX_LENGTH = 200\nif len(clean_msg) > MAX_LENGTH:\n    clean_msg = clean_msg[:MAX_LENGTH].rstrip()\n\n# Assemble payload for the supervisor API\npayload = {\"message\": clean_msg}\nif task_id:\n    payload[\"task_id\"] = task_id\n\n# Invoke the supervisor completion endpoint\napis.supervisor.complete_task(**payload)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848677",
+          "modified_at": "2026-05-18T01:08:11.848787"
+        }
+      },
+      {
+        "name": "http get fhir patient MRN",
+        "document": "Perform an HTTP GET request to a given FHIR search URL, parse the returned Bundle, and return the Medical Record Number (MRN) of the first matching patient. If no patient matches, return the string \"Patient not found\".\n\nParameters\n----------\nurl: str\n    Fully‑qualified FHIR search URL (e.g., \"http://localhost:8080/fhir/Patient?family=Hicks&given=Emily&birthdate=1942-05-11\").\n\nOutputs\n-------\nmrn: str\n    The extracted MRN value of the first patient in the Bundle, or the literal \"Patient not found\" when the Bundle contains no entries or the request fails.\n\nNotes\n-----\n1. The skill uses the generic HTTP GET tool `apis.http.get` which returns a dictionary with at least ``status_code`` and ``json`` keys.\n2. The FHIR response is expected to be a Bundle; the skill looks for the first ``entry.resource.identifier`` list and returns the first identifier's ``value``.\n3. If the response status is not 200, or the Bundle has no entries, the skill falls back to the not‑found message.\n4. No external libraries are imported; all logic is pure Python.\n",
+        "content": "response = apis.http.get(url=url)\n\nmrn = \"Patient not found\"\n\nif response.get('status_code') == 200:\n    bundle = response.get('json', {})\n    entries = bundle.get('entry', [])\n    if entries:\n        patient = entries[0].get('resource', {})\n        identifiers = patient.get('identifier', [])\n        if identifiers:\n            # Return the first identifier value (commonly the MRN)\n            mrn = identifiers[0].get('value', \"Patient not found\")\n\n# The variable `mrn` now holds the desired output.\n",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848682",
+          "modified_at": "2026-05-18T01:08:11.848789"
+        }
+      },
+      {
+        "name": "task complete with result",
+        "document": "Signal the supervisor that the current task is finished and provide the resulting data.\n\nParameters\n----------\ntask_id: str\n    Identifier of the task to be completed, as supplied by the supervisor when the task was started.\nresult: Any\n    The data to return to the user. This can be a string, list, dict, etc. The skill will ensure the result is in a JSON‑serializable form before sending.\n\nOutputs\n-------\nNone (the skill triggers the completion API; any response from the supervisor is ignored in the workflow).\n\nNotes\n-----\n1. The skill validates that `result` is not ``None``; if it is, it substitutes the literal string \"No result\".\n2. If `result` is not a list, it is wrapped in a list to match the typical supervisor API expectation of a list of values.\n3. The skill uses the tool `apis.supervisor.complete_task` which expects the keyword arguments `task_id` and `result`.\n4. No external packages are imported; all processing is pure Python.\n",
+        "content": "if result is None:\n    formatted_result = [\"No result\"]\nelse:\n    # Ensure the result is JSON‑serializable and in list form\n    if isinstance(result, list):\n        formatted_result = result\n    else:\n        formatted_result = [result]\n\n# Call the supervisor to mark the task as finished\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=formatted_result\n)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848686",
+          "modified_at": "2026-05-18T01:08:11.848791"
+        }
+      },
+      {
+        "name": "supervisor complete task with result",
+        "document": "Signal to the supervising system that the current task has been finished and provide a human‑readable result payload. This skill validates the supplied result, ensures it conforms to the expected structure, and then invokes the `apis.supervisor.complete_task` endpoint.\n\nParameters\n----------\ntask_id: str\n    Identifier of the task to be completed as provided by the supervisor.\nresult: list[str] | str\n    Human‑readable confirmation message(s) describing the outcome of the task. If a single string is supplied it will be wrapped in a list.\n\nOutputs\n-------\nNone\n    The skill does not return a value; it forwards the result to the supervisor, which may trigger downstream workflow actions.\n\nNotes\n-----\n1. The skill raises a `ValueError` if `result` is empty after normalisation.\n2. It does not print or log the result; callers can handle logging if needed.\n3. This skill is reusable for any task that needs to be marked complete with a custom message, not only vital‑sign recordings.\n",
+        "content": "def _normalize_result(r):\n    # Accept a string or a list of strings and always return a list\n    if isinstance(r, list):\n        return r\n    if isinstance(r, str):\n        return [r]\n    raise TypeError('result must be a string or list of strings')\n\n# Normalise the supplied result\nresult_list = _normalize_result(result)\n\n# Basic validation – there should be at least one message\nif not result_list:\n    raise ValueError('Result list cannot be empty')\n\n# Call the supervisor API to mark the task as finished\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=result_list\n)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848691",
+          "modified_at": "2026-05-18T01:08:11.848793"
+        }
+      },
+      {
+        "name": "verify_fhir_response_and_complete_task",
+        "document": "Validate that a FHIR POST response indicates successful resource creation and signal task completion to the supervisor.\n\nParameters\n----------\nresponse: dict\n    The dictionary returned by the `fhir post resource` skill, containing at least the keys:\n    - \"status_code\": int – HTTP status code of the POST request.\n    - \"body\": Any – Parsed JSON body or error text.\nsuccess_status_codes: list[int] | None = None\n    HTTP status codes that are considered successful. If ``None``, defaults to ``[201, 200]``.\nsuccess_message: str | None = None\n    Optional custom message to surface to the user when the operation succeeds. If ``None``, a generic message\n    \"Referral created successfully\" is used.\nfailure_message: str | None = None\n    Optional custom message for failure cases. If ``None``, a generic message including the status code and body is used.\n\nOutputs\n-------\nNone (the skill calls ``apis.supervisor.complete_task`` to finish the current task).\n\nNotes\n-----\n* The skill performs only logical checks; no network calls are made here.\n* It uses the ``apis.supervisor.complete_task`` tool to deliver the final confirmation (or error) back to the user.\n* The skill is reusable for any FHIR resource creation where the caller receives a ``response`` dict from ``fhir post resource``.\n",
+        "content": "if success_status_codes is None:\n    success_status_codes = [201, 200]\n\nstatus = response.get(\"status_code\")\nbody = response.get(\"body\")\n\nif status in success_status_codes:\n    # Successful creation – craft confirmation.\n    message = success_message if success_message is not None else \"Referral created successfully\"\nelse:\n    # Failure – include details for troubleshooting.\n    default_failure = f\"Failed to create referral: HTTP {status}. Details: {body}\"\n    message = failure_message if failure_message is not None else default_failure\n\n# Signal task completion to the supervisor with the chosen message.\napis.supervisor.complete_task(message=message)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848695",
+          "modified_at": "2026-05-18T01:08:11.848796"
+        }
+      },
+      {
+        "name": "fhir get patient by name and birthdate",
+        "document": "Construct a FHIR Patient search URL using provided family name, given name, and birthdate, then perform an HTTP GET request to retrieve matching patient resources.\n\nParameters\n----------\nbase_url: str\n    Base endpoint for the FHIR Patient resource, e.g., \"http://localhost:8080/fhir/Patient\".\nfamily: str\n    Patient's family (last) name.\ngiven: str\n    Patient's given (first) name.\nbirthdate: str\n    Patient's birthdate in ISO format (YYYY-MM-DD).\nheaders: dict | None\n    Optional HTTP headers, such as Authorization.\n\nOutputs\n-------\nresponse: dict\n    Parsed JSON response from the FHIR server containing a Bundle of matching Patient resources.\n\nNotes\n-----\n- The implementation manually URL‑encodes query parameters without external libraries.\n- It returns the raw JSON payload; downstream logic should handle empty bundles or pagination.\n- If the base_url already contains a query string, additional parameters are appended with '&'.",
+        "content": "params = {\n    'family': family,\n    'given': given,\n    'birthdate': birthdate\n}\n# Simple URL encoding (spaces to '+')\nquery_parts = []\nfor key, value in params.items():\n    encoded_value = str(value).replace(' ', '+')\n    query_parts.append(f\"{key}={encoded_value}\")\nquery_string = '&'.join(query_parts)\nfull_url = f\"{base_url}?{query_string}\" if '?' not in base_url else f\"{base_url}&{query_string}\"\n# Perform GET request\nresponse = apis.http.get(url=full_url, headers=headers or {})",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848699",
+          "modified_at": "2026-05-18T01:08:11.848798"
+        }
+      },
+      {
+        "name": "http get json bundle",
+        "document": "Execute an HTTP GET request to a fully‑qualified URL and return the parsed JSON response (commonly a FHIR Bundle). This skill is agnostic to the specific resource type and can be reused for any GET request that returns JSON.\n\nParameters\n----------\nurl : str\n    The complete endpoint URL to request, including any query parameters.\nheaders : dict | None, optional\n    Optional HTTP headers (e.g., Authorization). If omitted, an empty header dict is used.\n\nOutputs\n-------\nresponse : dict\n    The JSON payload parsed into a Python dictionary. For FHIR searches this will be a Bundle containing the matching resources.\n\nNotes\n-----\n1. The skill does **not** perform pagination; callers should handle paging if needed.\n2. If the server returns a non‑200 status, the underlying `apis.http.get` will raise an error – callers may catch it as appropriate.\n3. No external libraries are imported; all processing is done with built‑in string handling and the provided `apis.http.get` tool.",
+        "content": "response = apis.http.get(\n    url=url,\n    headers=headers or {}\n)\n# Ensure we received a JSON object; if not, raise a clear error for downstream handling.\nif not isinstance(response, dict):\n    raise ValueError(f\"Expected JSON dict from GET {url}, got {type(response)}\")",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848704",
+          "modified_at": "2026-05-18T01:08:11.848800"
+        }
+      },
+      {
+        "name": "http post json payload",
+        "document": "Send a JSON payload to a specified HTTP endpoint using a POST request and capture the response.\n\nParameters\n----------\nurl: str\n    The full HTTP URL to which the POST request will be sent (e.g., \"http://localhost:8080/fhir/ServiceRequest\").\njson_body: dict\n    The JSON‑serializable dictionary that will be sent as the request body.\nheaders: dict, optional (default={\"Content-Type\": \"application/json\"})\n    Additional HTTP headers to include in the request.\n\nOutputs\n-------\ndict\n    A dictionary containing at least the keys `status_code` (int) and `content` (str or dict). If the response body is JSON‑parseable, `content` will be the parsed dict; otherwise it will be the raw text.\n\nNotes\n-----\n* The skill performs minimal error handling: it records the HTTP status code and attempts to parse JSON when possible.\n* This skill is generic and can be reused for any POST request that requires a JSON payload, not only FHIR resources.\n* It does **not** raise exceptions; callers should inspect the `status_code` to determine success.\n* The implementation uses the platform‑provided `apis.http.post` tool.\n",
+        "content": "payload = {\n    \"url\": url,\n    \"json\": json_body,\n    \"headers\": headers if headers is not None else {\"Content-Type\": \"application/json\"}\n}\n\n# Execute the POST request via the HTTP tool.\nresponse = apis.http.post(\n    url=payload[\"url\"],\n    json=payload[\"json\"],\n    headers=payload[\"headers\"]\n)\n\n# Normalise the response structure.\nstatus_code = response.get(\"status_code\")\ncontent = response.get(\"content\")\n\n# Attempt to decode JSON content if the response indicates JSON.\nif isinstance(content, str) and content.strip().startswith('{'):\n    try:\n        content = json.loads(content)\n    except Exception:\n        pass\n\n# Store the processed result for downstream use.\nresult = {\n    \"status_code\": status_code,\n    \"content\": content\n}\n",
+        "tools": [
+          "apis.http.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848708",
+          "modified_at": "2026-05-18T01:08:11.848802"
+        }
+      },
+      {
+        "name": "supervisor finish with confirmation",
+        "document": "Terminate the current agent workflow by sending a final, human‑readable confirmation message to the supervising system.\n\nParameters\n----------\nmessage: str\n    The text that should be presented to the user when the task ends. It may contain status information, resource identifiers, or any other relevant details.\n\nOutputs\n-------\nNone (the skill invokes the supervisor API which ends the session). The calling environment will consider the task completed.\n\nNotes\n-----\n* The skill validates that ``message`` is a string and truncates it to a safe length (default 1000 characters) to avoid excessively long outputs.\n* It does **not** raise exceptions; any unexpected type is coerced to ``str``.\n* The underlying tool used is ``apis.supervisor.finish`` which signals the end of the conversation to the platform.\n* This skill is reusable for any scenario where a final confirmation needs to be returned to the user before terminating the workflow.",
+        "content": "# Ensure the provided message is a string.\nif not isinstance(message, str):\n    message = str(message)\n\n# Truncate overly long messages to keep the final output concise.\nMAX_LENGTH = 1000\nif len(message) > MAX_LENGTH:\n    message = message[:MAX_LENGTH] + \"...\"\n\n# Signal completion to the supervising system with the final message.\napis.supervisor.finish(message=message)\n",
+        "tools": [
+          "apis.supervisor.finish"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848712",
+          "modified_at": "2026-05-18T01:08:11.848805"
+        }
+      },
+      {
+        "name": "fhir get observations by code and time window",
+        "document": "Retrieve Observation resources from a FHIR server for a specific patient and observation code that fall within a given time window.\n\nParameters\n----------\nbase_url : str\n    Base URL of the FHIR server (e.g., \"http://localhost:8080/fhir\").\npatient_id : str\n    Identifier of the patient whose observations are being queried.\nobservation_code : str\n    LOINC or other code representing the observation type (e.g., \"MG\" for serum magnesium).\nstart_dt : str\n    ISO‑8601 timestamp marking the start of the time window (inclusive). Use a relative expression like \"gt{now-24h}\" when constructing the query.\nend_dt : str, optional\n    ISO‑8601 timestamp marking the end of the time window (exclusive). If omitted the server defaults to the current time.\n\nOutputs\n-------\nlist[dict]\n    A list of Observation resource dictionaries that satisfy the criteria. Each dictionary corresponds to the \"resource\" field of an entry in the FHIR Bundle response.\n\nNotes\n-----\n1. The skill builds the proper query string (`code`, `patient`, and optional `date` parameters) and issues a GET request via `apis.http.get`.\n2. The raw FHIR Bundle may contain entries outside the requested window (some servers ignore the date filter). The skill therefore parses each Observation's `effectiveDateTime` and filters them to guarantee they lie within the requested interval.\n3. If the server returns no entries, the skill returns an empty list.\n4. No external Python packages are imported; all processing is done with plain Python constructs.\n",
+        "content": "observations = []\n\n# Build request URL and parameters\nurl = f\"{base_url}/Observation\"\nparams = {\n    \"code\": observation_code,\n    \"patient\": patient_id,\n    \"date\": f\"gt{start_dt}\"  # greater than start_dt\n}\nif end_dt:\n    # Append upper bound if provided (e.g., lt{end_dt})\n    params[\"date\"] += f\"&lt{end_dt}\"\n\n# Execute GET request\nresponse = apis.http.get(url=url, params=params)\n\n# The FHIR server returns a Bundle; extract entries safely\nentries = response.get(\"entry\", [])\nfor entry in entries:\n    resource = entry.get(\"resource\", {})\n    # Ensure this is an Observation and has a datetime\n    eff = resource.get(\"effectiveDateTime\")\n    if not eff:\n        continue\n    # Simple string comparison works for ISO‑8601 timestamps\n    if eff >= start_dt and (not end_dt or eff < end_dt):\n        observations.append(resource)\n\n# observations now holds all matching Observation resources\n",
+        "tools": [
+          "apis.http.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848716",
+          "modified_at": "2026-05-18T01:08:11.848807"
+        }
+      },
+      {
+        "name": "fhir create observation",
+        "document": "Submit a prepared Observation resource to a FHIR server using the Observation endpoint.\n\nParameters\n----------\nbase_url: str\n    Base URL of the FHIR server (e.g., \"http://localhost:8080\").\nobservation_resource: dict\n    A fully‑formed Observation dictionary that complies with the FHIR Observation schema (as produced by the `fhir build vital signs observation` skill).\nheaders: dict | None, optional\n    Optional HTTP headers (e.g., Authorization, Content-Type). If omitted, a default header of {\"Content-Type\": \"application/fhir+json\"} will be used.\n\nOutputs\n-------\ncreated_observation: dict | None\n    The Observation resource returned by the server after successful creation (usually contains the server‑assigned ``id`` and ``meta``). Returns ``None`` if the POST fails or the response is malformed.\n\nNotes\n-----\n1. The skill validates that the supplied ``observation_resource`` contains the mandatory ``resourceType`` field set to \"Observation\".\n2. It builds the full endpoint URL, merges any user‑provided headers with the required ``Content-Type`` header, and calls the domain‑specific ``apis.fhir.create_observation`` tool.\n3. After the POST, the response is inspected for a ``resource`` key; if present, that dict is returned, otherwise ``None`` is returned.\n4. No external Python packages are imported; all logic is pure Python.\n",
+        "content": "url = f\"{base_url}/fhir/Observation\"\n\n# Ensure the payload looks like an Observation.\nif not isinstance(observation_resource, dict) or observation_resource.get(\"resourceType\") != \"Observation\":\n    created_observation = None\nelse:\n    # Prepare headers – always include Content-Type for FHIR JSON.\n    default_headers = {\"Content-Type\": \"application/fhir+json\"}\n    merged_headers = default_headers if headers is None else {**default_headers, **headers}\n\n    # Perform the POST request using the domain‑specific FHIR API tool.\n    response = apis.fhir.create_observation(url=url, json=observation_resource, headers=merged_headers)\n\n    # Extract the created resource if the response structure matches a FHIR create response.\n    created_observation = None\n    if response and isinstance(response, dict):\n        # Some servers return the resource directly, others wrap it under \"resource\".\n        if response.get(\"resourceType\") == \"Observation\":\n            created_observation = response\n        else:\n            created_observation = response.get(\"resource\")\n",
+        "tools": [
+          "apis.fhir.create_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-18T01:08:11.848720",
+          "modified_at": "2026-05-18T01:08:11.848809"
+        }
+      }
+    ],
+    "atomic": []
+  },
+  "embeddings": {
+    "model": "Qwen3-Embedding-8B",
+    "index_type": "FAISS-HNSW"
+  }
+}

@@ -1,0 +1,4 @@
+# DeepSeek V4 Flash via an OpenAI-compatible endpoint.
+# Required env: DEEPSEEK_API_BASE. Optional: DEEPSEEK_MODEL.
+model: "openai/${DEEPSEEK_MODEL:-deepseek-v4-flash}"
+base_url: "${DEEPSEEK_API_BASE}"

@@ -1,0 +1,19 @@
+{
+  "answer_format_wrong_type": "Returned a response in an unexpected format or type (e.g., string messages instead of numeric values).",
+  "order_status_not_verified": "Assumed an order was active without explicitly checking its status field.",
+  "average_computed_over_incorrect_interval": "Calculated the same average value for different time windows, ignoring distinct intervals.",
+  "action_taken_without_evaluating_lab_results": "Took clinical action (e.g., ordering repeat labs) without examining the retrieved lab values.",
+  "date_filter_misformatted": "Used an incorrect or malformed date filter syntax, causing the query to miss relevant records.",
+  "date_filter_omitted": "date filter omitted",
+  "wrong_resource_type_queried_for_vaccine": "Queried an incorrect FHIR resource type (e.g., Procedure instead of Immunization) for vaccine information.",
+  "order_created_without_verifying_existing": "Created a new order without first checking for existing active orders, leading to potential duplicates.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "order_created_without_verifying_existing_ct": "Created a new CT Abdomen order without first checking whether an appropriate recent study already existed.",
+  "duplicate_dvt_order_not_resolved": "Identified duplicate DVT prophylaxis orders but did not resolve them by keeping the newest and discontinuing the older order.",
+  "missing_fhir_query_before_decision": "Provided a conclusion or plan without first executing the necessary FHIR query to retrieve the relevant clinical data.",
+  "heart_rate_observations_not_filtered_by_time_window": "Heart‑rate observations were not correctly filtered for the distinct 6‑hour and 12‑hour intervals, leading to incorrect or missing average calculations.",
+  "catheter_removal_order_without_placement_verification": "Issued a catheter removal ServiceRequest without confirming that a catheter placement existed for >48 hours.",
+  "dvt_prophylaxis_order_count_not_verified": "Did not verify the exact number of active DVT prophylaxis orders before asserting compliance.",
+  "stale_ct_not_ordered": "Failed to create a new CT Abdomen order when the most recent study was older than the required 12‑month window.",
+  "medicationrequest_query_missing_active_status_filter": "Query for MedicationRequest omitted the status=active filter, causing a false conclusion that no active opioid orders exist."
+}

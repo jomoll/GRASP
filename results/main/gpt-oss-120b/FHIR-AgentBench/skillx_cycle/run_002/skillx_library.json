@@ -1,0 +1,1339 @@
+{
+  "version": "1.0",
+  "benchmark": "appworld",
+  "created_at": "2026-05-14T08:19:10.772177",
+  "skills": {
+    "planning": {},
+    "functional": [
+      {
+        "name": "fhir get first ICU encounter for patient",
+        "document": "Retrieve all Encounter resources for a given patient, keep only those that represent an ICU stay (any identifier.system contains the substring \"encounter-icu\" case‑insensitively), order them chronologically by the encounter start date, and return the earliest encounter object.\n\nParameters\n----------\npatient_fhir_id: str\n    The FHIR identifier of the patient whose encounters are to be inspected.\n\nOutputs\n-------\ndict | None\n    The full Encounter resource that corresponds to the first ICU visit for the patient, or ``None`` if no ICU encounter is found.\n\nNotes\n-----\n* The function uses the generic ``get_resources_by_patient_fhir_id`` API to fetch Encounter resources.\n* Each Encounter may have multiple identifiers; the filter checks every identifier's ``system`` field for the substring ``\"encounter-icu\"`` in a case‑insensitive manner.\n* Sorting relies on the ISO‑8601 ``period.start`` string; lexical ordering of ISO‑8601 timestamps matches chronological order, so no external date‑parsing library is required.\n* If an Encounter lacks a ``period.start`` value it is treated as the earliest possible date (empty string sorts before any valid timestamp).\n* The skill does **not** print or log the full list; it only produces the selected encounter for downstream use.",
+        "content": "encounters = get_resources_by_patient_fhir_id(\n    resource_type=\"Encounter\",\n    patient_fhir_id=patient_fhir_id\n)\n\n# Keep only ICU encounters – any identifier.system containing \"encounter-icu\"\nicu_encounters = []\nfor enc in encounters:\n    identifiers = enc.get(\"identifier\", [])\n    if any(\"encounter-icu\" in (iden.get(\"system\") or \"\").lower() for iden in identifiers):\n        icu_encounters.append(enc)\n\n# Sort by period.start (ISO‑8601 string). Missing start dates are treated as empty string, which sorts first.\nicu_encounters_sorted = sorted(\n    icu_encounters,\n    key=lambda e: e.get(\"period\", {}).get(\"start\", \"\")\n)\n\nfirst_icu_encounter = icu_encounters_sorted[0] if icu_encounters_sorted else None",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911227",
+          "modified_at": "2026-05-14T08:49:04.911496"
+        }
+      },
+      {
+        "name": "fhir get respiratory rate observations for ICU encounter",
+        "document": "Retrieve all Observation resources for a given patient, then keep only those that represent a respiratory rate measurement and that are linked to a specific ICU encounter.\n\nParameters\n----------\npatient_fhir_id: str\n    The FHIR identifier of the patient whose observations are to be inspected.\nicu_encounter_ref: str\n    The full reference string (e.g., \"Encounter/abc123\") of the ICU encounter that should be associated with the observations.\n\nOutputs\n-------\nlist[dict]\n    A list of Observation resources that (1) have a coding entry whose ``code`` or ``display`` contains the phrase \"respiratory rate\" (case‑insensitive) and (2) whose ``encounter.reference`` matches ``icu_encounter_ref``.\n\nNotes\n-----\n* The skill uses the generic ``get_resources_by_patient_fhir_id`` API to fetch Observation resources.\n* Respiratory‑rate observations are identified by searching **any** coding entry in ``observation['code']['coding']`` for the substring \"respiratory rate\" in either the ``code`` or ``display`` fields.\n* The encounter reference may appear in the observation as ``observation['encounter']['reference']``; the skill performs an exact string match against the provided ``icu_encounter_ref``.\n* The function does not print or log the full payload; it only returns the filtered list for downstream calculations.\n* If no matching observations are found, an empty list is returned.",
+        "content": "observations = get_resources_by_patient_fhir_id(\n    resource_type=\"Observation\",\n    patient_fhir_id=patient_fhir_id\n)\n\nfiltered = []\nfor obs in observations:\n    # ----- filter by respiratory‑rate coding -----\n    code_block = obs.get(\"code\", {})\n    codings = code_block.get(\"coding\", [])\n    has_rr = any(\n        (\n            (coding.get(\"code\") or \"\").lower().find(\"respiratory rate\") != -1)\n            or (coding.get(\"display\") or \"\").lower().find(\"respiratory rate\") != -1\n        )\n        for coding in codings\n    )\n    if not has_rr:\n        continue\n\n    # ----- filter by encounter reference -----\n    encounter_ref = obs.get(\"encounter\", {}).get(\"reference\", \"\")\n    if encounter_ref != icu_encounter_ref:\n        continue\n\n    filtered.append(obs)\n",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911264",
+          "modified_at": "2026-05-14T08:49:04.911501"
+        }
+      },
+      {
+        "name": "format_difference_and_complete_task",
+        "document": "Create a human‑readable answer that combines a numeric difference with its measurement unit and submit the answer via the supervisor API.\n\nParameters\n----------\n difference: float | int\n     The numeric difference between two measurements (second – first).\n unit: str\n     The unit string to append to the numeric value (e.g., \"breaths per minute\").\n\nOutputs\n-------\nNone\n     The skill calls ``apis.supervisor.complete_task`` with the formatted answer; the API's return value is not used further.\n\nNotes\n-----\n* The numeric value is formatted to show a sign (\"+\" or \"-\") when appropriate and is stripped of unnecessary trailing zeros.\n* If ``difference`` is ``None`` the skill reports that the difference could not be computed.\n* No external libraries are imported; all processing is done with built‑in string and numeric operations.\n* This skill is generic and can be reused for any numeric difference with any unit, not only respiratory‑rate values.",
+        "content": "if difference is None:\n    answer = \"Unable to compute the difference between the two measurements.\"\nelse:\n    # format number: keep sign, avoid excessive decimal places\n    if isinstance(difference, float):\n        # use general format, strip trailing zeros\n        formatted_num = f\"{difference:+g}\"\n    else:\n        formatted_num = f\"{int(difference):+d}\"\n    answer = f\"{formatted_num} {unit}\"  # e.g., \"-7 breaths per minute\"\n\n# Submit the answer to the supervising system\napis.supervisor.complete_task(answer=answer)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911273",
+          "modified_at": "2026-05-14T08:49:04.911504"
+        }
+      },
+      {
+        "name": "fetch all patient resources with pagination",
+        "document": "Retrieve every resource of a specified FHIR type for a given patient by iteratively paging through results until no more records are returned.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to fetch (e.g., \"Encounter\", \"MedicationRequest\").\npatient_fhir_id: str\n    The unique FHIR identifier of the patient whose resources are being queried.\npage_limit: int, optional (default=20)\n    Number of resources to request per page. Adjust to balance between request size and performance.\n\nOutputs\n-------\nlist[dict]\n    A list containing all retrieved resource objects of the specified type for the patient.\n\nNotes\n-----\n1. The underlying ``get_resources_by_patient_fhir_id`` tool supports pagination via ``page_index`` and ``page_limit`` parameters.\n2. The loop stops when an empty page is returned, indicating that all resources have been fetched.\n3. If the API returns an error or unexpected structure, the skill will raise an exception with a clear message.\n4. This skill is generic and can be reused for any resource type, not only Encounter resources.",
+        "content": "all_resources = []\npage_index = 0\nwhile True:\n    batch = get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page_index,\n        page_limit=page_limit\n    )\n    if not isinstance(batch, list):\n        raise ValueError(f\"Unexpected response type for {resource_type}: {type(batch)}\")\n    if not batch:  # empty list signals end of pagination\n        break\n    all_resources.extend(batch)\n    page_index += 1",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911281",
+          "modified_at": "2026-05-14T08:49:04.911505"
+        }
+      },
+      {
+        "name": "fhir get all patient resources",
+        "document": "Retrieve every FHIR resource of a specified type for a given patient by paging through results until no more pages are returned.\n\nParameters\n----------\nresource_type : str\n    The FHIR resource type to retrieve (e.g., \"MedicationRequest\", \"Observation\", \"Condition\").\npatient_fhir_id : str\n    The unique FHIR identifier for the patient whose resources are being requested.\n\nOutputs\n-------\nlist[dict]\n    A list containing all resource objects of the requested type that belong to the patient.\n\nNotes\n-----\n* The underlying API `apis.fhir.get_resources_by_patient_fhir_id` supports pagination via `page_index` and `page_limit`. This skill iterates over pages until an empty batch is received, ensuring complete retrieval without requiring the caller to manage pagination.\n* Adjust `page_limit` if the environment imposes different paging constraints.\n* The function does not perform any filtering beyond the requested type; further processing should be done downstream.",
+        "content": "resources = []\npage = 0\npage_limit = 20  # reasonable default; can be changed if needed\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page,\n        page_limit=page_limit\n    )\n    if not batch:  # empty list signals no more pages\n        break\n    resources.extend(batch)\n    page += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911297",
+          "modified_at": "2026-05-14T08:49:04.911507"
+        }
+      },
+      {
+        "name": "format_and_complete_task",
+        "document": "Prepare a human‑readable response from a numeric result and send it back to the orchestrating system using the supervisor completion API.\n\nParameters\n----------\nresult_value: float | int\n    The numeric value that should be communicated to the user (e.g., a weight difference).\nunit: str\n    The unit associated with ``result_value`` (e.g., \"kg\", \"cm\"). If an empty string is supplied the unit is omitted.\nmessage_template: str, optional\n    A Python format string that contains a ``{value}`` placeholder and optionally a ``{unit}`` placeholder. If omitted a default template of \"The result is {value}{unit}.\" is used.\ntask_id: str\n    Identifier of the current task/session that the supervisor API expects to close.\n\nOutputs\n-------\nNone\n    The skill calls ``apis.supervisor.complete_task`` which signals task completion; no explicit return value is required.\n\nNotes\n-----\n* The skill performs **local formatting only**; the only external interaction is the single call to ``apis.supervisor.complete_task``.\n* ``message_template`` can be any string that uses ``{value}`` and optionally ``{unit}``. Example: \"Weight difference: {value} {unit}.\"\n* The function does **not** perform any rounding unless the caller includes it in the template; however, a default two‑decimal formatting is applied when using the built‑in template.\n* This skill is generic and can be reused for any numeric answer (weight, blood pressure, lab value, etc.).",
+        "content": "if not message_template:\n    # default template with two‑decimal formatting\n    formatted = f\"The result is {result_value:.2f}{unit if unit else ''}.\"\nelse:\n    # ensure placeholders exist; fallback to default if missing\n    try:\n        formatted = message_template.format(value=result_value, unit=unit)\n    except KeyError:\n        # missing placeholder – use safe default\n        formatted = f\"The result is {result_value:.2f}{unit if unit else ''}.\"\n\n# Send the formatted response back via the supervisor API\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=formatted\n)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911305",
+          "modified_at": "2026-05-14T08:49:04.911509"
+        }
+      },
+      {
+        "name": "fhir format diagnosis answer and complete task",
+        "document": "Compose a concise natural‑language answer that states whether a patient received any disease diagnoses during their most recent hospital encounter and optionally enumerates the unique diagnosis names. The generated answer is then submitted to the supervising system via the `apis.supervisor.complete_task` API.\n\nParameters\n----------\nhas_conditions: bool\n    ``True`` if at least one Condition resource linked to the encounter was found; ``False`` otherwise.\nunique_diagnoses: list[str]\n    A list of distinct diagnosis names extracted from the relevant Condition resources. May be empty when ``has_conditions`` is ``False``.\ntask_id: str\n    Identifier of the current supervisory task that must be completed with the final answer.\n\nOutputs\n-------\nNone (the skill performs its effect by calling ``apis.supervisor.complete_task``).\n\nNotes\n-----\n1. The answer is phrased in a single sentence for brevity. When diagnoses are present they are joined with commas.\n2. No external libraries are imported; only built‑in string handling is used.\n3. The skill is reusable for any patient/encounter context where a Boolean flag and a list of diagnosis names are already prepared.\n4. The skill does **not** return a value; its purpose is to communicate the result back to the supervising workflow.\n",
+        "content": "if has_conditions:\n    # Join the unique diagnosis names with commas for readability\n    diagnoses_text = ', '.join(unique_diagnoses)\n    answer = f\"Yes, the patient received disease diagnoses in the last hospital encounter: {diagnoses_text}.\"\nelse:\n    answer = \"No, the patient did not receive any disease diagnoses in the last hospital encounter.\"\n\n# Submit the answer to the supervising system\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=answer\n)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911313",
+          "modified_at": "2026-05-14T08:49:04.911510"
+        }
+      },
+      {
+        "name": "fhir fetch all resources by patient ID",
+        "document": "Retrieve every FHIR resource of a given type that is linked to a specific patient. The skill iterates through paginated results (if the underlying API supports pagination) until no more records are returned, then aggregates them into a single list.\n\nParameters\n----------\npatient_fhir_id : str\n    The unique FHIR identifier for the patient whose resources are being queried.\nresource_type : str\n    The FHIR resource type to retrieve (e.g., \"Encounter\", \"Observation\", \"MedicationRequest\").\npage_limit : int, optional (default=20)\n    Number of items to request per page when pagination is supported.\n\nOutputs\n-------\nlist[dict]\n    A list containing all retrieved resource objects of the requested type for the patient.\n\nNotes\n-----\n1. The underlying API `get_resources_by_patient_fhir_id` may return a paginated response. This skill abstracts that detail by looping until an empty page is received.\n2. Do **not** assume the API returns the full dataset in a single call; always check for an empty batch to terminate the loop.\n3. The returned list can be further filtered or inspected by downstream logic.\n",
+        "content": "resources = []\npage_index = 0\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page_index,\n        page_limit=page_limit\n    )\n    if not batch:  # empty list signals no more pages\n        break\n    resources.extend(batch)\n    page_index += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911324",
+          "modified_at": "2026-05-14T08:49:04.911512"
+        }
+      },
+      {
+        "name": "supervisor complete task with boolean",
+        "document": "Send the final boolean outcome of a reasoning task back to the supervising system via the `apis.supervisor.complete_task` endpoint.\n\nParameters\n----------\ntask_id : str\n    Identifier of the task that the agent is completing. Must be a non‑empty string.\nresult : bool\n    The boolean answer to the original question (e.g., whether the last creatinine value is less than the second‑to‑last value).\nmessage : str, optional\n    Optional free‑text explanation that will be attached to the task completion payload. If omitted an empty string is sent.\n\nOutputs\n-------\nresponse : dict\n    The JSON response returned by the supervisor API. Typically contains fields such as ``status`` and ``task_id``.\n\nNotes\n-----\n1. The skill validates that ``task_id`` is a non‑empty string and that ``result`` is a ``bool``; otherwise a ``ValueError`` is raised.\n2. The boolean is converted to a lower‑case string (\"true\"/\"false\") because the supervisor endpoint expects a JSON payload where booleans may be represented as strings in some deployments.\n3. Any exception raised by the underlying API call is re‑raised after adding contextual information to aid debugging.\n4. This skill does **not** perform any further business logic – it merely formats and forwards the result, making it reusable for any boolean‑type task completion.",
+        "content": "if not isinstance(task_id, str) or not task_id.strip():\n    raise ValueError('task_id must be a non‑empty string')\n\nif not isinstance(result, bool):\n    raise ValueError('result must be a bool')\n\n# Normalise optional message\nmsg = '' if message is None else str(message)\n\n# Convert bool to lower‑case string for payload compatibility\nresult_str = str(result).lower()\n\npayload = {\n    'task_id': task_id.strip(),\n    'result': result_str,\n    'message': msg\n}\n\n# Call the supervisor API – any network‑level exception will propagate\nresponse = apis.supervisor.complete_task(**payload)\n\n# The variable ``response`` now holds the supervisor's JSON reply for downstream use",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911335",
+          "modified_at": "2026-05-14T08:49:04.911514"
+        }
+      },
+      {
+        "name": "fhir retrieve all resources for patient",
+        "document": "Retrieve every resource of a specified FHIR type for a given patient using the patient's FHIR ID. The skill handles pagination by repeatedly calling the `get_resources_by_patient_fhir_id` tool until no more pages are returned.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to retrieve (e.g., \"Observation\", \"Condition\", \"MedicationStatement\").\npatient_fhir_id: str\n    The unique FHIR identifier for the patient whose resources are being requested.\npage_limit: int, optional (default=50)\n    Maximum number of resources to request per page. Adjust based on API limits.\n\nOutputs\n-------\nlist[dict]\n    A flat list containing all retrieved resource objects of the requested type for the patient.\n\nNotes\n-----\n1. The underlying `get_resources_by_patient_fhir_id` tool is expected to accept `resource_type`, `patient_fhir_id`, `page_index`, and `page_limit` arguments and return a list of resource dictionaries for the requested page.\n2. If the API does not support pagination parameters, the loop will execute only once and return the initial batch.\n3. The skill does not perform any domain‑specific filtering; callers can apply further processing on the returned list as needed.\n",
+        "content": "resources = []\npage = 0\nwhile True:\n    batch = get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page,\n        page_limit=page_limit\n    )\n    if not batch:  # Empty list signals no more pages\n        break\n    resources.extend(batch)\n    page += 1",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280100",
+          "modified_at": "2026-05-14T09:26:30.280275"
+        }
+      },
+      {
+        "name": "fhir get all resources by patient id",
+        "document": "Retrieve every resource of a specified FHIR type for a given patient using the patient's FHIR identifier. The skill handles potential pagination by repeatedly invoking the `get_resources_by_patient_fhir_id` API until no further pages are returned, then returns a clean list of resource dictionaries.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to retrieve (e.g., \"Encounter\", \"Observation\", \"MedicationRequest\").\npatient_fhir_id: str\n    The unique FHIR identifier for the patient whose resources are being requested.\n\nOutputs\n-------\nlist[dict]\n    A list containing all retrieved resources of the requested type for the patient.\n\nNotes\n-----\n1. The underlying API may support pagination via `page_index` and `page_limit`. This skill abstracts that detail and aggregates results across pages.\n2. The function normalises the returned data by discarding any `None` entries and ensuring the final output is a flat list.\n3. No domain‑specific filtering is performed here; callers can apply additional filters (e.g., encounter class, observation code) after obtaining the full list.",
+        "content": "resources = []\npage_index = 0\npage_limit = 50  # reasonable batch size to avoid over‑fetching\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page_index,\n        page_limit=page_limit\n    )\n    # Guard against unexpected None or empty responses\n    if not batch:\n        break\n    # Ensure batch is iterable and filter out any falsy entries\n    clean_batch = [r for r in batch if r]\n    resources.extend(clean_batch)\n    # If the returned batch is smaller than the limit, we have reached the last page\n    if len(batch) < page_limit:\n        break\n    page_index += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627940",
+          "modified_at": "2026-05-14T13:44:22.628191"
+        }
+      },
+      {
+        "name": "task complete with numeric result",
+        "document": "Send a numeric result back to the supervising system as the final answer for a task.\n\nParameters\n----------\nresult: float | None\n    The numeric value to report (e.g., weight difference). If ``None`` the skill reports that the calculation could not be performed.\npatient_fhir_id: str\n    Identifier of the patient for which the result was computed – used only for message formatting.\nmetric_name: str, optional (default=\"weight difference\")\n    Human‑readable description of the metric being reported.\nunits: str, optional (default=\"kg\")\n    Units associated with ``result``; included in the answer string.\n\nOutputs\n-------\nNone\n    The skill performs a side‑effect call to ``apis.supervisor.complete_task``; it does not return a value.\n\nNotes\n-----\n1. The skill validates the ``result`` and builds a clear answer string, handling the case where the calculation failed.\n2. It formats the numeric value to two decimal places for readability.\n3. The call to ``apis.supervisor.complete_task`` is the only external interaction; no other tools are used.\n4. This skill is generic – it can be reused for any numeric answer, not only weight differences.",
+        "content": "answer: str\nif result is None:\n    # No usable value – inform the supervisor that the computation failed.\n    answer = (\n        f\"Unable to compute {metric_name} for patient {patient_fhir_id} \"\n        \"because the required observations are missing or incomplete.\"\n    )\nelse:\n    # Format the numeric result with two decimal places.\n    formatted = f\"{result:.2f}\"\n    answer = (\n        f\"The {metric_name} for patient {patient_fhir_id} is \"\n        f\"{formatted} {units}.\"\n    )\n# Complete the task by sending the answer back to the supervisor.\napis.supervisor.complete_task(answer=answer)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911358",
+          "modified_at": "2026-05-14T08:49:04.911518"
+        }
+      },
+      {
+        "name": "respond_yes_no_based_on_item_presence",
+        "document": "Return a concise Yes/No answer to the supervising system depending on whether a supplied collection contains at least one element. The skill normalises the presence check, maps the boolean result to configurable affirmative/negative strings, and sends the answer back via the `apis.supervisor.complete_task` endpoint.\n\nParameters\n----------\nitems: list[dict]\n    The collection whose non‑emptiness determines the answer (e.g., a list of Procedure resources that matched the query).\ntask_id: str\n    Identifier of the current task that the supervisor expects a response for.\naffirmative: str, optional (default=\"Yes\")\n    Text to return when ``items`` is non‑empty.\nnegative: str, optional (default=\"No\")\n    Text to return when ``items`` is empty.\n\nOutputs\n-------\nNone\n    The skill sends the answer to the supervisor; no value is returned to the caller.\n\nNotes\n-----\n1. The skill performs a simple truthiness check but includes an explicit mapping step to keep the logic clear and reusable.\n2. It does **not** print or log the answer; the only side‑effect is the API call.\n3. If ``task_id`` is missing or empty, the skill will raise a ValueError to alert the caller.\n4. The implementation avoids importing external modules and relies solely on built‑in Python constructs.",
+        "content": "if not task_id:\n    raise ValueError('task_id must be provided to complete the task')\n\n# Step 1: Determine presence of at least one item\nhas_item = bool(items)\n\n# Step 2: Map boolean to answer string\nanswer = affirmative if has_item else negative\n\n# Step 3: Send the answer back to the supervising system\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=answer\n)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911363",
+          "modified_at": "2026-05-14T08:49:04.911520"
+        }
+      },
+      {
+        "name": "fhir format diagnosis presence answer",
+        "document": "Generate a concise textual answer indicating whether any diagnosis (Condition resources) were recorded for a particular encounter and, if so, list their human‑readable names or codes.\n\nParameters\n----------\nconditions: list[dict]\n    The list of Condition resources that have already been filtered to those associated with the target encounter.\ndisplay_path: list[str], optional (default=[\"code\", \"coding\", 0, \"display\"])\n    Path of keys/indices to follow inside each Condition to obtain a displayable diagnosis string. The path may contain integer indices for list navigation.\nmax_list: int, optional (default=10)\n    Maximum number of diagnosis strings to include in the answer; excess items are omitted for brevity.\n\nOutputs\n-------\nstr\n    \"Yes\" followed by a colon and a comma‑separated list of diagnosis display strings when at least one Condition is present, e.g. \"Yes: Acute embolism, Chronic heart failure\". If the list is empty, returns \"No\".\n\nNotes\n-----\n* The skill performs only local Python processing – no external API calls are required.\n* If a Condition lacks the requested display field, it is skipped in the list.\n* The implementation safely handles missing keys, list indices, and non‑string values.\n* This skill is reusable for any collection of Condition‑like resources where a textual identifier is stored in a nested field.",
+        "content": "def _extract_by_path(item, path):\n    \"\"\"Traverse *item* following *path* (which may contain int indices) and return the leaf value or ``None``.\n    Missing keys/indices are ignored and result in ``None``.\n    \"\"\"\n    for p in path:\n        if isinstance(p, int):\n            if isinstance(item, list) and 0 <= p < len(item):\n                item = item[p]\n            else:\n                return None\n        else:\n            if isinstance(item, dict):\n                item = item.get(p)\n            else:\n                return None\n        if item is None:\n            return None\n    return item\n\n# Step 1: Determine presence of any Condition records\nhas_conditions = bool(conditions)\n\n# Step 2: If present, extract up to *max_list* display strings\nif has_conditions:\n    diagnosis_strings = []\n    for cond in conditions:\n        display = _extract_by_path(cond, display_path)\n        if isinstance(display, str) and display.strip():\n            diagnosis_strings.append(display.strip())\n        if len(diagnosis_strings) >= max_list:\n            break\n    # Step 3: Build answer string\n    if diagnosis_strings:\n        answer = \"Yes: \" + \", \".join(diagnosis_strings)\n    else:\n        # No usable display values found\n        answer = \"Yes\"\nelse:\n    answer = \"No\"",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911370",
+          "modified_at": "2026-05-14T08:49:04.911522"
+        }
+      },
+      {
+        "name": "format timestamp and complete task",
+        "document": "Convert a datetime object (or ``None``) into a human‑readable string and send the result back to the orchestrating supervisor as the final answer.\n\nParameters\n----------\ntimestamp: datetime | None\n    The timestamp to be reported. If ``None`` the skill reports that no matching observation was found.\nformat_str: str, optional\n    A ``datetime.strftime`` format string. Defaults to ISO‑8601 style ``\"%Y-%m-%dT%H:%M:%S\"``.\n\nOutputs\n-------\nNone (the skill signals completion via ``supervisor.complete_task``).\n\nNotes\n-----\n1. The skill does **not** perform any further data processing; it only formats and returns the result.\n2. If ``timestamp`` is ``None`` a helpful message is returned instead of raising an error.\n3. The implementation deliberately avoids importing additional modules; it relies only on the standard ``datetime`` methods and the ``supervisor.complete_task`` tool provided by the environment.\n4. This skill is generic and can be reused for any situation where a datetime needs to be presented as the final answer of a task.",
+        "content": "answer = None\nif timestamp is None:\n    answer = \"No matching observation was found within the specified window.\"\nelse:\n    # Use provided format or default ISO‑8601 style\n    fmt = format_str if format_str is not None else \"%Y-%m-%dT%H:%M:%S\"\n    answer = timestamp.strftime(fmt)\n\n# Send the answer back to the supervisor (or equivalent task‑completion mechanism)\nsupervisor.complete_task({\n    \"answer\": answer\n})",
+        "tools": [
+          "supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911376",
+          "modified_at": "2026-05-14T08:49:04.911523"
+        }
+      },
+      {
+        "name": "fhir filter medication requests by encounter ids",
+        "document": "Filter a list of MedicationRequest resources so that only those linked to a specified set of Encounter IDs remain.\n\nParameters\n----------\nmedication_requests: list[dict]\n    The collection of MedicationRequest resources to be filtered. Each resource is expected to contain an ``encounter`` element that may be a dict with a ``reference`` field (e.g., \"Encounter/abc123\") or a plain string reference.\nencounter_ids: set[str] | list[str]\n    The collection of Encounter IDs that are considered relevant (e.g., the ID of the latest hospital encounter plus any child encounter IDs).\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resources whose ``encounter`` reference matches any ID in ``encounter_ids``.\n\nNotes\n-----\n1. The function tolerates both dictionary and string forms for the ``encounter`` field.\n2. When the reference is a full FHIR reference (\"Encounter/{id}\"), the ID is extracted by splitting on '/' and taking the last segment.\n3. If a MedicationRequest lacks an ``encounter`` reference, it is excluded from the result.\n4. No external APIs are called; the operation runs entirely on the provided data structures.",
+        "content": "filtered_requests = []\n# Ensure encounter_ids is a set for O(1) look‑ups\nif not isinstance(encounter_ids, set):\n    encounter_ids = set(encounter_ids)\n\nfor mr in medication_requests:\n    enc = mr.get('encounter')\n    if not enc:\n        continue\n    # ``enc`` may be a dict with a ``reference`` key or a plain string\n    if isinstance(enc, dict):\n        ref = enc.get('reference', '')\n    else:\n        ref = str(enc)\n    # Extract the encounter ID from a possible \"Encounter/{id}\" reference\n    encounter_id = ref.split('/')[-1] if '/' in ref else ref\n    if encounter_id in encounter_ids:\n        filtered_requests.append(mr)",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911382",
+          "modified_at": "2026-05-14T08:49:04.911525"
+        }
+      },
+      {
+        "name": "compose_change_answer",
+        "document": "Generate a concise natural‑language response that reports the numeric change of a measurement between two timestamps, or indicates that the required observations are missing. The skill also sends the answer to the task supervisor via the provided API.\n\nParameters\n----------\nchange: float | None\n    The computed difference between the later and earlier measurement values. ``None`` signals that one or both values were unavailable.\nstatus: str\n    Indicates whether a numeric change could be computed. Expected values are \"computed\" or \"not found\".\nmeasurement_name: str\n    Human‑readable name of the measurement (e.g., \"respiratory rate\").\nlater_time: str | datetime\n    Timestamp of the later observation (e.g., \"2129-01-12 13:00:00\").\nearlier_time: str | datetime\n    Timestamp of the earlier observation (e.g., \"2129-01-12 12:00:00\").\nunit: str | None, optional\n    Unit of the measurement (e.g., \"breaths/min\"). If ``None`` the unit is omitted from the answer.\n\nOutputs\n-------\nNone (the skill sends the answer via ``apis.supervisor.complete_task``).\n\nNotes\n-----\n* The skill builds the answer string locally; no external data is fetched.\n* It formats the numeric change with up to two decimal places when available.\n* If ``status`` is not \"computed\" the answer states that the required observations were not found.\n* The final answer is transmitted using the supervisor API, which is the standard mechanism for completing a user task.\n",
+        "content": "if status == \"computed\" and change is not None:\n    # Normalise timestamps to strings for readability\n    later_str = later_time if isinstance(later_time, str) else later_time.strftime('%Y-%m-%d %H:%M:%S')\n    earlier_str = earlier_time if isinstance(earlier_time, str) else earlier_time.strftime('%Y-%m-%d %H:%M:%S')\n    # Prepare unit suffix if provided\n    unit_suffix = f\" {unit}\" if unit else \"\"\n    answer = (\n        f\"The {measurement_name} changed by {change:.2f}{unit_suffix} \"\n        f\"between {earlier_str} and {later_str}.\"\n    )\nelse:\n    answer = (\n        f\"The required observations for {measurement_name} at the specified times were not \"\n        \"available, so the change cannot be determined.\"\n    )\n# Send the answer to the supervisor to complete the task\napis.supervisor.complete_task(answer=answer)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911389",
+          "modified_at": "2026-05-14T08:49:04.911526"
+        }
+      },
+      {
+        "name": "extract quantity value and unit from observation",
+        "document": "Extract the numeric value and its unit from an Observation's ``valueQuantity`` field and return a human‑readable string.\n\nParameters\n----------\nobservation : dict\n    A single FHIR Observation resource dictionary that is expected to contain a ``valueQuantity`` entry.\n\nOutputs\n-------\nstr\n    A formatted string ``\"{value} {unit}\"`` (e.g., \"70.3 kg\"). If the required fields are missing, an empty string is returned.\n\nNotes\n-----\n1. The skill performs defensive checks: it verifies that ``valueQuantity`` exists and that both ``value`` and ``unit`` are present and of the correct type.\n2. The numeric value is converted to ``float`` to handle both integer and decimal representations, then stripped of trailing ``.0`` for cleaner output.\n3. No external APIs or packages are used; all processing is performed locally.\n",
+        "content": "weight_str = ''\n\n# Guard against a malformed observation\nif isinstance(observation, dict):\n    vq = observation.get('valueQuantity')\n    if isinstance(vq, dict):\n        val = vq.get('value')\n        unit = vq.get('unit')\n        # Ensure both components are present and of expected types\n        if isinstance(val, (int, float)) and isinstance(unit, str):\n            # Normalise the numeric representation\n            val_float = float(val)\n            # Remove unnecessary trailing .0\n            if val_float.is_integer():\n                val_str = str(int(val_float))\n            else:\n                val_str = str(val_float)\n            weight_str = f\"{val_str} {unit.strip()}\"\n\n# The variable ``weight_str`` now holds the formatted result (or remains empty if extraction failed).",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911395",
+          "modified_at": "2026-05-14T08:49:04.911528"
+        }
+      },
+      {
+        "name": "supervisor complete task with formatted response",
+        "document": "Send the final answer string back to the supervising system using the `apis.supervisor.complete_task` endpoint.\n\nParameters\n----------\nanswer : str\n    The human‑readable response that should be presented to the user (e.g., \"70.3 kg\").\n\nOutputs\n-------\nNone\n    The skill performs a side‑effect call to the supervisor API; it does not return a value.\n\nNotes\n-----\n1. The function validates that the provided answer is a non‑empty string.\n2. Leading/trailing whitespace is stripped and internal newlines are collapsed to a single space to keep the payload compact.\n3. If the cleaned answer exceeds 2000 characters, it is truncated to that limit to avoid payload‑size errors.\n4. The skill logs (via a local `debug_log` variable) the original and cleaned answer for debugging purposes before invoking the API.\n5. No external Python packages are imported; all processing is performed with built‑in string operations.\n",
+        "content": "# Validate the input\nif not isinstance(answer, str):\n    raise ValueError(\"Answer must be a string.\")\n\n# Preserve the original for possible debugging\noriginal_answer = answer\n\n# Clean up whitespace: strip ends and collapse internal whitespace\ncleaned = \" \".join(answer.strip().split())\n\n# Enforce a reasonable length limit for the supervisor payload\nMAX_LEN = 2000\nif len(cleaned) > MAX_LEN:\n    cleaned = cleaned[:MAX_LEN]\n\n# Optional debug log (can be inspected by the calling context)\ndebug_log = {\n    \"original\": original_answer,\n    \"cleaned\": cleaned,\n    \"truncated\": len(cleaned) < len(original_answer)\n}\n\n# Call the supervisor API to complete the task\napis.supervisor.complete_task(answer=cleaned)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911401",
+          "modified_at": "2026-05-14T08:49:04.911530"
+        }
+      },
+      {
+        "name": "fhir get patient medication_requests",
+        "document": "Retrieve every MedicationRequest resource linked to a specific patient from the FHIR server, with optional status filtering.\n\nParameters\n----------\npatient_fhir_id : str\n    The unique FHIR identifier of the patient whose medication requests are required.\nstatus_filter : list[str] | None, optional\n    A list of MedicationRequest status codes (e.g., \"active\", \"completed\") to limit the results. If ``None`` all statuses are returned.\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resource dictionaries that match the optional filter.\n\nNotes\n-----\n1. The underlying tool ``get_resources_by_patient_fhir_id`` handles pagination and low‑level API errors.\n2. This skill adds a lightweight post‑processing step to optionally filter by the ``status`` element, making it reusable for callers that only need a subset of requests.\n3. If the API returns an empty list, the skill returns an empty list as well.\n",
+        "content": "med_requests = get_resources_by_patient_fhir_id(\n    resource_type=\"MedicationRequest\",\n    patient_fhir_id=patient_fhir_id\n)\n\n# Optional post‑processing: filter by status if a filter list is supplied\nif status_filter is not None:\n    lowered_filter = [s.lower() for s in status_filter]\n    medication_requests = [mr for mr in med_requests if mr.get('status', '').lower() in lowered_filter]\nelse:\n    medication_requests = med_requests",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911407",
+          "modified_at": "2026-05-14T08:49:04.911532"
+        }
+      },
+      {
+        "name": "fhir get medications_from_requests",
+        "document": "Retrieve the Medication resources that are referenced by a patient's MedicationRequest resources. This skill extracts the ``medicationReference`` identifiers from each MedicationRequest, de‑duplicates them, fetches the corresponding Medication resources from the FHIR server, and returns a mapping from Medication id to the full Medication resource (including display names, codes, etc.).\n\nParameters\n----------\npatient_fhir_id : str\n    The unique FHIR identifier of the patient whose medication data is required.\nmedication_requests : list[dict] | None, optional\n    A list of MedicationRequest resource dictionaries already obtained for the patient. If ``None`` the skill will retrieve all MedicationRequest resources for the patient using ``get_resources_by_patient_fhir_id``.\n\nOutputs\n-------\nmedication_map : dict[str, dict]\n    A dictionary where each key is a Medication resource ``id`` and the value is the full Medication resource dictionary returned by the FHIR API. This enables callers to look up display names or other attributes using the Medication id.\n\nNotes\n-----\n1. The skill uses the low‑level tool ``get_resources_by_patient_fhir_id`` for both MedicationRequest and Medication resources; it does **not** rely on other higher‑level skills to stay self‑contained.\n2. If a MedicationRequest does not contain a ``medicationReference`` (e.g., it references a medicationCodeableConcept instead), that request is ignored for the purpose of this lookup.\n3. The function silently skips any referenced Medication that cannot be retrieved (e.g., missing on the server) and simply omits it from the result.\n4. The returned ``medication_map`` can be used to obtain a human‑readable name via ``medication_map[id].get('code', {}).get('text')`` or similar fields depending on the server's Medication representation.",
+        "content": "medication_map = {}\n\n# ------------------------------------------------------------------\n# Step 1: Obtain MedicationRequest resources if they are not supplied.\n# ------------------------------------------------------------------\nif medication_requests is None:\n    medication_requests = get_resources_by_patient_fhir_id(\n        resource_type=\"MedicationRequest\",\n        patient_fhir_id=patient_fhir_id\n    )\n\n# ------------------------------------------------------------------\n# Step 2: Extract unique Medication resource IDs from the requests.\n# ------------------------------------------------------------------\nmedication_ids = set()\nfor mr in medication_requests:\n    # Medication may be referenced via ``medicationReference``\n    med_ref = mr.get('medicationReference')\n    if isinstance(med_ref, dict):\n        # FHIR references are usually of the form \"Medication/{id}\" or just the id.\n        ref = med_ref.get('reference', '')\n        # Split on '/' and take the last segment as the id.\n        if '/' in ref:\n            _, med_id = ref.split('/')[-2:]\n        else:\n            med_id = ref\n        if med_id:\n            medication_ids.add(med_id)\n    # If a medicationCodeableConcept is used instead, we cannot resolve a Medication resource.\n    # Those cases are intentionally ignored for this skill.\n\n# ------------------------------------------------------------------\n# Step 3: Retrieve all Medication resources for the patient.\n# ------------------------------------------------------------------\nall_medications = get_resources_by_patient_fhir_id(\n    resource_type=\"Medication\",\n    patient_fhir_id=patient_fhir_id\n)\n\n# Build a quick lookup from id to resource.\nmed_by_id = {med.get('id'): med for med in all_medications if med.get('id')}\n\n# ------------------------------------------------------------------\n# Step 4: Populate the output map with only the medications that were referenced.\n# ------------------------------------------------------------------\nfor med_id in medication_ids:\n    med_resource = med_by_id.get(med_id)\n    if med_resource:\n        medication_map[med_id] = med_resource\n\n# ``medication_map`` now contains the Medication resources needed for further processing.",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911414",
+          "modified_at": "2026-05-14T08:49:04.911534"
+        }
+      },
+      {
+        "name": "return final answer",
+        "document": "Submit the final result of a workflow to the supervising system.\n\nParameters\n----------\nanswer_text : str\n    The human‑readable answer that should be presented to the user. The string is trimmed of surrounding whitespace; if it is empty after trimming, the skill raises a ValueError.\n\nOutputs\n-------\nNone\n    The skill performs a side‑effect by invoking the `supervisor.complete_task` tool; it does not return a value to the caller.\n\nNotes\n-----\n1. This skill is deliberately generic – it can be used to return any textual answer, not only medication names.\n2. The implementation validates that the supplied answer is non‑empty before calling the supervisor, providing a clear error for callers that forget to generate an answer.\n3. The tool `supervisor.complete_task` is expected to accept a dictionary with an `answer` key; adjust the payload if the supervising environment uses a different schema.\n",
+        "content": "clean_answer = answer_text.strip()\nif not clean_answer:\n    raise ValueError('Answer text must be a non‑empty string.')\n\n# Prepare the payload for the supervising system.\npayload = {\"answer\": clean_answer}\n\n# Send the final answer.\nsupervisor.complete_task(payload)",
+        "tools": [
+          "supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911420",
+          "modified_at": "2026-05-14T08:49:04.911535"
+        }
+      },
+      {
+        "name": "fhir get patient encounters",
+        "document": "Retrieve every Encounter resource associated with a specific patient FHIR ID by paging through results until no more records remain.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to request. For this skill the default is \"Encounter\" but any resource type can be supplied.\npatient_fhir_id: str\n    The unique identifier of the patient whose resources are being requested.\npage_limit: int, optional\n    Number of records to request per page. Defaults to 20 to balance performance and API limits.\n\nOutputs\n-------\nlist[dict]\n    A list containing all Encounter resource objects returned for the patient.\n\nNotes\n-----\n1. The underlying API `apis.fhir.get_resources_by_patient_fhir_id` supports pagination via `page_index` and `page_limit` arguments.\n2. The skill aggregates results across all pages, ensuring a complete collection without requiring the caller to manage pagination.\n3. The variable `encounters` will hold the final aggregated list after execution.\n",
+        "content": "encounters = []\npage = 0\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page,\n        page_limit=page_limit\n    )\n    if not batch:  # No more records\n        break\n    encounters.extend(batch)\n    page += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627951",
+          "modified_at": "2026-05-14T13:44:22.628198"
+        }
+      },
+      {
+        "name": "fhir get patient observations",
+        "document": "Retrieve every Observation resource associated with a specific patient from the FHIR server.\n\nParameters\n----------\npatient_fhir_id : str\n    The unique FHIR identifier for the patient whose observations are being requested. Whitespace and case are ignored.\n\nOutputs\n-------\nlist[dict]\n    A list containing the raw Observation resource dictionaries returned by the FHIR API. Returns an empty list if no observations are found.\n\nNotes\n-----\n1. The underlying API ``get_resources_by_patient_fhir_id`` automatically handles pagination; this skill simply forwards the request for the ``Observation`` resource type.\n2. The skill normalises the ``patient_fhir_id`` by stripping surrounding whitespace and lower‑casing it before the API call.\n3. A sanity check ensures the API response is a list; otherwise a ``ValueError`` is raised.\n4. This skill is reusable for any patient ID and does not depend on prior steps.\n",
+        "content": "patient_fhir_id = patient_fhir_id.strip().lower()\n\nobservations = apis.fhir.get_resources_by_patient_fhir_id(\n    resource_type=\"Observation\",\n    patient_fhir_id=patient_fhir_id\n)\n\nif not isinstance(observations, list):\n    raise ValueError(\"Expected a list of Observation resources from get_resources_by_patient_fhir_id\")\n\n# observations now holds a list of Observation dicts (may be empty)\n",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911433",
+          "modified_at": "2026-05-14T08:49:04.911539"
+        }
+      },
+      {
+        "name": "fhir filter observations by encounter and test term",
+        "document": "Filter a list of Observation resources to retain only those that belong to a specific encounter and whose test name or code matches a given term (e.g., \"bicarbonate\").\n\nParameters\n----------\nobservations : list[dict]\n    The raw Observation resources retrieved from the FHIR server.\nencounter_id : str\n    The FHIR reference ID of the encounter to which the observations must be linked (e.g., \"Encounter/12345\").\ntest_term : str\n    The laboratory test name or code to match (case‑insensitive, surrounding whitespace ignored).  Typical values are human‑readable test names such as \"bicarbonate\".\n\nOutputs\n-------\nlist[dict]\n    A list containing the Observation dictionaries that satisfy both criteria. The list may be empty if no matching observations are found.\n\nNotes\n-----\n1. Matching is performed against the ``Observation.encounter.reference`` field and any ``code.coding`` entries (both ``code`` and ``display`` fields).\n2. All string comparisons are normalised by stripping whitespace and converting to lower‑case.\n3. No external API calls are made; the skill works entirely on the supplied data structures.\n4. The skill is reusable for any patient, encounter, or laboratory test term.\n",
+        "content": "encounter_id = encounter_id.strip().lower()\nterm = test_term.strip().lower()\n\nfiltered = []\nfor obs in observations:\n    # --- Encounter reference check ---\n    enc_ref = obs.get('encounter', {}).get('reference', '')\n    if not enc_ref:\n        continue\n    if enc_ref.strip().lower() != encounter_id:\n        continue\n\n    # --- Test name/code check ---\n    code_block = obs.get('code', {})\n    coding_list = code_block.get('coding', [])\n    match_found = False\n    for coding in coding_list:\n        # Check code\n        code_val = coding.get('code', '')\n        if isinstance(code_val, str) and code_val.strip().lower() == term:\n            match_found = True\n            break\n        # Check display (human readable name)\n        display_val = coding.get('display', '')\n        if isinstance(display_val, str) and display_val.strip().lower() == term:\n            match_found = True\n            break\n    if match_found:\n        filtered.append(obs)\n\n# ``filtered`` now holds the observations that belong to the specified encounter and match the test term.\n",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911439",
+          "modified_at": "2026-05-14T08:49:04.911540"
+        }
+      },
+      {
+        "name": "supervisor answer yes_no based on list presence",
+        "document": "Determine a simple Yes/No answer depending on whether a provided collection contains any elements, then report the result to the supervising system.\n\nParameters\n----------\nitems : list[dict]\n    The collection to inspect – typically a list of Observation resources filtered for a specific test.\naffirmative : str, optional (default=\"Yes\")\n    The text to return when the collection is non‑empty.\nnegative : str, optional (default=\"No\")\n    The text to return when the collection is empty.\n\nOutputs\n-------\nNone (the skill calls ``apis.supervisor.complete_task`` internally to deliver the answer).\n\nNotes\n-----\n1. The skill performs a lightweight validation that ``items`` is a list; if not, it raises ``ValueError``.\n2. Whitespace around the answer strings is stripped and the final answer is capitalised for consistency.\n3. No external data is fetched – all logic is local.\n4. This skill is reusable for any Yes/No decision based on the existence of items, not only for lab‑test checks.",
+        "content": "items = items if isinstance(items, list) else []\n\n# Validate input type – raise early if misuse\nif not isinstance(items, list):\n    raise ValueError(\"'items' must be a list of dictionaries.\")\n\n# Choose answer based on presence of at least one element\nanswer = affirmative if items else negative\n\n# Normalise answer text (strip whitespace, ensure first letter capitalised)\nanswer = answer.strip().capitalize()\n\n# Report the result to the supervising process\napis.supervisor.complete_task(answer=answer)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-14T08:49:04.911444",
+          "modified_at": "2026-05-14T08:49:04.911542"
+        }
+      },
+      {
+        "name": "fhir get all resources for patient",
+        "document": "Retrieve every FHIR resource of a specified type that belongs to a particular patient by repeatedly calling the `get_resources_by_patient_fhir_id` endpoint until no more pages remain.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to fetch (e.g., \"Encounter\", \"Observation\").\npatient_fhir_id: str\n    The unique FHIR identifier of the patient whose resources are required.\npage_limit: int, optional (default=100)\n    Maximum number of resources to request per page. Adjust to stay within API limits.\n\nOutputs\n-------\nlist[dict]\n    A flat list containing all resource objects of the requested type for the patient.\n\nNotes\n-----\n1. The underlying `get_resources_by_patient_fhir_id` API supports pagination via `page_index` and `page_limit` parameters. This skill abstracts that detail and returns a complete collection.\n2. If the API returns an empty list for a page, pagination stops.\n3. Errors from the API are not caught here; callers should handle exceptions as needed.\n",
+        "content": "resources = []\n\npage_index = 0\nwhile True:\n    batch = get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page_index,\n        page_limit=page_limit\n    )\n    if not batch:  # No more results\n        break\n    resources.extend(batch)\n    page_index += 1\n",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627962",
+          "modified_at": "2026-05-14T13:44:22.628207"
+        }
+      },
+      {
+        "name": "fhir get resources by patient",
+        "document": "Retrieve all FHIR resources of a specified type for a given patient using their FHIR identifier.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to retrieve (e.g., \"MedicationAdministration\", \"Observation\", \"Condition\").\npatient_fhir_id: str\n    The unique FHIR identifier of the patient whose resources are being requested.\n\nOutputs\n-------\nlist[dict]\n    A list of resource objects of the requested type belonging to the patient. Each element is a dictionary representing a single FHIR resource instance.\n\nNotes\n-----\n1. The underlying API may paginate results; this skill abstracts away pagination by iteratively requesting pages until no further results are returned.\n2. The returned list can be safely iterated or filtered for further analysis (e.g., date ranges, specific codes).\n3. No authentication handling is performed here; it is assumed that a valid session/token is already available to the underlying API call.",
+        "content": "resources = []\npage_index = 0\npage_limit = 50  # reasonable batch size to avoid server limits\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page_index,\n        page_limit=page_limit\n    )\n    if not batch:\n        break\n    resources.extend(batch)\n    page_index += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404521",
+          "modified_at": "2026-05-15T02:49:33.404632"
+        }
+      },
+      {
+        "name": "select_latest_fhir_resource_by_effective_datetime",
+        "document": "Select the single FHIR resource (e.g., Observation) that has the most recent effective datetime among a collection.\n\nParameters\n----------\nresources: list[dict]\n    A list of FHIR resource dictionaries to evaluate. Each resource may contain either an ``effectiveDateTime`` element or an ``effectivePeriod.start`` element that holds an ISO‑8601 timestamp.\n\nOutputs\n-------\nlatest_resource: dict | None\n    The resource dictionary with the greatest effective datetime. Returns ``None`` if the input list is empty or none of the resources contain a parsable timestamp.\n\nNotes\n-----\n* The skill does **not** perform any network calls; it works entirely on in‑memory data.\n* Timestamp extraction follows the same precedence as ``filter_fhir_resources_by_datetime_range``: first ``effectiveDateTime``, then ``effectivePeriod.start``.\n* Timestamps are parsed with ``datetime.fromisoformat``; resources with malformed timestamps are ignored.\n* If multiple resources share the exact latest timestamp, the first encountered in the input order is returned.\n* No external tools are required; only the built‑in ``datetime`` class is used.\n",
+        "content": "latest_resource = None\nlatest_dt = None\nfor r in resources:\n    # Prefer effectiveDateTime, fall back to effectivePeriod.start\n    eff = r.get('effectiveDateTime') or r.get('effectivePeriod', {}).get('start')\n    if not eff:\n        continue  # No timestamp to evaluate\n    try:\n        dt = datetime.fromisoformat(eff).replace(tzinfo=None)\n    except Exception:\n        continue  # Skip malformed timestamps\n    if (latest_dt is None) or (dt > latest_dt):\n        latest_dt = dt\n        latest_resource = r\n# Result is stored in variable `latest_resource` for downstream use.",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280106",
+          "modified_at": "2026-05-14T09:26:30.280280"
+        }
+      },
+      {
+        "name": "filter procedures by code phrase",
+        "document": "Select Procedure resources whose coding or text description contains a given phrase after normalising whitespace and case.\n\nParameters\n----------\nprocedures : list[dict]\n    A list of Procedure resource dictionaries retrieved from the FHIR server.\nphrase : str\n    The phrase to search for (e.g., \"enteral infusion of concentrated nutritional substances\"). The search is performed on the procedure's code display or text after stripping surrounding whitespace and converting to lower‑case.\n\nOutputs\n-------\nlist[dict]\n    A list containing only those Procedure dictionaries whose normalized code/display includes the supplied phrase. Returns an empty list if no matches are found.\n\nNotes\n-----\n1. The skill looks for the phrase in two possible locations:\n   * ``procedure['code']['coding'][i]['display']`` – the first coding entry is used if present.\n   * ``procedure['code']['text']`` – a free‑text description.\n2. Missing fields are safely ignored; procedures without a usable description are excluded from the result.\n3. Normalisation consists of stripping leading/trailing whitespace and lower‑casing the string before the containment check.\n4. No external APIs are called; all processing is performed locally.\n",
+        "content": "matched = []\nnormalized_phrase = phrase.strip().lower()\n\nfor proc in procedures:\n    # Try to obtain a display string from the first coding entry\n    display = ''\n    code = proc.get('code', {})\n    coding = code.get('coding')\n    if isinstance(coding, list) and coding:\n        display = coding[0].get('display', '') or ''\n    # Fallback to free‑text description if display is empty\n    if not display:\n        display = code.get('text', '') or ''\n    # Normalise the description\n    normalized = display.strip().lower()\n    if normalized_phrase in normalized:\n        matched.append(proc)\n# Result stored in variable `matched`\n",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280112",
+          "modified_at": "2026-05-14T09:26:30.280286"
+        }
+      },
+      {
+        "name": "fhir retrieve patient resources",
+        "document": "Retrieve all FHIR resources of a specified type that belong to a given patient. The skill pages through the results (if the underlying API supports pagination) until no more resources are returned.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to fetch (e.g., \"Encounter\", \"Observation\", \"MedicationRequest\").\npatient_fhir_id: str\n    The unique FHIR identifier of the patient whose resources are being requested.\n\nOutputs\n-------\nlist[dict]\n    A list containing every resource object of the requested type associated with the patient.\n\nNotes\n-----\n1. The underlying API `apis.fhir.get_resources_by_patient_fhir_id` may accept optional pagination arguments `page_index` and `page_limit`. If the API returns all results in a single call, the loop will terminate after the first iteration.\n2. The skill does not perform any domain‑specific filtering; callers can apply additional criteria (e.g., encounter type) after retrieval.\n3. No external Python packages are imported; only basic control‑flow and list handling are used.",
+        "content": "resources = []\npage = 0\nwhile True:\n    # Attempt to fetch a batch of resources; pagination arguments are optional and ignored if unsupported.\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page,\n        page_limit=50\n    )\n    # If the API returns None or an empty list, we have retrieved all available resources.\n    if not batch:\n        break\n    resources.extend(batch)\n    page += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280117",
+          "modified_at": "2026-05-14T09:26:30.280288"
+        }
+      },
+      {
+        "name": "return_fhir_count_result",
+        "document": "Compose a human‑readable answer from a numeric count (and optional supplemental identifiers) and send it back to the orchestrating system via the supervisor API.\n\nParameters\n----------\ncount: int\n    The number of resources that matched the query (e.g., hospital encounters).\nids: list[str] | None, optional\n    A list of resource identifiers that may be useful for the user. If ``None`` or empty, identifiers are omitted from the answer.\nentity_name: str, optional (default=\"hospital visits\")\n    A short description of what the count represents; used to build the answer sentence.\n\nOutputs\n-------\nNone\n    The skill does not return a Python value; it invokes ``apis.supervisor.complete_task`` with the formatted answer string.\n\nNotes\n-----\n1. The skill builds a concise answer, handling singular vs. plural forms automatically.\n2. No external libraries are imported; only built‑in string handling is used.\n3. The final call ``apis.supervisor.complete_task`` is the standard way for the agent to signal task completion to the surrounding framework.\n",
+        "content": "answer = f\"{count} {entity_name}\" if count != 1 else f\"1 {entity_name.rstrip('s')}\"\nif ids:\n    # Join IDs into a comma‑separated list, truncate if very long for readability\n    ids_str = ', '.join(ids)\n    answer += f\". Encounter IDs: {ids_str}\"\n# Send the final response back to the orchestrator\napis.supervisor.complete_task(result=answer)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280123",
+          "modified_at": "2026-05-14T09:26:30.280290"
+        }
+      },
+      {
+        "name": "supervisor complete task with formatted answer",
+        "document": "Send a final answer back to the supervising system after a computation step. The skill formats a timestamp (and optionally a numeric value) into a concise, human‑readable string and invokes the `apis.supervisor.complete_task` endpoint to mark the task as finished.\n\nParameters\n----------\ntask_id: str\n    Identifier of the task that the supervisor expects a response for.\ntimestamp: datetime.datetime\n    The datetime object representing the moment to be reported (e.g., the time of the maximum systolic blood pressure observation).\nvalue: float | None, optional\n    The numeric measurement associated with the timestamp (e.g., the systolic pressure value). If ``None`` the value is omitted from the answer.\ninclude_value: bool = True\n    Flag indicating whether the value should be included in the answer string when ``value`` is provided.\n\nOutputs\n-------\nNone\n    The skill performs a side‑effect call to the supervisor API; no direct return value is required.\n\nNotes\n-----\n1. The timestamp is rendered in ISO‑8601 format with a trailing \"Z\" to indicate UTC.\n2. If ``include_value`` is ``True`` and ``value`` is not ``None``, the answer follows the pattern \"<timestamp> (value <value>)\"; otherwise only the timestamp is returned.\n3. The skill does **not** perform any further business logic; it simply prepares the answer string and calls the supervisor endpoint.\n4. This skill is intended to be used after other processing steps (e.g., filtering observations, extracting max values) have produced the required data.",
+        "content": "# Parameters (to be supplied when invoking the skill)\n# task_id: str\n# timestamp: datetime.datetime\n# value: float | None = None\n# include_value: bool = True\n\n# Step 1: format timestamp as ISO‑8601 UTC string\nformatted_ts = timestamp.isoformat(timespec='seconds')\nif not formatted_ts.endswith('Z'):\n    formatted_ts += 'Z'\n\n# Step 2: build answer string\nif include_value and (value is not None):\n    answer = f\"{formatted_ts} (value {value})\"\nelse:\n    answer = formatted_ts\n\n# Step 3: invoke supervisor API to complete the task\napis.supervisor.complete_task(\n    task_id=task_id,\n    answer=answer\n)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280128",
+          "modified_at": "2026-05-14T09:26:30.280292"
+        }
+      },
+      {
+        "name": "task return formatted numeric result",
+        "document": "Create a human‑readable answer from a numeric result and its measurement unit, then signal task completion via the supervisor API.\n\nParameters\n----------\ntask_id: str\n    Identifier of the current task as supplied by the orchestration layer.\nresult_value: float | None\n    The numeric result to be reported. If ``None`` the skill reports that the data were insufficient.\nunit: str\n    The measurement unit to attach to the numeric result (e.g., \"breaths per minute\").\nprecision: int, optional (default: 2)\n    Number of decimal places to keep when formatting the numeric value.\n\nOutputs\n-------\nNone (the skill calls ``apis.supervisor.complete_task`` which returns no value to the caller).\n\nNotes\n-----\n* The skill formats the number using the requested precision and appends a space before the unit.\n* If ``result_value`` is ``None`` a generic message \"Insufficient data to compute a result.\" is sent.\n* The function does **not** print or return the message; it forwards it directly to the supervisor via the provided API.\n* This skill is generic and can be reused for any numeric result that needs to be returned with a unit (e.g., temperature, heart rate, lab value).",
+        "content": "message = ''\nif result_value is None:\n    message = 'Insufficient data to compute a result.'\nelse:\n    # format with the desired precision, strip trailing zeros\n    formatted = f\"{result_value:.{precision}f}\".rstrip('0').rstrip('.')\n    message = f\"{formatted} {unit}\"\n\n# send the answer back to the orchestration layer\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=message\n)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280134",
+          "modified_at": "2026-05-14T09:26:30.280295"
+        }
+      },
+      {
+        "name": "return_task_result",
+        "document": "Send the final answer of a workflow back to the supervising system, formatting a numeric difference with the desired unit string. Handles missing values gracefully.\n\nParameters\n----------\ntask_id: str\n    Identifier of the task that the supervisor expects a completion payload for.\nvalue: float | None\n    The numeric difference that has been computed (e.g., -14.0). If ``None`` the skill reports that the calculation could not be performed.\nunit: str\n    Human‑readable unit to append to the numeric result (e.g., \"mmHg\").\n\nOutputs\n-------\nNone\n    The skill performs a side‑effect call to ``apis.supervisor.complete_task``; it does not return a value to the caller.\n\nNotes\n-----\n1. If ``value`` is ``None`` the skill returns a generic message instead of a numeric string.\n2. The numeric part is formatted without unnecessary decimal places – ``int`` when the value is an integer, otherwise a short float representation.\n3. The implementation is pure Python logic plus a single API call; no external libraries are imported.\n4. This skill is reusable for any task that requires returning a computed numeric result together with a unit (e.g., lab differences, vital sign changes, dosage calculations).",
+        "content": "message = None\nif value is None:\n    # Unable to compute – provide a clear explanation\n    message = \"Unable to compute the difference due to missing data.\"\nelse:\n    # Choose formatting: no decimal places for whole numbers, otherwise keep a reasonable precision\n    if value.is_integer():\n        formatted_value = f\"{int(value)}\"\n    else:\n        formatted_value = f\"{value:.2f}\".rstrip('0').rstrip('.')\n    message = f\"{formatted_value} {unit}\"  # e.g., \"-14 mmHg\"\n\n# Send the result back to the supervisor (or equivalent orchestration layer)\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=message\n)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280146",
+          "modified_at": "2026-05-14T09:26:30.280307"
+        }
+      },
+      {
+        "name": "fhir get all resources by patient",
+        "document": "Retrieve every resource of a specified FHIR type for a given patient, automatically paging through results until the server returns no more items.\n\nParameters\n----------\nresource_type : str\n    The FHIR resource type to query (e.g., \"Encounter\", \"MedicationRequest\", \"Observation\").\npatient_fhir_id : str\n    The unique FHIR identifier of the patient whose resources are being requested.\npage_limit : int, optional (default=20)\n    Maximum number of items to request per page. Adjust to balance performance and API limits.\n\nOutputs\n-------\nlist[dict]\n    A flat list containing all retrieved resource objects of the requested type for the patient.\n\nNotes\n-----\n1. The underlying API `apis.fhir.get_resources_by_patient_fhir_id` supports pagination via `page_index` and `page_limit` parameters.\n2. The skill continues requesting pages until an empty list is returned, indicating that all resources have been fetched.\n3. If the API returns an error or a non‑list payload, the loop will stop and the partially collected resources will be returned.\n4. This skill is generic and can be reused for any FHIR resource type, not just Encounter resources.",
+        "content": "resources = []\npage = 0\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page,\n        page_limit=page_limit\n    )\n    if not batch or not isinstance(batch, list):\n        break\n    resources.extend(batch)\n    page += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404544",
+          "modified_at": "2026-05-15T02:49:33.404650"
+        }
+      },
+      {
+        "name": "supervisor complete with formatted numeric result",
+        "document": "Format a numeric result (optionally with a unit) into a concise human‑readable answer string and signal task completion via the `apis.supervisor.complete_task` tool.\n\nParameters\n----------\nresult: float | int\n    The numeric value to report (e.g., a weight difference).\nunit: str | None (default: None)\n    The unit of the result (e.g., \"kg\", \"lb\"). If ``None`` the unit is omitted from the output.\nprecision: int (default: 2)\n    Number of decimal places to round the result to before formatting.\ninclude_units: bool (default: True)\n    Whether to append the unit to the formatted value when a unit is provided.\nmessage_prefix: str (default: \"Result\")\n    Optional leading text for the answer (e.g., \"Weight difference\").\n\nOutputs\n-------\nNone (the skill performs a side‑effect by calling the supervisor tool).\n\nNotes\n-----\n1. The skill validates that ``result`` is a number; if not, it falls back to a generic error message.\n2. Rounding is performed using Python's built‑in ``round`` via formatted string literals.\n3. The final answer string is passed to ``apis.supervisor.complete_task`` which is the standard mechanism for signalling task completion.\n4. No external packages are imported; only basic built‑in operations are used.\n",
+        "content": "answer = \"\"\n\n# Validate the numeric result\nif isinstance(result, (int, float)):\n    # Round / format the number\n    formatted_number = f\"{result:.{precision}f}\"\n    # Append unit if requested and available\n    if include_units and unit:\n        formatted_number = f\"{formatted_number} {unit.strip()}\"\n    # Build the final answer string\n    answer = f\"{message_prefix}: {formatted_number}\"\nelse:\n    answer = f\"{message_prefix}: unable to compute a numeric result.\"\n\n# Signal completion to the supervisor\napis.supervisor.complete_task(answer=answer)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280156",
+          "modified_at": "2026-05-14T09:26:30.280313"
+        }
+      },
+      {
+        "name": "finalize task with monthly minimum weights",
+        "document": "Prepare the final answer for a supervisory task by ensuring the monthly‑minimum weight list is correctly ordered, validated, and then submitted via the supervisor API.\n\nParameters\n----------\nresult_data: list[dict]\n    A list where each element contains the keys ``month`` (str, ``YYYY‑MM``), ``weight`` (float) and ``unit`` (str). This is typically the output of a weight‑aggregation skill.\ntask_id: str, optional\n    Identifier of the current task. If omitted, the supervisor API will infer the active task from context.\n\nOutputs\n-------\nNone (the skill calls ``apis.supervisor.complete_task`` which finalizes the task on the platform).\n\nNotes\n-----\n* The skill first sorts ``result_data`` chronologically by the ``month`` field to guarantee deterministic output.\n* It validates that each entry contains the required keys and that ``weight`` is a numeric type; malformed entries are discarded.\n* The cleaned and sorted list is then passed to ``apis.supervisor.complete_task``. No return value is expected.\n* This skill is generic – it can be used for any task that requires returning a list of monthly aggregated values, not only weight observations.",
+        "content": "cleaned = []\nfor entry in result_data:\n    # Verify required keys exist\n    if not isinstance(entry, dict):\n        continue\n    month = entry.get('month')\n    weight = entry.get('weight')\n    unit = entry.get('unit')\n    if not (isinstance(month, str) and isinstance(unit, str)):\n        continue\n    if not isinstance(weight, (int, float)):\n        continue\n    cleaned.append({'month': month, 'weight': float(weight), 'unit': unit})\n\n# Sort chronologically (lexicographic works for YYYY‑MM)\ncleaned.sort(key=lambda e: e['month'])\n\n# Submit the final answer to the supervisor\nif task_id:\n    apis.supervisor.complete_task(task_id=task_id, result=cleaned)\nelse:\n    apis.supervisor.complete_task(result=cleaned)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280161",
+          "modified_at": "2026-05-14T09:26:30.280315"
+        }
+      },
+      {
+        "name": "format_and_complete_daily_max_measurements",
+        "document": "Create a human‑readable representation of a list of (date, value) tuples and signal task completion via the supervisor API.\n\nParameters\n----------\nmeasurements: list[tuple[str, float]]\n    A list where each element is a ``(date, max_value)`` tuple. ``date`` must be an ISO‑date string (``YYYY‑MM‑DD``) and ``max_value`` a numeric measurement (e.g., weight in kilograms).\n\nOutputs\n-------\nNone (the skill performs a side‑effect by calling ``apis.supervisor.complete_task``).\n\nNotes\n-----\n1. The skill builds a concise answer string where each date/value pair appears on its own line in the form ``YYYY‑MM‑DD: value``.\n2. If the input list is empty, the answer indicates that no measurements were found.\n3. The final answer string is passed to ``apis.supervisor.complete_task`` which marks the task as finished for the agent framework.\n4. No external libraries are imported; all processing is done with basic Python constructs.\n",
+        "content": "if not measurements:\n    answer_text = \"No daily weight measurements were found for the specified patient and period.\"\nelse:\n    # Ensure the list is sorted chronologically (defensive programming)\n    sorted_measurements = sorted(measurements, key=lambda x: x[0])\n    lines = []\n    for date_str, value in sorted_measurements:\n        # Format each line as 'YYYY-MM-DD: value'\n        lines.append(f\"{date_str}: {value}\")\n    answer_text = \"\\n\".join(lines)\n\n# Signal completion of the task with the generated answer\napis.supervisor.complete_task(answer=answer_text)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280165",
+          "modified_at": "2026-05-14T09:26:30.280318"
+        }
+      },
+      {
+        "name": "fhir get patient resources by type",
+        "document": "Retrieve all FHIR resources of a specified type for a given patient using the patient's FHIR identifier.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to fetch (e.g., \"Encounter\", \"Observation\").\npatient_fhir_id: str\n    The unique FHIR identifier of the patient whose resources are requested.\n\nOutputs\n-------\nlist[dict]\n    A list containing the raw FHIR resource dictionaries returned by the API. If no resources are found, an empty list is returned.\n\nNotes\n-----\n1. The underlying API `apis.fhir.get_resources_by_patient_fhir_id` may paginate results; this skill aggregates all pages into a single list.\n2. The function does not assume any particular structure of the returned resources – callers should inspect the list according to the resource type.\n3. Errors from the API are not caught here; they will propagate to the caller for handling.\n",
+        "content": "resources = []\npage_index = 0\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page_index,\n        page_limit=50\n    )\n    if not batch:\n        break\n    resources.extend(batch)\n    page_index += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404499",
+          "modified_at": "2026-05-15T02:49:33.404599"
+        }
+      },
+      {
+        "name": "format_diagnosis_summary",
+        "document": "Create a concise natural‑language answer that states whether the patient received any diagnosis during their first hospital encounter and, if so, enumerates those diagnoses.\n\nParameters\n----------\ndiagnosis_names: list[str]\n    A list of human‑readable diagnosis display names that were linked to the first hospital encounter. An empty list indicates no diagnoses were recorded.\nmax_items: int, optional\n    Maximum number of diagnosis names to include in the output before truncating with an ellipsis. Defaults to 10.\n\nOutputs\n-------\nstr\n    The final answer string ready to be sent back to the user.\n\nNotes\n-----\n1. The skill first determines presence of diagnoses, then builds the answer using simple string operations.\n2. If the number of diagnoses exceeds *max_items*, only the first *max_items* are shown followed by \"...\" to keep the response concise.\n3. The skill finishes by invoking the `supervisor.complete_task` tool with the generated answer, ensuring the task is marked completed.\n4. No external libraries are imported; all processing is done with native Python constructs.",
+        "content": "if not diagnosis_names:\n    answer = \"No, the patient was not given any diagnosis on their first hospital visit.\"\nelse:\n    # Limit the number of displayed diagnoses for brevity\n    displayed = diagnosis_names[:max_items]\n    if len(diagnosis_names) > max_items:\n        diagnoses_str = \", \".join(displayed) + \", ...\"\n    else:\n        diagnoses_str = \", \".join(displayed)\n    answer = (\n        \"Yes, the patient received diagnoses on their first hospital visit: \"\n        + diagnoses_str\n        + \".\"\n    )\n# Send the final answer back to the supervising system\nsupervisor.complete_task({\"answer\": answer})",
+        "tools": [
+          "supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280175",
+          "modified_at": "2026-05-14T09:26:30.280322"
+        }
+      },
+      {
+        "name": "return latest datetime as task answer",
+        "document": "Select the most recent ISO‑8601 datetime from a list and report it back to the supervising system via the task‑completion API.\n\nParameters\n----------\niso_datetimes: list[str]\n    A collection of timestamps in ISO‑8601 format (e.g., \"2023-07-21T14:30:00Z\" or \"2023-07-21T14:30:00-04:00\").\n\ntask_id: str\n    Identifier of the currently executing task that must be marked complete.\n\nOutputs\n-------\nNone\n    The skill sends the selected datetime to ``apis.supervisor.complete_task``; it does not return a value to the caller.\n\nNotes\n-----\n1. The function parses each string with ``datetime.fromisoformat`` after normalising a trailing ``Z`` to ``+00:00``.\n2. Unparsable entries are ignored.\n3. If the input list is empty or contains no valid dates, the skill reports ``None`` as the result.\n4. The original string (including its original timezone offset) of the most recent datetime is sent to the supervisor so that downstream consumers retain the exact formatting.\n5. This skill combines data processing with the final task‑completion step; it should be used after any prior filtering of relevant timestamps (e.g., extracting discharge times from Encounter resources).",
+        "content": "from datetime import datetime\n\n# Determine the most recent datetime string\nlatest_dt: datetime | None = None\nlatest_str: str | None = None\n\nfor dt_str in iso_datetimes:\n    try:\n        # Normalise Zulu time to an offset understood by fromisoformat\n        parsed = datetime.fromisoformat(dt_str.replace('Z', '+00:00'))\n    except Exception:\n        # Skip values that cannot be parsed\n        continue\n    if (latest_dt is None) or (parsed > latest_dt):\n        latest_dt = parsed\n        latest_str = dt_str\n\n# If no valid datetime was found, report None\nresult = latest_str if latest_str is not None else None\n\n# Notify the supervising system that the task is complete\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=result\n)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280180",
+          "modified_at": "2026-05-14T09:26:30.280325"
+        }
+      },
+      {
+        "name": "supervisor return task result",
+        "document": "Send the final answer of a completed task back to the supervising system.\n\nParameters\n----------\ntask_id : str\n    Identifier of the task that the agent is completing. Typically supplied by the supervisor when the task is created.\nresult : str | float | int | dict\n    The value to be returned to the user. Can be a pre‑formatted string, a numeric value, or a structured object. If a numeric value is supplied together with a ``unit`` the skill will format it as a human‑readable string.\nunit : str, optional\n    Unit of measurement to append when ``result`` is numeric and ``formatted_result`` is not provided (e.g., \"kg\", \"lb\").\nformatted_result : str, optional\n    An already‑formatted representation of the result. If supplied it is sent verbatim; otherwise the skill formats ``result`` (with ``unit`` if given).\n\nOutputs\n-------\nNone (the skill performs a side‑effect by invoking the supervisor API).\n\nNotes\n-----\n1. The skill performs only local processing and a single external call to ``apis.supervisor.complete_task``.\n2. It is deliberately generic – any type of result can be returned, making it reusable for all kinds of tasks (numeric differences, textual answers, JSON payloads, etc.).\n3. If ``result`` is numeric and ``formatted_result`` is omitted, the skill rounds the value to two decimal places before appending the unit.\n4. Callers should ensure ``task_id`` is valid in the current execution context.\n",
+        "content": "# Determine what to send back\nif 'formatted_result' in locals() and formatted_result:\n    payload = formatted_result\nelse:\n    # If the result is numeric, format it with optional unit\n    if isinstance(result, (int, float)):\n        # Default precision of 2 decimal places\n        precision = 2\n        rounded = round(result, precision)\n        if precision > 0:\n            fmt = f\"{{rounded:.{precision}f}}\"\n            number_str = fmt.format(rounded=rounded)\n        else:\n            number_str = str(int(rounded))\n        payload = f\"{number_str} {unit}\".strip() if unit else number_str\n    else:\n        # For non‑numeric results, use the raw value converted to string\n        payload = str(result)\n\n# Call the supervisor API to mark the task as complete and return the answer\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=payload\n)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280186",
+          "modified_at": "2026-05-14T09:26:30.280327"
+        }
+      },
+      {
+        "name": "fhir get patient medication requests",
+        "document": "Retrieve every MedicationRequest resource associated with a specific patient from the FHIR server.\n\nParameters\n----------\npatient_fhir_id : str\n    The unique FHIR identifier of the patient whose medication requests are being requested.\n\nOutputs\n-------\nlist[dict]\n    A list of MedicationRequest resources (each represented as a dict). The list is sorted chronologically by the `authoredOn` field when available; resources without this field are placed at the end.\n\nNotes\n-----\n1. The underlying tool `get_resources_by_patient_fhir_id` is invoked with `resource_type=\"MedicationRequest\"`.\n2. The skill guarantees that the return value is always a list, even if the API returns `None` or a non‑list object.\n3. Sorting provides a deterministic order for downstream analysis (e.g., selecting the first encounter's prescriptions).\n4. No pagination handling is required for the current API; if pagination is added later, the skill can be extended accordingly.",
+        "content": "med_requests = get_resources_by_patient_fhir_id(\n    resource_type=\"MedicationRequest\",\n    patient_fhir_id=patient_fhir_id\n)\n\n# Ensure the result is always a list\nif not isinstance(med_requests, list):\n    med_requests = []\n\n# Helper to extract the authoredOn date for sorting; missing dates are placed last\ndef _authored_date(mr: dict) -> str:\n    date = mr.get('authoredOn')\n    return date if isinstance(date, str) else '9999-12-31T23:59:59Z'\n\n# Sort medication requests chronologically (earliest first)\nmed_requests.sort(key=_authored_date)",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-14T12:02:34.818898",
+          "modified_at": "2026-05-14T12:02:34.819002"
+        }
+      },
+      {
+        "name": "fhir retrieve all resources of a given type for a patient",
+        "document": "Retrieve every resource of a specified FHIR resource type that belongs to a patient identified by their FHIR ID. The function pages through the results until no more pages are returned, aggregating all resources into a list.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to retrieve (e.g., \"Encounter\", \"Observation\", \"Condition\").\npatient_fhir_id: str\n    The unique FHIR identifier of the patient whose resources are being requested.\npage_limit: int, optional (default=20)\n    Number of items to request per page. Adjust to balance performance and API limits.\n\nOutputs\n-------\nlist[dict]\n    A list containing every resource object of the requested type for the patient.\n\nNotes\n-----\n1. The underlying API `get_resources_by_patient_fhir_id` supports pagination via `page_index` and `page_limit` arguments.\n2. The skill aggregates results across all pages, so callers receive a complete collection without needing to handle pagination themselves.\n3. If the patient has no resources of the requested type, an empty list is returned.\n",
+        "content": "all_resources = []\npage_index = 0\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=resource_type,\n        patient_fhir_id=patient_fhir_id,\n        page_index=page_index,\n        page_limit=page_limit\n    )\n    if not batch:  # No more pages\n        break\n    all_resources.extend(batch)\n    page_index += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280195",
+          "modified_at": "2026-05-14T09:26:30.280331"
+        }
+      },
+      {
+        "name": "compute difference between latest two observations",
+        "document": "Calculate the numeric difference between the most recent observation and the second‑most recent observation in a list.\n\nParameters\n----------\nobservations : list[dict]\n    A list of FHIR Observation resources (or any dicts) that contain a timestamp and a numeric value.\neffective_datetime_key : str, optional\n    The key (or dot‑path) where the observation's timestamp can be found. Default is ``\"effectiveDateTime\"`` which matches the standard FHIR field.\nvalue_key : str, optional\n    The key (or dot‑path) where the observation's numeric value can be found. Default is ``\"valueQuantity.value\"`` which matches the standard FHIR representation.\n\nOutputs\n-------\nfloat | None\n    The difference ``latest_value - second_latest_value``. Returns ``None`` if fewer than two valid observations are present.\n\nNotes\n-----\n1. Observations are sorted lexicographically on their ISO‑8601 timestamp; this works because the format is chronological.\n2. Observations missing the timestamp or numeric value are ignored.\n3. The skill performs all processing locally; no external API calls are required.\n4. The result is stored in the variable ``diff`` for downstream use (no explicit return statement).",
+        "content": "sorted_obs = []\n# Helper to retrieve nested keys safely\ndef get_nested(d, path):\n    parts = path.split('.')\n    for p in parts:\n        if not isinstance(d, dict):\n            return None\n        d = d.get(p)\n    return d\n\n# Filter out observations lacking required fields and collect (timestamp, value)\nfor o in observations:\n    if not isinstance(o, dict):\n        continue\n    ts = get_nested(o, effective_datetime_key or \"effectiveDateTime\")\n    val = get_nested(o, value_key or \"valueQuantity.value\")\n    if isinstance(ts, str) and isinstance(val, (int, float)):\n        sorted_obs.append((ts, val))\n\n# Sort by timestamp (ISO‑8601 strings sort chronologically)\nsorted_obs.sort(key=lambda x: x[0])\n\nif len(sorted_obs) >= 2:\n    last_val = sorted_obs[-1][1]\n    second_last_val = sorted_obs[-2][1]\n    diff = last_val - second_last_val\nelse:\n    diff = None",
+        "tools": [
+          "execute_python_code"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-14T09:26:30.280203",
+          "modified_at": "2026-05-14T09:26:30.280338"
+        }
+      },
+      {
+        "name": "filter observations by code phrase",
+        "document": "Filter a list of FHIR Observation resources, keeping only those whose `code` element contains a given phrase (case‑insensitive) in either any coding `display` value or the free‑text `code.text` field.\n\nParameters\n----------\nobservations: list[dict]\n    A list of Observation resource dictionaries as returned from a FHIR query.\nphrase: str\n    The phrase to search for inside the observation's code (e.g., \"daily weight\").\n\nOutputs\n-------\nlist[dict]\n    A list containing only the Observation dictionaries that match the phrase.\n\nNotes\n-----\n1. The function safely handles missing keys – if an observation lacks a `code` element or the expected sub‑fields, it is ignored.\n2. Multiple coding entries are examined; any match qualifies the observation.\n3. The search is performed in a case‑insensitive manner after normalising whitespace.\n4. No external APIs are called; the skill relies solely on Python's built‑in data structures.\n",
+        "content": "filtered_observations = []\n\n# Normalise the search phrase once for efficiency\nsearch = phrase.lower().strip()\n\nfor obs in observations:\n    # Guard against missing code\n    code_block = obs.get('code', {})\n    if not code_block:\n        continue\n\n    # Collect textual representations from coding entries\n    texts = []\n    for coding in code_block.get('coding', []):\n        display = coding.get('display')\n        if isinstance(display, str):\n            texts.append(display)\n\n    # Also consider the free‑text field `code.text`\n    free_text = code_block.get('text')\n    if isinstance(free_text, str):\n        texts.append(free_text)\n\n    # Combine all gathered texts, lower‑case for case‑insensitive match\n    combined = ' '.join(texts).lower()\n\n    if search in combined:\n        filtered_observations.append(obs)\n\n# `filtered_observations` now holds the matching Observation resources.\n",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-14T12:02:34.818842",
+          "modified_at": "2026-05-14T12:02:34.818957"
+        }
+      },
+      {
+        "name": "fhir get patient resources",
+        "document": "Retrieve all resources of a specified FHIR resource type for a given patient using the patient's FHIR identifier.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to retrieve (e.g., \"Procedure\", \"MedicationStatement\").\npatient_fhir_id: str\n    The unique FHIR identifier of the patient whose resources are being requested.\n\nOutputs\n-------\nlist[dict]\n    A list containing the resource objects of the requested type associated with the patient. If no resources are found, an empty list is returned.\n\nNotes\n-----\n1. The underlying API `apis.fhir.get_resources_by_patient_fhir_id` returns a dictionary keyed by the requested resource type. This skill extracts the list for the caller's convenience.\n2. No authentication handling is performed here; it is assumed that the caller provides any required credentials via environment or prior setup.\n3. The skill gracefully handles missing keys or unexpected response shapes by returning an empty list.\n",
+        "content": "retrieved = apis.fhir.get_resources_by_patient_fhir_id(\n    resource_type=resource_type,\n    patient_fhir_id=patient_fhir_id\n)\n# Ensure the response contains the expected key; fall back to empty list otherwise\nresources = retrieved.get(resource_type, []) if isinstance(retrieved, dict) else []",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-14T12:02:34.818855",
+          "modified_at": "2026-05-14T12:02:34.818975"
+        }
+      },
+      {
+        "name": "fhir retrieve and sort patient encounters",
+        "document": "Retrieve every Encounter resource for a given patient from the FHIR server and order them chronologically by the encounter start date.\n\nParameters\n----------\npatient_fhir_id: str\n    The unique FHIR identifier for the patient whose encounters are being requested.\n\nOutputs\n-------\nlist[dict]\n    A list of Encounter resources sorted in ascending order based on the `period.start` field. If no encounters are found, an empty list is returned.\n\nNotes\n-----\n1. The underlying API `get_resources_by_patient_fhir_id` may return an unsorted collection; this skill guarantees chronological ordering.\n2. Encounters lacking a `period.start` value are placed at the end of the list to preserve order without errors.\n3. No pagination handling is performed here; it assumes the API returns the complete set or handles paging internally.",
+        "content": "encounters = get_resources_by_patient_fhir_id(\n    resource_type=\"Encounter\",\n    patient_fhir_id=patient_fhir_id\n)\n\n# Ensure we have a list even if the API returned None\nif not encounters:\n    encounters = []\n\n# Sort encounters by the start datetime; encounters without a start are placed last\nencounters_sorted = sorted(\n    encounters,\n    key=lambda e: e.get(\"period\", {}).get(\"start\", \"\") or \"\"\n)\n\n# The variable `encounters_sorted` holds the final ordered list of Encounter resources",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-14T12:02:34.818861",
+          "modified_at": "2026-05-14T12:02:34.818978"
+        }
+      },
+      {
+        "name": "compute difference between last two observations",
+        "document": "Compute the numeric difference between the most recent observation and the one immediately preceding it.\n\nParameters\n----------\nobservations: list[dict]\n    A collection of Observation resources that have already been filtered to the desired code and encounter period.\nvalue_path: str\n    Dot‑separated path to the numeric value inside each Observation (e.g., \"valueQuantity.value\").\ndatetime_field: str, optional (default='effectiveDateTime')\n    The field name that holds the observation timestamp used for chronological ordering.\n\nOutputs\n-------\nfloat | None\n    The difference calculated as ``last_value - second_last_value``. Returns ``None`` when fewer than two observations are available or when numeric conversion fails.\n\nNotes\n-----\n1. The skill sorts the observations lexicographically by the ISO‑8601 timestamp; this works without external date libraries.\n2. Nested dictionary access follows the ``value_path``; missing keys are treated as ``None``.\n3. All values are coerced to ``float``; non‑numeric entries are ignored, causing the skill to return ``None``.\n4. No network calls are performed; the skill operates purely on the supplied data.\n",
+        "content": "sorted_obs = sorted(\n    observations,\n    key=lambda o: o.get(datetime_field, '') or ''\n)\n\n# Need at least two observations to compute a difference\nif len(sorted_obs) < 2:\n    diff = None\nelse:\n    # Helper to retrieve a nested value using a dot‑separated path\n    def get_nested_value(item, path):\n        parts = path.split('.')\n        for p in parts:\n            if isinstance(item, dict):\n                item = item.get(p)\n            else:\n                return None\n        return item\n\n    last_obs = sorted_obs[-1]\n    second_last_obs = sorted_obs[-2]\n\n    last_val_raw = get_nested_value(last_obs, value_path)\n    second_last_val_raw = get_nested_value(second_last_obs, value_path)\n\n    try:\n        last_val = float(last_val_raw)\n        second_last_val = float(second_last_val_raw)\n        diff = last_val - second_last_val\n    except (TypeError, ValueError):\n        diff = None\n\n# The variable `diff` holds the final numeric difference (or None if unavailable)",
+        "tools": [
+          "execute_python_code"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-14T12:02:34.818865",
+          "modified_at": "2026-05-14T12:02:34.818979"
+        }
+      },
+      {
+        "name": "fhir get observations by patient fhir id",
+        "document": "Retrieve every Observation resource that belongs to a patient identified by a FHIR ID. The function pages through the FHIR server until no more results are returned, concatenating all pages into a single list.\n\nParameters\n----------\npatient_fhir_id : str\n    The globally unique FHIR identifier for the patient whose observations are required.\npage_limit : int, optional (default=20)\n    Number of Observation resources to request per page. Adjust to balance performance and server limits.\n\nOutputs\n-------\nlist[dict]\n    A list containing the raw Observation resource dictionaries for the patient.\n\nNotes\n-----\n* The underlying API ``get_resources_by_patient_fhir_id`` accepts ``resource_type``, ``patient_fhir_id``, ``page_index`` and ``page_limit`` arguments.\n* This skill automatically iterates over pages until an empty page is received, ensuring complete retrieval without requiring the caller to manage pagination.\n* No assumptions are made about the structure of the Observation resources; they are returned exactly as received from the FHIR server.\n* Use this skill whenever you need the full set of a patient’s observations for further filtering or analysis.",
+        "content": "observations = []\npage_index = 0\nwhile True:\n    batch = get_resources_by_patient_fhir_id(\n        resource_type=\"Observation\",\n        patient_fhir_id=patient_fhir_id,\n        page_index=page_index,\n        page_limit=page_limit\n    )\n    if not batch:  # Empty list signals that there are no more pages\n        break\n    observations.extend(batch)\n    page_index += 1",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-14T12:02:34.818869",
+          "modified_at": "2026-05-14T12:02:34.818982"
+        }
+      },
+      {
+        "name": "fhir retrieve patient encounters",
+        "document": "Retrieve every Encounter resource associated with a specific patient using the generic FHIR helper API `get_resources_by_patient_fhir_id`. The skill handles optional pagination, validates the returned objects, and returns the encounters sorted chronologically by their start date.\n\nParameters\n----------\npatient_fhir_id: str\n    The unique FHIR identifier for the target patient.\n\nOutputs\n-------\nlist[dict]\n    A list of Encounter resources (as dictionaries) belonging to the patient, ordered from earliest to latest based on the `period.start` field.\n\nNotes\n-----\n1. The underlying API may return a single page or a paginated response containing a ``next`` token. The skill iterates until no further pages are available.\n2. Encounters lacking a valid `period.start` are placed at the end of the list to avoid sorting errors.\n3. No assumptions are made about the encounter type; callers can further filter the result as needed.\n",
+        "content": "encounters = []\n\n# Initial request – the API may accept pagination parameters; we start without a token.\nnext_token = None\nwhile True:\n    response = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=\"Encounter\",\n        patient_fhir_id=patient_fhir_id,\n        page_token=next_token  # The API should ignore None if pagination is not supported.\n    )\n    # Expect the response to be a dict with 'entries' (list) and optionally 'next' token.\n    batch = response.get('entries', [])\n    encounters.extend(batch)\n    next_token = response.get('next')\n    if not next_token:\n        break\n\n# Basic validation – keep only dicts that look like Encounter resources.\nvalid_encounters = [e for e in encounters if isinstance(e, dict) and e.get('resourceType') == 'Encounter']\n\n# Helper to extract the start datetime for sorting; missing values get a max placeholder.\ndef _start_datetime(enc: dict) -> str:\n    period = enc.get('period', {})\n    start = period.get('start')\n    return start or ''\n\n# Sort chronologically; empty strings sort after real dates.\nvalid_encounters.sort(key=lambda e: _start_datetime(e) or 'zzz')\n\n# The final sorted list is the skill output.\nsorted_encounters = valid_encounters",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627907",
+          "modified_at": "2026-05-14T13:44:22.628135"
+        }
+      },
+      {
+        "name": "compare two values and complete task",
+        "document": "Compare a second numeric value with a first numeric value and report the result through the supervisor API.\n\nParameters\n----------\nfirst_value : int | float | str\n    The value measured first. May be a number or a string that can be converted to a float.\nsecond_value : int | float | str\n    The value measured second. May be a number or a string that can be converted to a float.\ntask_id : str\n    Identifier of the current task that should be completed via `apis.supervisor.complete_task`.\n\nOutputs\n-------\nNone (the skill calls the supervisor API, which handles task completion and response delivery).\n\nNotes\n-----\n1. The skill safely attempts to coerce string inputs to floats; if conversion fails, the value is treated as ``None``.\n2. Comparison is only performed when both values are successfully interpreted as numbers; otherwise the answer defaults to \"No\".\n3. The Boolean outcome is expressed as the strings \"Yes\" (second > first) or \"No\" (otherwise).\n4. No external data sources are queried; the only side‑effect is the call to `apis.supervisor.complete_task`.\n5. The skill is deliberately generic and can be reused for any pair of numeric measurements, not just respiratory rate.",
+        "content": "def _to_number(val):\n    # Helper to coerce a value to a float when possible\n    if isinstance(val, (int, float)):\n        return float(val)\n    try:\n        return float(val)\n    except Exception:\n        return None\n\nnum1 = _to_number(first_value)\nnum2 = _to_number(second_value)\n\n# Default answer is \"No\"; will be changed only if a valid comparison shows second > first\nanswer = \"No\"\nif num1 is not None and num2 is not None:\n    if num2 > num1:\n        answer = \"Yes\"\n\n# Report the result to the supervisor so the task can be marked complete\napis.supervisor.complete_task(task_id=task_id, answer=answer)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-14T12:02:34.818884",
+          "modified_at": "2026-05-14T12:02:34.818999"
+        }
+      },
+      {
+        "name": "format observation minimum result",
+        "document": "Prepare a human‑readable answer that reports the minimum observation value (and its unit, if present) computed by previous processing steps. The skill validates the inputs, handles missing data gracefully, and invokes the task‑completion API to return the final response.\n\nParameters\n----------\nmin_value: float | None\n    The smallest numeric measurement extracted from the filtered Observation resources. ``None`` indicates that no numeric values were found.\nmin_unit: str | None\n    The unit associated with ``min_value`` (e.g., \"mEq/L\"). May be ``None`` if the observation did not specify a unit.\n\nOutputs\n-------\nNone\n    The skill does not return a Python object; instead it calls the supervisor's task‑completion tool to send the final answer back to the user.\n\nNotes\n-----\n* If ``min_value`` is ``None`` the skill returns a default message such as \"No matching observations were found.\".\n* When a unit is available it is appended to the numeric value with a single space separator.\n* The skill formats the numeric value with up to three decimal places, stripping trailing zeros for readability.\n* This skill should be invoked after the ``compute minimum observation value`` skill.\n",
+        "content": "answer = None\n\nif min_value is None:\n    answer = \"No matching observations were found.\"\nelse:\n    # Format the numeric value nicely (remove unnecessary trailing zeros)\n    formatted_val = (f\"{min_value:.3f}\").rstrip('0').rstrip('.')\n    if min_unit:\n        answer = f\"{formatted_val} {min_unit}\"\n    else:\n        answer = formatted_val\n\n# Send the answer back to the user via the supervisor's completion endpoint.\nsupervisor.complete_task({\"final_answer\": answer})",
+        "tools": [
+          "supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-14T12:02:34.818903",
+          "modified_at": "2026-05-14T12:02:34.819014"
+        }
+      },
+      {
+        "name": "supervisor respond with final answer",
+        "document": "Send a concise final answer back to the user via the supervisor API. The skill validates the answer, optionally normalises its format, and then calls the `apis.supervisor.complete_task` endpoint to deliver the result.\n\nParameters\n----------\nanswer: str\n    The text that should be presented to the user as the final response.\ntask_id: str\n    Identifier of the current task/session so the supervisor knows where to route the answer.\nmax_length: int, optional (default: 1000)\n    Upper bound on the number of characters allowed in the answer. If the answer exceeds this limit it will be truncated with an ellipsis.\n\nOutputs\n-------\nNone (the skill performs a side‑effect by invoking the supervisor API).\n\nNotes\n-----\n1. The skill ensures the answer is a non‑empty string; if empty, it substitutes a generic \"No relevant information found.\" message.\n2. Basic normalisation is performed: leading/trailing whitespace is stripped and the answer is forced to end with a period if it does not already.\n3. The implementation does **not** merely wrap the API call – it includes validation, truncation, and normalisation steps, making it reusable for any final‑answer scenario.\n",
+        "content": "answer = answer.strip()\nif not answer:\n    answer = \"No relevant information found.\"\n# Ensure the answer ends with a period for consistency\nif not answer.endswith('.'):\n    answer = answer + '.'\n# Truncate if overly long\nif len(answer) > max_length:\n    answer = answer[: max_length - 3].rstrip() + '...'\n# Deliver the answer via the supervisor API\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=answer\n)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627853",
+          "modified_at": "2026-05-14T13:44:22.628105"
+        }
+      },
+      {
+        "name": "supervisor return answer to user",
+        "document": "Send a final answer back to the user through the supervisor interface.\n\nParameters\n----------\ntask_id: str\n    Identifier of the current task that the supervisor expects a completion for.\nanswer: str\n    The human‑readable answer to be presented to the user (e.g., \"Yes, the patient has had an ER encounter since one year ago.\").\ndetails: list[dict] | None, optional (default=None)\n    Optional extra information to include in the response, such as encounter IDs or timestamps. Each dict should contain string keys and values.\nmax_length: int, optional (default=500)\n    Maximum allowed length for the ``answer`` string; longer answers will be truncated.\n\nOutputs\n-------\nNone (the skill invokes ``apis.supervisor.complete_task`` which handles the response transmission).\n\nNotes\n-----\n1. The skill performs lightweight validation and sanitisation before calling the supervisor API – this adds value beyond a thin wrapper.\n2. If ``details`` is provided, the skill ensures every entry is a dictionary with string values; malformed entries are ignored.\n3. The ``answer`` is trimmed to ``max_length`` characters to avoid overly long outputs that could break downstream UI components.\n4. No external packages are imported; only built‑in operations are used.\n",
+        "content": "## Step 1 – Validate and possibly truncate the answer string\nif not isinstance(answer, str):\n    raise ValueError('answer must be a string')\nif len(answer) > max_length:\n    answer = answer[:max_length] + '...'\n\n## Step 2 – Prepare a clean details list (if any)\nclean_details = None\nif details is not None:\n    if not isinstance(details, list):\n        raise ValueError('details must be a list of dictionaries or None')\n    clean_details = []\n    for entry in details:\n        if isinstance(entry, dict):\n            # Keep only string key/value pairs\n            clean_entry = {str(k): str(v) for k, v in entry.items() if isinstance(v, (str, int, float, bool))}\n            if clean_entry:\n                clean_details.append(clean_entry)\n    if not clean_details:\n        clean_details = None\n\n## Step 3 – Build the payload for the supervisor\npayload = {\n    'answer': answer\n}\nif clean_details is not None:\n    payload['details'] = clean_details\n\n## Step 4 – Send the completion to the supervisor\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=payload\n)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627878",
+          "modified_at": "2026-05-14T13:44:22.628124"
+        }
+      },
+      {
+        "name": "supervisor return boolean result",
+        "document": "Send a final Boolean outcome back to the supervising system, optionally attaching a human‑readable explanation. This skill is useful after any series of data‑processing steps that culminate in a true/false answer (e.g., a comparison of two lab values).\n\nParameters\n----------\nresult : bool\n    The Boolean value that represents the answer to the original user question.\nexplanation : str, optional (default=\"\")\n    A short textual description that will be shown to the user along with the Boolean value. If omitted, only the Boolean is returned.\n\nOutputs\n-------\nNone (the skill invokes the `apis.supervisor.complete_task` tool which signals task completion to the orchestration layer).\n\nNotes\n-----\n1. The skill validates that `result` is a Boolean; if not, it attempts to coerce common truthy/falsy representations (e.g., \"true\", \"false\", 1, 0).\n2. The Boolean is converted to a capitalised string (\"True\"/\"False\") before being sent, matching the expected format of downstream consumers.\n3. The optional explanation is trimmed of surrounding whitespace to avoid accidental formatting issues.\n4. No external libraries are imported; the implementation relies solely on pure Python and the `apis.supervisor.complete_task` tool.\n",
+        "content": "# Ensure the result is a Boolean\nif isinstance(result, bool):\n    bool_val = result\nelse:\n    # Attempt to coerce common string or numeric representations\n    truthy = {'true', '1', 'yes', 'y'}\n    falsy = {'false', '0', 'no', 'n'}\n    if isinstance(result, (int, float)):\n        bool_val = bool(result)\n    elif isinstance(result, str):\n        lowered = result.strip().lower()\n        if lowered in truthy:\n            bool_val = True\n        elif lowered in falsy:\n            bool_val = False\n        else:\n            # Fallback to Python's truthiness conversion\n            bool_val = bool(lowered)\n    else:\n        # If the type is unexpected, default to False to avoid raising\n        bool_val = False\n\n# Prepare a user‑facing message\nmsg = ''\nif explanation:\n    msg = explanation.strip()\n# Append the Boolean value in a clear form\nmsg = f\"{msg} Result: {bool_val}\" if msg else f\"Result: {bool_val}\"\n\n# Call the supervisor API to complete the task with the composed message\napis.supervisor.complete_task(message=msg)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627884",
+          "modified_at": "2026-05-14T13:44:22.628128"
+        }
+      },
+      {
+        "name": "format summary and complete task",
+        "document": "Create a human‑readable bullet‑point summary from a generic ``summary`` structure and send it back to the user via the task‑completion API.\n\nParameters\n----------\nsummary: dict\n    A dictionary containing at least two keys:\n    - ``count`` (int): total number of items.\n    - ``descriptions`` (list[str]): a description for each item, in the desired order.\ntitle: str | None, optional (default=None)\n    An optional heading that will appear before the bullet list.\ninclude_count: bool, optional (default=True)\n    If True, a line reporting the total count is added after the title.\n\nOutputs\n-------\nNone (the skill calls ``supervisor.complete_task`` which sends the formatted string to the user).\n\nNotes\n-----\n1. The skill is deliberately generic – it works for any summary that follows the ``{count, descriptions}`` schema, not only Procedure summaries.\n2. The bullet list uses the standard ``- `` prefix. Empty or missing description entries are replaced with \"<no description>\".\n3. The final call ``supervisor.complete_task`` is the canonical way for the agent to return a response to the user; replace it with an equivalent response API if your environment uses a different name.\n",
+        "content": "lines = []\nif title:\n    lines.append(title)\nif include_count:\n    lines.append(f\"Total items: {summary.get('count', len(summary.get('descriptions', [])))}\")\n\nfor desc in summary.get('descriptions', []):\n    text = desc if isinstance(desc, str) and desc.strip() else \"<no description>\"\n    lines.append(f\"- {text}\")\n\nformatted_output = \"\\n\".join(lines)\n# Send the formatted response back to the user.\nsupervisor.complete_task(response=formatted_output)\n",
+        "tools": [
+          "supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627891",
+          "modified_at": "2026-05-14T13:44:22.628130"
+        }
+      },
+      {
+        "name": "return minimum value via supervisor.complete_task",
+        "document": "Send the final answer to the supervising system after a numeric computation (e.g., a minimum value) has been performed.\n\nParameters\n----------\ncomputed_minimum: float | None\n    The numeric result obtained from prior processing steps. ``None`` indicates that no valid numbers were found.\nanswer_prefix: str, optional (default=\"The minimum value is\")\n    Text to prepend to the numeric result when constructing the final answer. Ignored when ``computed_minimum`` is ``None``.\n\nOutputs\n-------\nNone (the skill calls ``supervisor.complete_task`` directly)\n\nNotes\n-----\n1. The skill first determines whether a numeric result exists. If ``computed_minimum`` is ``None`` it produces the string ``\"no data\"``.\n2. When a value is present it is formatted to a reasonable representation (removing unnecessary trailing zeros) and combined with ``answer_prefix``.\n3. The final answer string is then passed to ``supervisor.complete_task`` which signals task completion to the outer orchestration layer.\n4. This skill is deliberately multi‑step (validation → formatting → message construction → API call) to satisfy the requirement that a skill involve more than a single thin wrapper around an API.\n",
+        "content": "if computed_minimum is None:\n    final_message = \"no data\"\nelse:\n    # Convert to string, strip trailing .0 if possible\n    if isinstance(computed_minimum, float) and computed_minimum.is_integer():\n        value_str = str(int(computed_minimum))\n    else:\n        value_str = str(computed_minimum)\n    final_message = f\"{answer_prefix} {value_str}\"\n\n# Send the answer to the supervising system\nsupervisor.complete_task(final_message)",
+        "tools": [
+          "supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627899",
+          "modified_at": "2026-05-14T13:44:22.628133"
+        }
+      },
+      {
+        "name": "fhir retrieve patient observations",
+        "document": "Retrieve every Observation resource associated with a specific patient using the generic FHIR helper API `get_resources_by_patient_fhir_id`. The skill handles optional pagination, validates the returned objects, and returns the observations sorted chronologically by the most relevant timestamp (effectiveDateTime, or period.start if present).\n\nParameters\n----------\npatient_fhir_id: str\n    The unique FHIR identifier for the target patient.\n\nOutputs\n-------\nlist[dict]\n    A list of Observation resources (as dictionaries) belonging to the patient, ordered from earliest to latest based on the observation's timestamp.\n\nNotes\n-----\n1. The underlying API may return a single page or a paginated response containing a ``next`` token. The skill iterates until no further pages are available.\n2. Observations lacking a recognizable timestamp are placed at the end of the list to avoid sorting errors.\n3. No assumptions are made about the observation type; callers can further filter the result (e.g., by code) after retrieval.\n",
+        "content": "observations = []\n\n# Pagination loop – continue until the API returns no further token.\nnext_token = None\nwhile True:\n    response = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=\"Observation\",\n        patient_fhir_id=patient_fhir_id,\n        page_token=next_token  # The API should ignore None if pagination is not supported.\n    )\n    # Expect the response to be a dict with 'entries' (list) and optionally a 'next' token.\n    batch = response.get('entries', [])\n    observations.extend(batch)\n    next_token = response.get('next')\n    if not next_token:\n        break\n\n# Basic validation – keep only dicts that look like Observation resources.\nvalid_observations = [o for o in observations if isinstance(o, dict) and o.get('resourceType') == 'Observation']\n\n# Helper to extract a sortable timestamp for each observation.\ndef _obs_timestamp(obs: dict) -> str:\n    # Prefer effectiveDateTime; fall back to period.start; otherwise empty string.\n    if 'effectiveDateTime' in obs:\n        return obs.get('effectiveDateTime') or ''\n    period = obs.get('period', {})\n    return period.get('start') or ''\n\n# Sort chronologically; observations without a timestamp end up at the list's tail.\nvalid_observations.sort(key=lambda o: _obs_timestamp(o) or 'zzz')\n\n# The sorted list is the final output.\nsorted_observations = valid_observations",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627914",
+          "modified_at": "2026-05-14T13:44:22.628177"
+        }
+      },
+      {
+        "name": "supervisor format_and_send_task_result",
+        "document": "Prepare a human‑readable result string from a computed numeric difference (optionally with units) and send it back to the supervising system using the `apis.supervisor.complete_task` endpoint.\n\nParameters\n----------\ntask_id: str\n    Identifier of the task that the agent is completing.\n\ndifference: float | None\n    The numeric difference to report. If ``None`` the skill reports that no data were available.\n\nunit: str | None, optional (default=None)\n    The measurement unit associated with the difference (e.g., \"kg\", \"cm\"). If omitted the unit is omitted from the output string.\n\nOutputs\n-------\nNone\n    The skill invokes the supervisor API; no explicit return value is required.\n\nNotes\n-----\n1. The skill sanitises the inputs, builds a concise result string (e.g., \"0.1 kg\"), and falls back to a generic message when the numeric value is missing.\n2. It does **not** assume any particular domain – the same skill can be reused for temperature, weight, blood pressure, etc.\n3. The implementation performs local processing before the single API call, satisfying the requirement for multiple processing steps.\n4. No external Python packages are imported.",
+        "content": "result_parts = []\n\n# Validate and format the numeric difference\nif difference is None:\n    result_parts.append('No data available')\nelse:\n    # Round to a reasonable precision (2 decimal places) for readability\n    try:\n        formatted_value = f\"{float(difference):.2f}\"\n    except Exception:\n        # If conversion fails, treat as unavailable\n        formatted_value = None\n    if formatted_value is None:\n        result_parts.append('No data available')\n    else:\n        result_parts.append(formatted_value)\n        # Append unit if provided and non‑empty\n        if unit:\n            result_parts.append(unit.strip())\n\n# Assemble the final result string\nfinal_result = ' '.join(result_parts)\n\n# Send the result back to the supervisor\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=final_result\n)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627920",
+          "modified_at": "2026-05-14T13:44:22.628183"
+        }
+      },
+      {
+        "name": "fhir get patient fhir id by numeric identifier",
+        "document": "Retrieve a patient's FHIR identifier when only a numeric (or legacy) patient ID is supplied. The skill first attempts a direct lookup via `apis.fhir.get_patient_by_id`. If that call does not return a valid resource (e.g., the numeric ID is not a FHIR resource ID), the skill falls back to searching the patient directory using `apis.fhir.search_patients` with the numeric ID as an identifier filter.\n\nParameters\n----------\nnumeric_id : str | int\n    The numeric or legacy identifier of the patient as stored in the source system.\n\nOutputs\n-------\nstr | None\n    The FHIR identifier (`id` field) of the matched patient, or ``None`` if no patient could be found.\n\nNotes\n-----\n1. The function does **not** raise exceptions; any lookup failure results in ``None``.\n2. If multiple patients match the numeric identifier, the first result is returned.\n3. The skill assumes the caller has already handled authentication for the FHIR API.\n4. The implementation includes basic validation of the API responses before extracting the identifier.",
+        "content": "fhir_id = None\n# First try a direct fetch assuming the numeric ID is already a FHIR resource ID\npatient = apis.fhir.get_patient_by_id(patient_id=str(numeric_id))\nif patient and isinstance(patient, dict):\n    fhir_id = patient.get('id')\n# If the direct fetch failed or returned no id, fall back to a search operation\nif not fhir_id:\n    # The search API is expected to accept a filter on the \"identifier\" field\n    search_results = apis.fhir.search_patients(filters={\n        'identifier': str(numeric_id)\n    })\n    # search_results should be a list of patient resources\n    if isinstance(search_results, list) and search_results:\n        first_match = search_results[0]\n        fhir_id = first_match.get('id')\n# At this point, fhir_id is either a string or None\n",
+        "tools": [
+          "apis.fhir.get_patient_by_id",
+          "apis.fhir.search_patients"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627927",
+          "modified_at": "2026-05-14T13:44:22.628185"
+        }
+      },
+      {
+        "name": "fhir filter resources by start datetime",
+        "document": "Filter a collection of FHIR resources, keeping only those whose date field (e.g., `authoredOn` or `occurrenceDateTime`) is on or after a specified cutoff datetime.\n\nParameters\n----------\nresources: list[dict]\n    The list of FHIR resource dictionaries to examine.\nstart_datetime: datetime\n    The earliest datetime (inclusive) that a resource must have to be retained.\ndate_fields: list[str], optional (default=[\"authoredOn\", \"occurrenceDateTime\"])\n    Ordered list of field names to look for a date string inside each resource. The first field that exists and contains a parsable ISO‑8601 string is used.\n\nOutputs\n-------\nlist[dict]\n    A subset of ``resources`` where the extracted date is greater than or equal to ``start_datetime``.\n\nNotes\n-----\n1. Resources missing all ``date_fields`` are ignored.\n2. Invalid or unparsable date strings are ignored.\n3. The function does **not** raise exceptions; errors are handled silently and the offending resource is skipped.\n4. The implementation uses the standard library ``datetime`` module for ISO‑8601 parsing; no external packages are required.",
+        "content": "from datetime import datetime\n\nfiltered = []\nfor res in resources:\n    date_str = None\n    # Find the first available date field\n    for field in date_fields:\n        if field in res:\n            date_str = res.get(field)\n            break\n    if not date_str:\n        continue  # No date information\n    try:\n        # Parse ISO‑8601 string; ignore timezone info for comparison\n        dt = datetime.fromisoformat(date_str).replace(tzinfo=None)\n    except Exception:\n        continue  # Unparsable date\n    if dt >= start_datetime:\n        filtered.append(res)\n# ``filtered`` now contains all matching resources",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627934",
+          "modified_at": "2026-05-14T13:44:22.628188"
+        }
+      },
+      {
+        "name": "fhir get most recent encounter by start date",
+        "document": "Select the most recent Encounter resource from a list by examining the encounter's start date.\n\nParameters\n----------\nencounters : list[dict]\n    A list of Encounter resource dictionaries, typically the output of `fhir filter hospital encounters`.\ndate_path : str, optional (default=\"period.start\")\n    Dot‑separated path to the string containing the ISO‑8601 start date within each encounter. The default follows the FHIR pattern where the start date is stored under `encounter['period']['start']`. If the path does not exist for a given encounter, that encounter is ignored for ordering.\n\nOutputs\n-------\nmost_recent : dict | None\n    The Encounter dictionary with the latest start date, or ``None`` if no encounters contain a valid date.\n\nNotes\n-----\n* The skill performs pure Python processing; no external API calls are required.\n* Date strings are assumed to be ISO‑8601 (e.g., \"2023-07-15T08:30:00Z\"). Because ISO‑8601 strings sort correctly lexicographically, the implementation can compare them directly without importing ``datetime``.\n* If multiple encounters share the exact same start date, the first one encountered in the sorted order is returned.\n* The function gracefully handles missing or malformed date fields by skipping those entries.\n",
+        "content": "def _get_by_path(item, path):\n    parts = path.split('.')\n    for p in parts:\n        if isinstance(item, dict):\n            item = item.get(p)\n        else:\n            return None\n    return item\n\n# Extract (encounter, start_date) pairs where a start date exists\npairs = []\nfor enc in encounters:\n    date_str = _get_by_path(enc, date_path)\n    if isinstance(date_str, str) and date_str.strip():\n        pairs.append((enc, date_str.strip()))\n\n# If no valid dates were found, return None\nif not pairs:\n    most_recent = None\nelse:\n    # Sort by date string descending (latest first)\n    pairs.sort(key=lambda x: x[1], reverse=True)\n    most_recent = pairs[0][0]",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627945",
+          "modified_at": "2026-05-14T13:44:22.628194"
+        }
+      },
+      {
+        "name": "fhir fetch resources by patient id",
+        "document": "Retrieve all FHIR resources of a specified type for a given patient using the patient's FHIR identifier.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to retrieve (e.g., \"Observation\", \"Condition\").\npatient_fhir_id: str\n    The unique FHIR identifier for the patient whose resources are being queried.\n\nOutputs\n-------\nlist[dict]\n    A list containing the raw JSON dictionaries of the requested resources. If no resources are found, an empty list is returned.\n\nNotes\n-----\n1. The underlying tool `get_resources_by_patient_fhir_id` may paginate results internally; this skill assumes the tool returns a complete list for the requested type.\n2. The skill validates that the response contains the expected resource type and gracefully handles missing or empty responses.\n3. No domain‑specific filtering is performed here; downstream logic should apply additional criteria (e.g., code filtering, date range) as needed.",
+        "content": "retrieved = get_resources_by_patient_fhir_id(\n    resource_type=resource_type,\n    patient_fhir_id=patient_fhir_id\n)\n# The tool returns a dict keyed by resource type; ensure we extract the list for the requested type.\nresources = []\nif isinstance(retrieved, dict):\n    resources = retrieved.get(resource_type, [])\nelif isinstance(retrieved, list):\n    # Fallback: tool returned a flat list of resources\n    resources = [r for r in retrieved if r.get('resourceType') == resource_type]\n# At this point `resources` is a list (possibly empty) of the desired FHIR resources.\n",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627956",
+          "modified_at": "2026-05-14T13:44:22.628203"
+        }
+      },
+      {
+        "name": "fhir return last discharge datetime",
+        "document": "Format the most recent discharge datetime for a patient and optionally signal task completion via the supervisor API.\n\nParameters\n----------\nlast_discharge : datetime | str\n    The datetime (or ISO‑8601 string) representing the patient’s most recent hospital discharge.\ntask_id : str, optional (default=None)\n    Identifier of the current supervisory task. If provided, the skill will call `apis.supervisor.complete_task` to return the answer to the user.\n\nOutputs\n-------\nanswer : str\n    Human‑readable ISO‑8601 representation of the discharge datetime (e.g., \"2023-04-15T14:30:00-04:00\").\n\nNotes\n-----\n1. The skill accepts either a Python ``datetime`` object or an ISO‑8601 string; strings are parsed safely.\n2. The datetime is normalised to ISO‑8601 with timezone offset preserved when available.\n3. If ``task_id`` is supplied, the skill reports the answer using ``apis.supervisor.complete_task``; otherwise it simply provides the formatted string for downstream use.\n4. No external network calls are made apart from the optional supervisor completion step.\n",
+        "content": "from datetime import datetime\n\n# Step 1: Normalise the input to a datetime object\nif isinstance(last_discharge, datetime):\n    dt_obj = last_discharge\nelif isinstance(last_discharge, str):\n    try:\n        dt_obj = datetime.fromisoformat(last_discharge)\n    except Exception:\n        # If parsing fails, fall back to the raw string as answer\n        dt_obj = None\nelse:\n    dt_obj = None\n\n# Step 2: Produce a consistent ISO‑8601 string\nif dt_obj is not None:\n    # datetime.isoformat() retains timezone info if present\n    formatted = dt_obj.isoformat()\nelse:\n    # Use the original value when we cannot parse it\n    formatted = str(last_discharge)\n\n# Step 3: Prepare the answer string\nanswer = f\"The patient last departed the hospital on {formatted}.\"\n\n# Step 4: Optionally inform the supervisor that the task is complete\nif task_id:\n    apis.supervisor.complete_task(task_id=task_id, result=answer)\n\n# The variable `answer` now holds the final response for downstream steps.",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627968",
+          "modified_at": "2026-05-14T13:44:22.628213"
+        }
+      },
+      {
+        "name": "task finalize with numeric result",
+        "document": "Submit the final answer for a user task by formatting a numeric result (e.g., a weight difference) and sending it to the supervisor.\n\nParameters\n----------\nresult: float | int | str\n    The numeric value to report. Strings are accepted if they can be converted to ``float``.\nunit: str, optional (default=\"\")\n    Unit of measurement to append to the answer (e.g., \"kg\"). If empty, no unit is added.\ndescription: str, optional (default=\"\")\n    Human‑readable description that precedes the numeric answer (e.g., \"Weight difference\"). If empty, only the numeric value (and unit) is sent.\nround_to: int, optional (default=2)\n    Number of decimal places to round the numeric result to before presenting it.\n\nOutputs\n-------\nNone (the skill calls ``apis.supervisor.complete_task`` which registers the answer with the system).\n\nNotes\n-----\n1. The skill validates that *result* can be interpreted as a number; otherwise a ``ValueError`` is raised.\n2. The numeric value is rounded to *round_to* decimal places to avoid overly long floating‑point representations.\n3. The final answer string is built as ``\"{description}: {value}{unit}\"`` with sensible handling of missing optional parts.\n4. No external libraries are imported; all processing is performed with built‑in Python constructs.\n5. This skill is generic and can be reused for any task that requires returning a single numeric answer to the supervisor.",
+        "content": "# Validate and coerce the result to a float\nif isinstance(result, (int, float)):\n    numeric = float(result)\nelif isinstance(result, str):\n    try:\n        numeric = float(result)\n    except ValueError:\n        raise ValueError(f\"Result string '{result}' cannot be converted to float\")\nelse:\n    raise ValueError(f\"Unsupported result type: {type(result)}\")\n\n# Round to the requested precision\nif not isinstance(round_to, int) or round_to < 0:\n    raise ValueError(\"round_to must be a non‑negative integer\")\nnumeric_rounded = round(numeric, round_to)\n\n# Build the answer string, handling optional parts\nanswer_parts = []\nif description:\n    answer_parts.append(description.rstrip(':'))\nanswer_parts.append(str(numeric_rounded))\nif unit:\n    answer_parts[-1] = f\"{answer_parts[-1]}{unit}\"\nfinal_answer = \": \".join(answer_parts) if description else answer_parts[0]\n\n# Send the answer to the supervisor (or equivalent completion endpoint)\napis.supervisor.complete_task(answer=final_answer)\n",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627979",
+          "modified_at": "2026-05-14T13:44:22.628224"
+        }
+      },
+      {
+        "name": "fhir get first encounter for patient",
+        "document": "Retrieve every Encounter resource associated with a given patient FHIR ID, then determine the earliest encounter (i.e., the first hospital visit) based on the encounter's period.start timestamp.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to retrieve; for this skill it should be \"Encounter\" but the function is generic.\npatient_fhir_id: str\n    The unique FHIR identifier of the patient whose encounters are being queried.\n\nOutputs\n-------\nfirst_encounter: dict | None\n    The Encounter resource dictionary that has the earliest period.start value. Returns ``None`` if no encounters are found.\n\nNotes\n-----\n1. The underlying API ``apis.fhir.get_resources_by_patient_fhir_id`` may return a paginated list; this skill assumes the API abstracts pagination and returns a flat list.\n2. If multiple encounters share the exact same start time, the first one encountered in the returned list is used.\n3. The skill does **not** modify the retrieved data; it only selects and returns the earliest encounter for downstream processing.",
+        "content": "encounters = apis.fhir.get_resources_by_patient_fhir_id(\n    resource_type=resource_type,\n    patient_fhir_id=patient_fhir_id\n)\n\n# Ensure we have a list; if the API returns None, treat as empty list\nif not encounters:\n    first_encounter = None\nelse:\n    # Filter out entries without a start time to avoid errors during sorting\n    encounters_with_start = [e for e in encounters if e.get('period', {}).get('start')]\n    if not encounters_with_start:\n        first_encounter = None\n    else:\n        # Sort by the ISO timestamp string; lexical order works for ISO 8601\n        encounters_with_start.sort(key=lambda e: e['period']['start'])\n        first_encounter = encounters_with_start[0]",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627985",
+          "modified_at": "2026-05-14T13:44:22.628229"
+        }
+      },
+      {
+        "name": "fhir get resources for patient",
+        "document": "Retrieve all FHIR resources of a specified type that belong to a given patient.\n\nParameters\n----------\nresource_type: str\n    The FHIR resource type to request (e.g., \"Observation\", \"Encounter\", \"MedicationStatement\").\npatient_fhir_id: str\n    The unique FHIR identifier of the patient whose resources are being queried.\n\nOutputs\n-------\nresources: list[dict]\n    A flat list containing every resource dictionary returned by the FHIR server for the requested type. If no resources exist, an empty list is returned.\n\nNotes\n-----\n1. The underlying API ``apis.fhir.get_resources_by_patient_fhir_id`` is assumed to handle pagination and return a complete list.\n2. The function does **not** modify the retrieved resources; it simply forwards the list for downstream processing.\n3. If the API call fails or returns ``None``, the skill returns an empty list to simplify downstream logic.\n",
+        "content": "resources = apis.fhir.get_resources_by_patient_fhir_id(\n    resource_type=resource_type,\n    patient_fhir_id=patient_fhir_id\n)\n\n# Ensure a consistent return type\nif not resources:\n    resources = []",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627990",
+          "modified_at": "2026-05-14T13:44:22.628231"
+        }
+      },
+      {
+        "name": "supervisor return datetime result",
+        "document": "Send the final answer for a task by converting a datetime (or None) into a human‑readable string and invoking the supervisor API.\n\nParameters\n----------\ntask_id : str\n    Identifier of the task that the assistant is completing.\nresult_datetime : datetime | None\n    The datetime object representing the observation date to be reported. If ``None`` the skill reports that no matching observation was found.\nnone_message : str, optional (default=\"none found\")\n    Message to use when ``result_datetime`` is ``None``.\ndate_format : str, optional (default=\"%Y-%m-%d\")\n    ``strftime`` format string used to turn the datetime into a textual representation.\n\nOutputs\n-------\nNone\n    The skill performs a side‑effect by calling ``apis.supervisor.complete_task`` with the formatted answer. No value is returned to the caller.\n\nNotes\n-----\n1. The skill first checks whether ``result_datetime`` is ``None``.\n2. If a datetime is present, it is formatted using the supplied ``date_format`` (ISO‑like by default).\n3. The final answer string is either the formatted date or the ``none_message``.\n4. The skill then calls ``apis.supervisor.complete_task`` with ``task_id`` and the answer string.\n5. This skill is reusable for any scenario where a datetime (or lack thereof) needs to be reported back to the supervisor.",
+        "content": "answer = none_message\nif result_datetime is not None:\n    # Ensure we work with a naive datetime for consistent formatting\n    dt = result_datetime\n    # If the datetime carries tzinfo, drop it for a clean string\n    if hasattr(dt, 'tzinfo') and dt.tzinfo is not None:\n        dt = dt.replace(tzinfo=None)\n    answer = dt.strftime(date_format)\n\n# Complete the task with the prepared answer\napis.supervisor.complete_task(\n    task_id=task_id,\n    answer=answer\n)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-14T13:44:22.627996",
+          "modified_at": "2026-05-14T13:44:22.628234"
+        }
+      },
+      {
+        "name": "supervisor return final answer",
+        "document": "Send the final Yes/No answer of a query back to the user through the supervisor interface.\n\nParameters\n----------\nanswer : str\n    The final answer to be presented to the user. Expected values are \"Yes\" or \"No\", but any non‑empty string is accepted.\n\nOutputs\n-------\nNone (the skill invokes the supervisor API which delivers the answer to the user). The function does not return a value to the caller.\n\nNotes\n-----\n1. The skill validates that *answer* is a non‑empty string before invoking the API.\n2. It abstracts the underlying supervisor call, allowing other agents to simply provide the answer text.\n3. If the validation fails, a clear exception is raised so the calling workflow can handle the error.\n4. This skill is reusable for any final‑answer delivery, not only Yes/No responses.",
+        "content": "if not isinstance(answer, str) or not answer.strip():\n    raise ValueError('Answer must be a non‑empty string')\n\n# Trim whitespace and ensure consistent casing for Yes/No answers (optional)\nclean_answer = answer.strip()\n\n# Deliver the answer via the supervisor endpoint\napis.supervisor.complete_task(answer=clean_answer)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404516",
+          "modified_at": "2026-05-15T02:49:33.404626"
+        }
+      },
+      {
+        "name": "binary_answer_from_count",
+        "document": "Evaluate a numeric count and produce a binary \"Yes\"/\"No\" answer based on whether the count exceeds zero. Optionally report the answer to the supervising system.\n\nParameters\n----------\ncount: int\n    The numeric value to evaluate. Typically the result of a prior aggregation (e.g., number of medication requests).\nuse_supervisor: bool, optional (default: False)\n    If True, the skill will call `apis.supervisor.complete_task` to submit the final answer.\n\nOutputs\n-------\nanswer: str\n    Either \"Yes\" if `count > 0` or \"No\" otherwise.\n\nNotes\n-----\n1. The skill performs only local decision logic; no external data fetching is required.\n2. When `use_supervisor` is True, the answer is sent to the supervising system via `apis.supervisor.complete_task(answer=answer)`. The call is fire‑and‑forget – the skill does not return the supervisor's response.\n3. This skill is generic and can be reused for any situation where a simple positive‑count check determines a yes/no outcome.",
+        "content": "if count > 0:\n    answer = \"Yes\"\nelse:\n    answer = \"No\"\n\nif use_supervisor:\n    # Report the final decision to the supervising system.\n    apis.supervisor.complete_task(answer=answer)\n\n# The variable `answer` now holds the binary result for downstream use.",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404525",
+          "modified_at": "2026-05-15T02:49:33.404637"
+        }
+      },
+      {
+        "name": "fhir get patient procedures",
+        "document": "Retrieve every Procedure resource associated with a given patient by querying the FHIR server using the patient's FHIR identifier.\n\nParameters\n----------\npatient_fhir_id : str\n    The unique FHIR identifier of the patient whose procedures are to be retrieved.\n\nOutputs\n-------\nlist[dict]\n    A list containing the raw Procedure resource dictionaries returned by the FHIR API. If no procedures are found, an empty list is returned.\n\nNotes\n-----\n1. The underlying tool `get_resources_by_patient_fhir_id` expects the resource type to be provided explicitly; this skill fixes it to \"Procedure\" for reusability.\n2. The skill validates the response type to guarantee that downstream logic always receives a list, avoiding type‑related errors.\n3. No pagination handling is required because the tool internally returns all matching resources; however, the implementation can be extended later if needed.\n",
+        "content": "response = get_resources_by_patient_fhir_id(\n    resource_type=\"Procedure\",\n    patient_fhir_id=patient_fhir_id\n)\n# Ensure a consistent list output for downstream processing\nif isinstance(response, list):\n    procedures = response\nelse:\n    procedures = []  # fallback to empty list if the tool returned an unexpected type",
+        "tools": [
+          "get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404529",
+          "modified_at": "2026-05-15T02:49:33.404641"
+        }
+      },
+      {
+        "name": "complete_task_with_latest_datetime",
+        "document": "Finalize a task by reporting the latest `effectiveDateTime` (or a not‑found message) to the supervisor.\n\nParameters\n----------\nanswer: str | None\n    The ISO‑8601 datetime string representing the most recent observation that matches the query, or ``None`` if no matching observation exists.\ntask_id: str\n    Identifier of the current task that should be marked as completed. Usually supplied by the orchestrating system.\n\nOutputs\n-------\nNone\n    The skill invokes ``apis.supervisor.complete_task``; it does not return a value to the caller.\n\nNotes\n-----\n1. The skill normalises the output so that a ``None`` answer is turned into a clear human‑readable message (\"No matching observations found.\").\n2. The final message is passed to the supervisor via the ``result`` parameter.\n3. No printing or logging is performed – the skill solely prepares the result and calls the supervisor API.\n",
+        "content": "if answer is None:\n    result_message = \"No matching observations found.\"\nelse:\n    result_message = f\"The latest effectiveDateTime is {answer}.\"\n\napis.supervisor.complete_task(\n    task_id=task_id,\n    result=result_message\n)",
+        "tools": [
+          "apis.supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404533",
+          "modified_at": "2026-05-15T02:49:33.404643"
+        }
+      },
+      {
+        "name": "fhir get all patient encounters",
+        "document": "Retrieve every Encounter resource that belongs to a specific patient by repeatedly calling the FHIR `get_resources_by_patient_fhir_id` endpoint until no more pages are returned. This abstracts pagination handling so callers only need to provide the patient’s FHIR identifier.\n\nParameters\n----------\npatient_fhir_id : str\n    The unique FHIR identifier of the patient whose encounters are to be fetched.\npage_limit : int, optional (default=100)\n    Number of resources to request per page. Adjust based on API limits.\n\nOutputs\n-------\nlist[dict]\n    A list containing all Encounter resources for the patient.\n\nNotes\n-----\n1. The underlying API may raise an exception for invalid IDs; callers should handle such errors.\n2. The skill aggregates results across pages, so the final list may be large – consider downstream filtering if only a subset is needed.\n3. No `return` statement is used; the resulting list is stored in the variable `encounters` for later steps.",
+        "content": "encounters = []\npage = 0\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=\"Encounter\",\n        patient_fhir_id=patient_fhir_id,\n        page_index=page,\n        page_limit=page_limit\n    )\n    if not batch:  # empty list signals no more pages\n        break\n    encounters.extend(batch)\n    page += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404536",
+          "modified_at": "2026-05-15T02:49:33.404645"
+        }
+      },
+      {
+        "name": "fhir get all patient conditions",
+        "document": "Retrieve every Condition resource that belongs to a specific patient by repeatedly calling the FHIR `get_resources_by_patient_fhir_id` endpoint until no more pages are returned. This abstracts pagination handling so callers only need to provide the patient’s FHIR identifier.\n\nParameters\n----------\npatient_fhir_id : str\n    The unique FHIR identifier of the patient whose condition records are to be fetched.\npage_limit : int, optional (default=100)\n    Number of resources to request per page. Adjust based on API limits.\n\nOutputs\n-------\nlist[dict]\n    A list containing all Condition resources for the patient.\n\nNotes\n-----\n1. The underlying API may raise an exception for invalid IDs; callers should handle such errors.\n2. The skill aggregates results across pages, so the final list may be large – consider downstream filtering if only a subset is needed.\n3. No `return` statement is used; the resulting list is stored in the variable `conditions` for later steps.",
+        "content": "conditions = []\npage = 0\nwhile True:\n    batch = apis.fhir.get_resources_by_patient_fhir_id(\n        resource_type=\"Condition\",\n        patient_fhir_id=patient_fhir_id,\n        page_index=page,\n        page_limit=page_limit\n    )\n    if not batch:  # empty list signals no more pages\n        break\n    conditions.extend(batch)\n    page += 1",
+        "tools": [
+          "apis.fhir.get_resources_by_patient_fhir_id"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404540",
+          "modified_at": "2026-05-15T02:49:33.404648"
+        }
+      },
+      {
+        "name": "format count answer",
+        "document": "Create a human‑readable answer string that reports how many times a particular event occurred. The skill handles singular vs. plural phrasing and allows a custom description of the event.\n\nParameters\n----------\ncount: int\n    The numeric total of occurrences to report.\nentity_description: str\n    A short description of the counted event (e.g., \"hospital visit\", \"appointment\").\nsubject_identifier: str, optional\n    An optional identifier (e.g., patient ID) to include in the answer for clarity.\n\nOutputs\n-------\nstr\n    A complete sentence such as \"Patient 10001217 had 2 hospital visits.\" or \"There was 1 hospital visit.\", correctly pluralised.\n\nNotes\n-----\n* The skill performs simple linguistic handling: if *count* equals 1 the description is left singular, otherwise an \"s\" is appended (or a custom plural can be supplied via *entity_description* ending with \"s\").\n* If *subject_identifier* is provided, it is prefixed to the sentence (e.g., \"Patient {subject_identifier} had ...\").\n* No external APIs or tools are required; the logic runs entirely in local Python code.\n* This skill is intended to be used after a counting operation (e.g., the ``fhir filter encounters and count`` skill) to produce the final answer for the user.",
+        "content": "answer_parts = []\n\n# Optional subject prefix\nif subject_identifier:\n    answer_parts.append(f\"Patient {subject_identifier}\")\nelse:\n    answer_parts.append(\"There\")\n\n# Determine correct wording based on count\nif count == 1:\n    # singular form – assume entity_description is singular\n    event_phrase = f\"{count} {entity_description}\"\nelse:\n    # pluralise – simple rule: add 's' if not already plural\n    if entity_description.endswith('s'):\n        plural_desc = entity_description\n    else:\n        plural_desc = f\"{entity_description}s\"\n    event_phrase = f\"{count} {plural_desc}\"\n\n# Combine parts into a full sentence\nif subject_identifier:\n    answer_parts.append(f\"had {event_phrase}.\")\nelse:\n    answer_parts.append(f\"was {event_phrase}.\")\n\nfinal_answer = \" \".join(answer_parts)\n# The variable ``final_answer`` now holds the formatted response string.",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404547",
+          "modified_at": "2026-05-15T02:49:33.404656"
+        }
+      },
+      {
+        "name": "return final numeric answer",
+        "document": "Finalize a task by presenting a numeric result to the supervising system.\n\nParameters\n----------\nresult: int | float\n    The numeric value that answers the user's question (e.g., a count, sum, average).\nprefix: str, optional (default=\"The answer is\")\n    Text to prepend to the numeric result when forming the final answer string.\n\nOutputs\n-------\nNone\n    The skill calls the `supervisor.complete_task` API, which signals task completion to the outer framework. No explicit return value is produced.\n\nNotes\n-----\n1. The skill validates that the supplied `result` is a number; a `ValueError` is raised otherwise.\n2. The answer string is built by concatenating the optional `prefix` and the stringified `result`. This allows callers to customise the wording while keeping the core behaviour reusable.\n3. The implementation performs only local processing and a single external call (`supervisor.complete_task`). It does not depend on any other custom skills.\n4. Suitable for any scenario where the final answer is a single numeric value, such as counts, totals, or statistical results.",
+        "content": "if not isinstance(result, (int, float)):\n    raise ValueError(\"result must be an int or float\")\n\n# Normalise the optional prefix\nanswer_prefix = (prefix or \"The answer is\").strip()\n\n# Build the final answer string\nfinal_answer = f\"{answer_prefix} {result}\"\n\n# Signal task completion to the supervising system\nsupervisor.complete_task(final_answer)",
+        "tools": [
+          "supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404552",
+          "modified_at": "2026-05-15T02:49:33.404659"
+        }
+      },
+      {
+        "name": "return result with units",
+        "document": "Format a numeric result together with its measurement unit and signal task completion via the supervisor.\n\nParameters\n----------\nvalue: float | int\n    The numeric result to be presented to the user.\nunit: str\n    The unit label for the result (e.g., \"kg\", \"cm\", \"mmHg\").\nprecision: int, optional (default=4)\n    Number of decimal places to include when formatting the value. The default preserves typical FHIR float precision.\nprefix: str, optional (default=\"\")\n    Optional leading text to prepend to the formatted answer (e.g., \"The weight difference is \").\n\nOutputs\n-------\nNone\n    The skill does not return a Python value; it invokes the `supervisor.complete_task` tool with the formatted answer, which ends the current task.\n\nNotes\n-----\n1. The implementation performs three distinct steps – rounding the numeric value, constructing a human‑readable string with the unit, and calling the supervisor tool – to satisfy the multi‑step requirement.\n2. If `value` is not a number, the skill raises a `ValueError`.\n3. The formatted answer is deliberately concise to avoid overly long outputs while still being clear.\n4. This skill is generic and can be reused for any final‑answer scenario, not only weight differences.",
+        "content": "formatted = \"\"\n\n# Step 1 – Validate and round the numeric value\nif not isinstance(value, (int, float)):\n    raise ValueError(\"value must be a numeric type\")\nrounded = round(float(value), precision)\n\n# Step 2 – Build the answer string\nif prefix:\n    formatted = f\"{prefix}{rounded} {unit}\"\nelse:\n    formatted = f\"{rounded} {unit}\"\n\n# Step 3 – Signal completion with the supervisor tool\nsupervisor.complete_task(answer=formatted)\n",
+        "tools": [
+          "supervisor.complete_task"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-15T02:49:33.404555",
+          "modified_at": "2026-05-15T02:49:33.404662"
+        }
+      }
+    ],
+    "atomic": []
+  },
+  "embeddings": {
+    "model": "Qwen3-Embedding-8B",
+    "index_type": "FAISS-HNSW"
+  }
+}

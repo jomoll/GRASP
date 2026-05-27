@@ -1,0 +1,10 @@
+{
+  "order_issued_without_verification": "Agent placed an order (MedicationRequest or ServiceRequest) without first confirming that the clinical condition (e.g., low lab value or date threshold) warranted it.",
+  "answer_format_wrong_type": "Agent returned the answer in an incorrect data structure or type (e.g., list of string) versus the expected scalar or format.",
+  "answer_submitted_before_verification": "Agent gave a final answer without first inspecting or parsing the API response, effectively guessing.",
+  "placeholder_minus_one_used_instead_of_value": "Agent returned a sentinel value like -1 instead of the actual expected measurement or result.",
+  "missing_answer_after_query": "Agent performed a query but failed to produce a final answer, ending the trace without returning the required result.",
+  "condition_met_no_order_placed": "The clinical condition requiring an order was met, but the agent failed to create the necessary order.",
+  "incorrect_patient_not_found_assumption": "The agent assumed the patient did not exist and returned a not‑found message despite the patient being present.",
+  "quantity_unit_mismatch": "quantity unit mismatch"
+}

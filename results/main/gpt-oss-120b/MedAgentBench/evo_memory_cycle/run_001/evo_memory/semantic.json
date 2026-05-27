@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-12T04:56:25.321004",
+  "rules": [
+    "[P1] If no qualifying lab result is found within the required window, FINISH with an empty JSON array.",
+    "[P1] Base all treatment or ordering actions on retrieved data, never on assumptions.",
+    "[P1] Return retrieved lab value and collection date as objects inside a JSON array.",
+    "[P1] Avoid unnecessary API calls; query required data first and if missing or already supplied, FINISH with an empty JSON array without extra calls.",
+    "[P1] Query the patient database using the provided identifier (e.g., MRN, name, DOB) before deciding if the patient exists.",
+    "[P1] If lookup succeeds, return the requested attribute in a JSON array.",
+    "[P1] Keep free‑text strings separate from structured JSON arrays; each data category (e.g., labs, orders) must be in its own array.",
+    "[P1] When querying a lab, limit the search to a clinically relevant recent time window (e.g., last 24 hours) unless a different window is specified.",
+    "[P1] FINISH responses must contain only the prescribed payload (e.g., empty JSON array or exact string) and no additional explanatory text.",
+    "[P1] Never emit placeholder or sentinel values; always use real data or an empty array.",
+    "[P1] Compare the lab's result date to the current date; if older than 1 year, emit an order JSON array for a new test.",
+    "[P1] If patient lookup fails, FINISH with the exact string \"Patient not found\".",
+    "[P1] Validate lab values against clinical thresholds before ordering; if thresholds not met, FINISH with an empty JSON array."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_f81fd11c40b4",
+      "text": "[P1] If no qualifying lab result is found within the required window, FINISH with an empty JSON array.",
+      "tags": [
+        "lab_lookup",
+        "conditional_ordering",
+        "no-result_handling",
+        "qualifying",
+        "result",
+        "found",
+        "within",
+        "required",
+        "window",
+        "finish"
+      ],
+      "shown": 5,
+      "success": 4,
+      "failure": 1,
+      "created_at": "2026-05-12T04:52:42.938176",
+      "updated_at": "2026-05-12T04:56:25.315507"
+    },
+    {
+      "id": "rule_b714ef36ce1d",
+      "text": "[P1] Base all treatment or ordering actions on retrieved data, never on assumptions.",
+      "tags": [
+        "vital_sign",
+        "empty_response",
+        "no_order",
+        "base",
+        "treatment",
+        "ordering",
+        "actions",
+        "retrieved",
+        "data",
+        "never"
+      ],
+      "shown": 5,
+      "success": 3,
+      "failure": 2,
+      "created_at": "2026-05-12T04:16:20.341800",
+      "updated_at": "2026-05-12T04:56:06.727468"
+    },
+    {
+      "id": "rule_3db0e0dc09fd",
+      "text": "[P1] Return retrieved lab value and collection date as objects inside a JSON array.",
+      "tags": [
+        "lab_lookup",
+        "date_comparison",
+        "conditional_order",
+        "response_format",
+        "return",
+        "retrieved",
+        "value",
+        "collection",
+        "date",
+        "objects"
+      ],
+      "shown": 6,
+      "success": 4,
+      "failure": 2,
+      "created_at": "2026-05-12T04:41:58.381866",
+      "updated_at": "2026-05-12T04:56:06.727497"
+    },
+    {
+      "id": "rule_51b4431cc1f8",
+      "text": "[P1] Avoid unnecessary API calls; query required data first and if missing or already supplied, FINISH with an empty JSON array without extra calls.",
+      "tags": [
+        "lab_lookup",
+        "missing_data",
+        "sentinel_response",
+        "avoid",
+        "unnecessary",
+        "calls",
+        "query",
+        "required",
+        "data",
+        "first"
+      ],
+      "shown": 5,
+      "success": 3,
+      "failure": 2,
+      "created_at": "2026-05-12T04:49:11.202122",
+      "updated_at": "2026-05-12T04:56:25.315544"
+    },
+    {
+      "id": "rule_2bdd4fc8f7ad",
+      "text": "[P1] Query the patient database using the provided identifier (e.g., MRN, name, DOB) before deciding if the patient exists.",
+      "tags": [
+        "patient-lookup",
+        "lookup-failure",
+        "response-format",
+        "query",
+        "patient",
+        "database",
+        "using",
+        "provided",
+        "identifier",
+        "name"
+      ],
+      "shown": 12,
+      "success": 9,
+      "failure": 3,
+      "created_at": "2026-05-12T04:46:43.255294",
+      "updated_at": "2026-05-12T04:56:25.315475"
+    },
+    {
+      "id": "rule_25d9557adbb6",
+      "text": "[P1] If lookup succeeds, return the requested attribute in a JSON array.",
+      "tags": [
+        "patient_lookup",
+        "response_format",
+        "finish_syntax",
+        "lookup",
+        "succeeds",
+        "return",
+        "requested",
+        "attribute",
+        "json",
+        "array"
+      ],
+      "shown": 9,
+      "success": 6,
+      "failure": 3,
+      "created_at": "2026-05-12T04:50:12.087390",
+      "updated_at": "2026-05-12T04:56:25.315518"
+    },
+    {
+      "id": "rule_5c4c47d7edd1",
+      "text": "[P1] Keep free‑text strings separate from structured JSON arrays; each data category (e.g., labs, orders) must be in its own array.",
+      "tags": [
+        "lab_lookup",
+        "missing_data",
+        "conditional_order",
+        "keep",
+        "free",
+        "text",
+        "strings",
+        "separate",
+        "from",
+        "structured"
+      ],
+      "shown": 5,
+      "success": 2,
+      "failure": 3,
+      "created_at": "2026-05-12T04:41:15.405247",
+      "updated_at": "2026-05-12T04:56:06.727638"
+    },
+    {
+      "id": "rule_336c03ad2e81",
+      "text": "[P1] When querying a lab, limit the search to a clinically relevant recent time window (e.g., last 24 hours) unless a different window is specified.",
+      "tags": [
+        "lab_lookup",
+        "conditional_order",
+        "output_format",
+        "when",
+        "querying",
+        "limit",
+        "search",
+        "clinically",
+        "relevant",
+        "recent"
+      ],
+      "shown": 14,
+      "success": 8,
+      "failure": 6,
+      "created_at": "2026-05-12T04:44:55.741865",
+      "updated_at": "2026-05-12T04:56:25.315556"
+    },
+    {
+      "id": "rule_02028a76c62c",
+      "text": "[P1] FINISH responses must contain only the prescribed payload (e.g., empty JSON array or exact string) and no additional explanatory text.",
+      "tags": [
+        "lab_lookup",
+        "conditional_order",
+        "output_format",
+        "finish",
+        "responses",
+        "must",
+        "contain",
+        "only",
+        "prescribed",
+        "payload"
+      ],
+      "shown": 1,
+      "success": 1,
+      "failure": 0,
+      "created_at": "2026-05-12T04:44:55.741903",
+      "updated_at": "2026-05-12T04:56:25.315568"
+    },
+    {
+      "id": "rule_e736d8eefd58",
+      "text": "[P1] Never emit placeholder or sentinel values; always use real data or an empty array.",
+      "tags": [
+        "lab_query",
+        "time_window",
+        "placeholder_error",
+        "never",
+        "emit",
+        "placeholder",
+        "sentinel",
+        "values",
+        "always",
+        "real"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-12T04:26:08.101151",
+      "updated_at": "2026-05-12T04:56:06.727732"
+    },
+    {
+      "id": "rule_0ab81bffc2e7",
+      "text": "[P1] Compare the lab's result date to the current date; if older than 1 year, emit an order JSON array for a new test.",
+      "tags": [
+        "lab_lookup",
+        "date_comparison",
+        "conditional_order",
+        "response_format",
+        "compare",
+        "result",
+        "date",
+        "current",
+        "older",
+        "than"
+      ],
+      "shown": 17,
+      "success": 10,
+      "failure": 7,
+      "created_at": "2026-05-12T04:41:58.381925",
+      "updated_at": "2026-05-12T04:56:25.315532"
+    },
+    {
+      "id": "rule_e9976b6b99ae",
+      "text": "[P1] If patient lookup fails, FINISH with the exact string \"Patient not found\".",
+      "tags": [
+        "lab_lookup",
+        "missing_data",
+        "conditional_order",
+        "patient",
+        "lookup",
+        "fails",
+        "finish",
+        "with",
+        "exact",
+        "string"
+      ],
+      "shown": 20,
+      "success": 12,
+      "failure": 8,
+      "created_at": "2026-05-12T04:41:15.405473",
+      "updated_at": "2026-05-12T04:56:25.315495"
+    },
+    {
+      "id": "rule_91655cd46326",
+      "text": "[P1] Validate lab values against clinical thresholds before ordering; if thresholds not met, FINISH with an empty JSON array.",
+      "tags": [
+        "lab_lookup",
+        "missing_data",
+        "conditional_order",
+        "validate",
+        "values",
+        "against",
+        "clinical",
+        "thresholds",
+        "before",
+        "ordering"
+      ],
+      "shown": 9,
+      "success": 3,
+      "failure": 6,
+      "created_at": "2026-05-12T04:41:15.405404",
+      "updated_at": "2026-05-12T04:56:06.727822"
+    }
+  ]
+}

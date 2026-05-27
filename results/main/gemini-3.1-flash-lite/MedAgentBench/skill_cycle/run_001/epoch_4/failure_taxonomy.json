@@ -1,0 +1,12 @@
+{
+  "incorrect_clinical_logic_evaluation": "Agent correctly retrieved data but reached an incorrect conclusion based on clinical thresholds.",
+  "failed_to_retrieve_data": "Agent failed to find the requested data and returned a placeholder or error code.",
+  "missing_required_unit": "missing required unit",
+  "excessive_redundant_queries": "Agent entered a loop of redundant or non-productive search queries without finding the target data.",
+  "patient_reference_format_error": "Agent returned a raw value instead of the required FHIR-compliant reference or formatted string.",
+  "unnecessary_action_performed": "Agent performed a write action (e.g., ServiceRequest) when the task only required data retrieval.",
+  "incorrect_dosage_calculation": "Agent performed the correct logic but calculated the medication dose incorrectly.",
+  "answer_format_wrong_type": "Returned a list or multiple strings when a single scalar value was expected.",
+  "wrong_loinc_code_queried": "Agent used an incorrect or non-standard code (e.g., 'K' instead of LOINC 2823-3) for laboratory data retrieval.",
+  "patient_age_calculation_error": "Agent retrieved correct birth date but calculated the patient's age incorrectly."
+}

@@ -1,0 +1,18 @@
+{
+  "sentinel_value_used_for_no_result": "Returned a placeholder like -1 instead of the required no-result answer format/value.",
+  "no_fallback_order_when_no_prior_result": "When no prior qualifying result was found, failed to place the required new lab order.",
+  "correct_answer_overwritten_by_retry": "Produced a valid answer, then replaced it with an incorrect later final response.",
+  "latest_observation_not_sorted_correctly": "Selected an older lab result instead of the most recent observation from the returned set.",
+  "answer_format_wrong_arity": "Returned the wrong number of answer fields/items compared with the expected output.",
+  "omitted_explicit_no_order_status": "Returned the lab value/date but omitted the required explicit statement that no new order was placed.",
+  "age_off_by_one_from_reference_date": "Computed patient age incorrectly by one year relative to the benchmark's reference date.",
+  "answer_format_extra_narration": "Returned procedurally correct content but with extra prose/non-canonical wording instead of the expected answer format.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "patient_mrn_used_instead_of_resource_id": "Used the MRN in FHIR patient references or order subjects instead of the resolved Patient resource id.",
+  "potassium_low_threshold_set_too_low": "Interpreted mildly low potassium values (e.g. 3.8-3.9) as normal, so no replacement/order was placed.",
+  "missing_payload_treated_as_no_result": "After a GET without visible response content, assumed the patient had no result instead of waiting for or verifying the payload.",
+  "stale_lab_followup_order_omitted": "Returned the last lab value/date but omitted the required follow-up order when the result was older than the task threshold.",
+  "servicerequest_note_wrong_type": "Constructed ServiceRequest.note as a single object instead of the expected array/Annotation structure.",
+  "fabricated_lab_result_without_payload": "After a query with no visible response body, the agent invented a specific lab value/date and answered as if it had been returned.",
+  "missing_payload_treated_as_patient_not_found": "After a patient lookup without visible response content, concluded the patient was not found instead of verifying the payload."
+}

@@ -1,0 +1,9 @@
+{
+  "incorrect_clinical_logic_evaluation": "Agent correctly retrieved data but reached an incorrect conclusion based on clinical thresholds.",
+  "failed_to_retrieve_data": "Agent failed to find the requested data and returned a placeholder or error code.",
+  "missing_required_unit": "missing required unit",
+  "excessive_redundant_queries": "Agent entered a loop of redundant or non-productive search queries without finding the target data.",
+  "patient_reference_format_error": "Agent returned a raw value instead of the required FHIR-compliant reference or formatted string.",
+  "unnecessary_action_performed": "Agent performed a write action (e.g., ServiceRequest) when the task only required data retrieval.",
+  "incorrect_dosage_calculation": "Agent performed the correct logic but calculated the medication dose incorrectly."
+}

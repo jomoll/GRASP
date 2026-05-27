@@ -1,0 +1,26 @@
+{
+  "test_eval_best": {
+    "split": "test",
+    "score": 0.15,
+    "n_correct": 9,
+    "n_total": 60
+  },
+  "test_eval_baseline": {
+    "split": "test",
+    "score": 0.18333333333333332,
+    "n_correct": 11,
+    "n_total": 60
+  },
+  "id_test_eval_best": {
+    "split": "id_test",
+    "score": 0.515625,
+    "n_correct": 33,
+    "n_total": 64
+  },
+  "id_test_eval_baseline": {
+    "split": "id_test",
+    "score": 0.5625,
+    "n_correct": 36,
+    "n_total": 64
+  }
+}

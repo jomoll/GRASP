@@ -1,0 +1,7 @@
+{
+  "split": "id_test",
+  "score": 0.8125,
+  "n_correct": 52,
+  "n_total": 64,
+  "skills_dir": "outputs-gpt5/skill_cycle_gpt54_low/20260513_025926/skills/best"
+}

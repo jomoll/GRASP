@@ -1,0 +1,16 @@
+# Generic OpenAI-compatible backend for the quickstart.
+#
+# Works with any endpoint exposing POST {base_url}/chat/completions — OpenAI,
+# a self-hosted vLLM / llama.cpp server, a LiteLLM proxy, etc. Configure via
+# environment variables (no secrets are stored in the repo):
+#
+#   export OPENAI_BASE_URL="http://localhost:8000/v1"   # your endpoint
+#   export OPENAI_API_KEY="sk-..."                        # or "EMPTY" for local
+#   export GRASP_MODEL="gpt-4o-mini"                      # model name
+#
+module: grasp.agents.openai_chat.OpenAIChatAgent
+parameters:
+  base_url: ${OPENAI_BASE_URL:-http://localhost:8000/v1}
+  api_key: ${OPENAI_API_KEY:-EMPTY}
+  model: ${GRASP_MODEL:-local-model}
+  max_tokens: 1024

@@ -1,0 +1,43 @@
+_resume: true
+agent:
+  module: src.client.agents.OpenAIResponsesAgent
+  parameters:
+    base_url: <REDACTED>
+    max_output_tokens: 65536
+    model: <REDACTED>-06-gpt-5.4-2026-03-05
+    reasoning_effort: low
+    text_verbosity: low
+    timeout: 1800
+cycle:
+  batch_concurrency: 5
+  epochs: 5
+  run_baseline: true
+  update_every: 48
+data:
+  dev: data/medagentbench/split_dev.json
+  full: data/medagentbench/test_data_v2.json
+  id_test: data/medagentbench/split_id_test.json
+  test: data/medagentbench/split_test.json
+  val: data/medagentbench/split_val.json
+evo_memory:
+  episodic_enabled: true
+  episodic_top_k: 3
+  max_context_chars: 6000
+  max_episodes: 500
+  max_semantic_rules: 25
+  semantic_enabled: true
+  semantic_top_k: 8
+output_dir: outputs/evo_memory_cycle_gpt54_low
+task:
+  controller_address: http://localhost:5050/api
+  fhir_api_base: http://localhost:8080/fhir/
+  name: medagentbench-skill
+updater:
+  module: src.client.agents.OpenAIResponsesAgent
+  parameters:
+    base_url: <REDACTED>
+    max_output_tokens: 65536
+    model: <REDACTED>-06-gpt-5.4-2026-03-05
+    reasoning_effort: low
+    text_verbosity: low
+    timeout: 1800

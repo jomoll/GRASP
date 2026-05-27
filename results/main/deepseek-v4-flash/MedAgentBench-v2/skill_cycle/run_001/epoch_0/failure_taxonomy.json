@@ -1,0 +1,19 @@
+{
+  "opioid_search_incomplete": "Agent identified an opioid but did not complete the naloxone matching verification",
+  "tsh_ft4_interpretation_wrong_action": "Agent correctly retrieved TSH/FT4 values but took wrong clinical action based on results",
+  "no_vaccine_found_incorrectly_ordered": "Agent found no vaccine records but incorrectly ordered a new vaccine",
+  "vaccine_date_returned_no_action": "Agent returned vaccine date but did not perform the required action based on the date",
+  "vaccine_search_incomplete": "Agent started vaccine search but did not complete the required verification steps",
+  "vaccine_found_incorrectly_ordered": "Agent found a vaccine record but incorrectly ordered a booster despite not meeting criteria",
+  "no_procedure_found_incorrectly_ordered": "Agent found no matching procedure but incorrectly ordered a new one instead of reporting absence",
+  "catheter_search_wrong_resource_type": "Agent searched Procedure for catheter then switched to Condition instead of completing the check",
+  "no_heart_rate_data_found": "no heart rate data found",
+  "catheter_search_incomplete": "Agent started catheter search but did not complete the required verification steps",
+  "opioid_search_missed_medication": "Agent claimed no active opioid orders but patient actually had opioid medications active",
+  "heart_rate_average_not_computed": "Agent retrieved heart rate values but returned raw numbers instead of computing averages",
+  "no_dvt_order_found_incorrectly_ordered": "Agent found no DVT prophylaxis orders but incorrectly created a new order without verifying all categories",
+  "no_vaccine_found_incorrect_conclusion": "Agent found no vaccine records and drew wrong conclusion about booster necessity",
+  "vaccine_lookup_wrong_resource_type": "Agent searched MedicationRequest and Procedure for vaccine records but missed Immunization resource",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "date_filter_omitted": "date filter omitted"
+}

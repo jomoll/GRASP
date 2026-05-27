@@ -1,0 +1,23 @@
+{
+  "observation_query_missing_for_potassium_check": "Did not query potassium Observation before deciding on replacement order.",
+  "unnecessary_order_created": "Created an order (ServiceRequest) that was not required by the instruction.",
+  "observation_query_missing_for_magnesium_check": "Failed to query magnesium Observation before evaluating replacement need.",
+  "patient_lookup_missing_for_age_query": "Did not execute patient lookup API call before computing age.",
+  "patient_lookup_missing_for_referral_order": "Did not perform patient lookup before creating referral ServiceRequest.",
+  "answer_format_wrong_sentence": "Returned a free-text sentence instead of the expected structured list format.",
+  "patient_lookup_missing_for_bp_record": "Did not perform patient lookup before attempting to record blood pressure observation.",
+  "answer_type_string_instead_of_number": "Returned numeric result as a string inside a list rather than a numeric type.",
+  "placeholder_value_returned": "Returned placeholder value like -1 instead of actual measurement.",
+  "answer_format_wrong_type": "Returned answer as a list of string when a plain string or different type was expected.",
+  "low_potassium_missing_replacement_order": "Identified a low potassium level but did not place the required potassium replacement order.",
+  "mrn_extraction_missing": "Did not extract the MRN from the Patient resource and returned a default \"Patient not found\" response.",
+  "service_request_creation_missing": "Provided reasoning for a referral but failed to issue the required ServiceRequest POST.",
+  "observation_value_returned_without_order": "Returned the potassium observation value directly instead of creating a replacement order when the value is low.",
+  "order_created_without_evaluating_potassium": "Created a medication order without first checking the potassium observation value.",
+  "datetime_missing_timezone": "Returned a date or datetime string without the required ISO‑8601 timezone component (e.g., missing 'T…+00:00').",
+  "duplicate_order_created": "The agent creates the same ServiceRequest (or other order) twice, resulting in duplicate orders.",
+  "observation_query_wrong_code_or_missing": "The agent queries the wrong Observation code or fails to retrieve the HbA1c observation, leading to a missing‑value response.",
+  "answer_returns_observation_instead_of_order": "The final answer contains the observed potassium value rather than the expected order confirmation or order details.",
+  "no_order_message_missing": "When the potassium level is normal, the agent returns only the value without a required message indicating that no replacement order is needed.",
+  "missing_observation_query_before_answer": "The agent never performed the required Observation GET request before producing a final answer."
+}

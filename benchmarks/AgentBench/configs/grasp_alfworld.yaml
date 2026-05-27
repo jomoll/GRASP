@@ -1,0 +1,34 @@
+output_dir: "outputs/grasp_alfworld"
+
+# Model backend: select with --agent / GRASP_BACKEND, or change the default here.
+# See configs/agents/README.md for presets (gptoss, deepseek, gemini, gpt4, gpt5, local).
+agent_preset: gptoss
+agent_temperature: 0.2
+
+# Task worker (must be running before starting this script):
+#   python -m src.start_task -a --config configs/start_skill_task_alfworld.yaml --controller-port 5060 --base-port 5061
+task:
+  name: "alfworld-skill"
+  controller_address: "http://localhost:5060/api"
+
+data:
+  dev: "data/alfworld/split_dev.json"
+  val: "data/alfworld/split_val.json"
+
+eval:
+  module: src.server.tasks.alfworld.eval
+
+skills:
+  base_dir: "skills/alfworld/base"
+
+cycle:
+  epochs: 10
+  update_every: 26
+  batch_concurrency: 1
+  max_proposals: 1
+  max_learned_skills: 10
+  grpo_k: 4
+  grpo_eval_n: 20
+  run_baseline: true
+  proposal_temperature: 0.8
+  seed: 2                  # RNG seed for data shuffling and probe sampling (change for multi-seed runs)

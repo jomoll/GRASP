@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-16T09:50:55.818505",
+  "rules": [
+    "[P1] Explicitly confirm absence or presence of required context or data before deciding or responding.",
+    "[P1] Only perform follow-up or contingent actions if their specified or prerequisite conditions are met.",
+    "[P1] Always fulfill unconditional components of instructions even if contingent data is absent.",
+    "[P1] Do not fabricate, infer, or assume values or answers in the absence of required source data."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_937fa55effc5",
+      "text": "[P1] Explicitly confirm absence or presence of required context or data before deciding or responding.",
+      "tags": [
+        "data-validation",
+        "fabrication",
+        "medical",
+        "explicitly",
+        "confirm",
+        "absence",
+        "presence",
+        "required",
+        "context",
+        "data"
+      ],
+      "shown": 4,
+      "success": 1,
+      "failure": 3,
+      "created_at": "2026-05-16T09:47:06.657079",
+      "updated_at": "2026-05-16T09:47:32.331703"
+    },
+    {
+      "id": "rule_e2f09de2e562",
+      "text": "[P1] Only perform follow-up or contingent actions if their specified or prerequisite conditions are met.",
+      "tags": [
+        "conditional-action",
+        "lab-check",
+        "medication-ordering",
+        "only",
+        "perform",
+        "follow",
+        "contingent",
+        "actions",
+        "their",
+        "specified"
+      ],
+      "shown": 32,
+      "success": 14,
+      "failure": 11,
+      "created_at": "2026-05-16T09:42:22.965872",
+      "updated_at": "2026-05-16T09:47:32.331879"
+    },
+    {
+      "id": "rule_69325e48a674",
+      "text": "[P1] Always fulfill unconditional components of instructions even if contingent data is absent.",
+      "tags": [
+        "contingent-action",
+        "lab-orders",
+        "instruction-parsing",
+        "always",
+        "fulfill",
+        "unconditional",
+        "components",
+        "instructions",
+        "even",
+        "contingent"
+      ],
+      "shown": 31,
+      "success": 12,
+      "failure": 19,
+      "created_at": "2026-05-16T09:43:38.030737",
+      "updated_at": "2026-05-16T09:47:32.331823"
+    },
+    {
+      "id": "rule_4a7de82c8917",
+      "text": "[P1] Do not fabricate, infer, or assume values or answers in the absence of required source data.",
+      "tags": [
+        "data_absence",
+        "fabrication",
+        "context-check",
+        "fabricate",
+        "infer",
+        "assume",
+        "values",
+        "answers",
+        "absence",
+        "required"
+      ],
+      "shown": 56,
+      "success": 25,
+      "failure": 31,
+      "created_at": "2026-05-16T09:38:34.253618",
+      "updated_at": "2026-05-16T09:47:32.331768"
+    }
+  ]
+}

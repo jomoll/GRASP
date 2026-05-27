@@ -1,0 +1,184 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-13T23:05:06.096618",
+  "rules": [
+    "[P1] Do not fabricate data; act only on provided context.",
+    "[P1] Explicitly confirm absence of prerequisite data before answering or terminating.",
+    "[P1] Explicitly check for the presence of required data before responding.",
+    "[P1] Always retrieve and verify requested data from context before responding.",
+    "[P1] Double-check date calculations for time-sensitive actions such as scheduling follow-up labs.",
+    "[P1] Copy required free-text content verbatim when specified in instructions.",
+    "[P1] Withhold actions if prerequisite data is missing.",
+    "[P1] Explicitly confirm completion of the requested action."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_262c7ce3a956",
+      "text": "[P1] Do not fabricate data; act only on provided context.",
+      "tags": [
+        "lab_check",
+        "data_fabrication",
+        "contingent_action",
+        "fabricate",
+        "data",
+        "only",
+        "provided",
+        "context",
+        "measurement_recording",
+        "confirmation"
+      ],
+      "shown": 3,
+      "success": 1,
+      "failure": 2,
+      "created_at": "2026-05-13T22:59:24.629846",
+      "updated_at": "2026-05-13T23:00:36.340191"
+    },
+    {
+      "id": "rule_7c7f514bc61c",
+      "text": "[P1] Explicitly confirm absence of prerequisite data before answering or terminating.",
+      "tags": [
+        "missing-data",
+        "confirmation",
+        "explicitly",
+        "confirm",
+        "absence",
+        "prerequisite",
+        "data",
+        "before",
+        "answering",
+        "terminating"
+      ],
+      "shown": 4,
+      "success": 1,
+      "failure": 3,
+      "created_at": "2026-05-13T22:59:47.143288",
+      "updated_at": "2026-05-13T23:00:36.340393"
+    },
+    {
+      "id": "rule_4f1b17f6bb35",
+      "text": "[P1] Explicitly check for the presence of required data before responding.",
+      "tags": [
+        "data_absence",
+        "fabrication",
+        "verification",
+        "explicitly",
+        "check",
+        "presence",
+        "required",
+        "data",
+        "before",
+        "responding"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-13T23:00:36.340292",
+      "updated_at": "2026-05-13T23:00:36.340295"
+    },
+    {
+      "id": "rule_b9b93ccc2dc9",
+      "text": "[P1] Always retrieve and verify requested data from context before responding.",
+      "tags": [
+        "retrieval",
+        "verification",
+        "context-absent",
+        "always",
+        "retrieve",
+        "verify",
+        "requested",
+        "data",
+        "from",
+        "context"
+      ],
+      "shown": 13,
+      "success": 7,
+      "failure": 6,
+      "created_at": "2026-05-13T22:57:56.311093",
+      "updated_at": "2026-05-13T23:00:36.340442"
+    },
+    {
+      "id": "rule_299f18acc425",
+      "text": "[P1] Double-check date calculations for time-sensitive actions such as scheduling follow-up labs.",
+      "tags": [
+        "ordering",
+        "date-calculation",
+        "lab-followup",
+        "double",
+        "check",
+        "date",
+        "calculations",
+        "time",
+        "sensitive",
+        "actions"
+      ],
+      "shown": 13,
+      "success": 6,
+      "failure": 6,
+      "created_at": "2026-05-13T22:56:28.259971",
+      "updated_at": "2026-05-13T23:00:36.340603"
+    },
+    {
+      "id": "rule_5765c6241ee1",
+      "text": "[P1] Copy required free-text content verbatim when specified in instructions.",
+      "tags": [
+        "order-entry",
+        "referral",
+        "instruction-following",
+        "copy",
+        "required",
+        "free",
+        "text",
+        "content",
+        "verbatim",
+        "when"
+      ],
+      "shown": 9,
+      "success": 3,
+      "failure": 3,
+      "created_at": "2026-05-13T22:58:17.904000",
+      "updated_at": "2026-05-13T23:00:36.340537"
+    },
+    {
+      "id": "rule_82c2ad441030",
+      "text": "[P1] Withhold actions if prerequisite data is missing.",
+      "tags": [
+        "conditional-action",
+        "data-verification",
+        "medical-workflow",
+        "withhold",
+        "actions",
+        "prerequisite",
+        "data",
+        "missing",
+        "absence-check",
+        "context-validation"
+      ],
+      "shown": 9,
+      "success": 3,
+      "failure": 6,
+      "created_at": "2026-05-13T22:58:47.748134",
+      "updated_at": "2026-05-13T23:00:36.340342"
+    },
+    {
+      "id": "rule_071b084e64bf",
+      "text": "[P1] Explicitly confirm completion of the requested action.",
+      "tags": [
+        "referral",
+        "documentation",
+        "clinical-detail",
+        "explicitly",
+        "confirm",
+        "completion",
+        "requested",
+        "action",
+        "vitals",
+        "confirmation"
+      ],
+      "shown": 17,
+      "success": 7,
+      "failure": 10,
+      "created_at": "2026-05-13T22:57:20.972618",
+      "updated_at": "2026-05-13T23:00:36.340488"
+    }
+  ]
+}

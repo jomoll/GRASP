@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Issue exactly one API action per turn, and verify the final request string is a single valid endpoint or POST payload before sending.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple records are returned for a clinical query, determine the most recent result by comparing the relevant date fields before answering or acting.",
+    "counter": 2
+  },
+  {
+    "text": "For time-based conditions, explicitly compare the record timestamp to the task’s reference time before deciding whether follow-up ordering is needed.",
+    "counter": 2
+  },
+  {
+    "text": "After completing any required order, finish with both the retrieved clinical finding and a clear statement of whether an order was placed.",
+    "counter": 2
+  },
+  {
+    "text": "Output exactly one valid API action per turn; never concatenate or repeat multiple requests in a single response.",
+    "counter": 2
+  },
+  {
+    "text": "Use the patient identifier directly in resource queries when the API supports it; avoid redundant lookup steps unless another identifier is required.",
+    "counter": 2
+  },
+  {
+    "text": "Before calling FINISH, check all task conditions against the returned data, including date-based thresholds and any required follow-up orders.",
+    "counter": 2
+  },
+  {
+    "text": "For lab-result tasks, retrieve the relevant Observation, report the latest value and its recorded date, and use that date to decide whether further action is needed.",
+    "counter": 2
+  },
+  {
+    "text": "Issue exactly one API action per turn, strictly matching the required response format.",
+    "counter": 2
+  },
+  {
+    "text": "Before calling FINISH, verify that every part of the task has been completed, including any conditional follow-up actions such as placing an order when criteria are met.",
+    "counter": 2
+  },
+  {
+    "text": "For time-based clinical tasks, identify the most recent relevant result, compare its date to the stated time threshold, and base the next action on that comparison.",
+    "counter": 2
+  },
+  {
+    "text": "If a search returns no matching data, use the task’s fallback instruction exactly as given and still check whether any additional requested actions are required.",
+    "counter": 2
+  },
+  {
+    "text": "Use the patient identifier provided in the task directly when the API accepts it; avoid extra lookup steps unless another resource ID is truly required.",
+    "counter": 2
+  },
+  {
+    "text": "For time-bounded lab tasks, query the relevant Observation with the given code and an explicit date filter covering the requested window before taking any action.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple results are returned, determine the most recent clinically relevant result by comparing timestamps in the response rather than assuming bundle order.",
+    "counter": 2
+  },
+  {
+    "text": "Only place an order when the retrieved result meets the stated threshold and timing conditions; otherwise explicitly finish with no action.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving clinical data, explicitly check every conditional instruction in the task before finishing, including whether follow-up orders are required.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple observations are returned, identify the most recent one by comparing the relevant timestamps rather than assuming the query result order is sufficient.",
+    "counter": 2
+  },
+  {
+    "text": "For time-based decisions, compare the observation date against the stated reference time using the exact threshold in the task before deciding whether to place an order.",
+    "counter": 2
+  },
+  {
+    "text": "If a requested follow-up order is needed, use the appropriate ordering resource and supplied code details before returning the final answer.",
+    "counter": 2
+  }
+]

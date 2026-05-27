@@ -1,0 +1,16 @@
+{
+  "answer_list_separate_fields": "Final answer returned separate list elements for value and date instead of the combined expected format.",
+  "no_api_call_before_answer": "Agent gave an answer without performing any required FHIR API request.",
+  "answer_string_instead_of_list": "Final answer provided a single descriptive string where a list of items was expected.",
+  "answer_text_not_numeric_value": "Final answer gave explanatory text rather than the numeric magnesium level as required.",
+  "minus_one_placeholder_returned": "Agent returned sentinel \"-1\" placeholder instead of the actual lab value.",
+  "answer_list_instead_of_scalar": "Returned the age inside a list instead of as a scalar integer.",
+  "quantity_unit_missing": "Returned a numeric value without the required unit (e.g., mg/dL).",
+  "unnecessary_potassium_test_ordered": "Agent ordered a repeat potassium test despite the level not being low.",
+  "unnecessary_order_in_answer": "Agent included an order action in the final answer when only the lab value was requested.",
+  "answer_extra_explanatory_text": "Final answer included extra explanatory sentences beyond the required concise response.",
+  "answer_missing_value": "Agent returned an empty answer list despite having retrieved a lab value.",
+  "duplicate_order_actions": "Agent issued multiple order resources (e.g., MedicationRequest and ServiceRequest) when only a single order was required.",
+  "missing_date_condition_check": "Agent ignored the instruction to compare the lab result date against a threshold before answering.",
+  "missing_order_when_low": "Agent retrieved a low lab value but failed to create the required replacement order."
+}

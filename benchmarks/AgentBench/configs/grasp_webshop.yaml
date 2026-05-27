@@ -1,0 +1,40 @@
+output_dir: "outputs/grasp_webshop"
+
+# Model backend: select with --agent / GRASP_BACKEND, or change the default here.
+# See configs/agents/README.md for presets (gptoss, deepseek, gemini, gpt4, gpt5, local).
+agent_preset: gptoss
+agent_temperature: 0.2
+
+# Task worker (must be running before starting this script)
+# Start with: python -m src.start_task -a --config configs/start_skill_task_webshop.yaml --controller-port 5090 --base-port 5091
+task:
+  name: "webshop-std"
+  controller_address: "http://localhost:5090/api"
+
+# Data splits produced by data/webshop/split_dataset.py
+# (round-robin partition of webshop-std indices 0..199)
+data:
+  dev: "data/webshop/split_dev.json"   # 100 samples — skill learning
+  val: "data/webshop/split_val.json"   #  50 samples — monitoring
+  test: "data/webshop/split_test.json"  #  50 samples — held-out
+
+# Task-specific eval function (reward == 1.0 counts as success)
+eval:
+  module: src.server.tasks.webshop.eval
+
+# Skill library
+skills:
+  base_dir: "skills/webshop/base"
+
+# Training loop hyperparameters
+cycle:
+  epochs: 10
+  update_every: 50        # 2 batches per epoch over 100 dev samples
+  batch_concurrency: 4    # each session uses an isolated env (unique session_prefix); keep modest — env is memory-heavy
+  max_proposals: 1        # one change per proposal call; best-of-K selects the winner
+  max_learned_skills: 10
+  grpo_k: 4               # candidate proposals sampled per update
+  grpo_eval_n: 40         # ~third of dev
+  run_baseline: true      # run a silent val eval before epoch 0
+  proposal_temperature: 0.8
+  seed: 3

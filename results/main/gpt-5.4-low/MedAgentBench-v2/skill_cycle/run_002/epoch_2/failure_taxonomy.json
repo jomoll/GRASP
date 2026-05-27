@@ -1,0 +1,18 @@
+{
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "task_abandoned_without_final_answer": "Stopped after partial retrieval/pagination and never produced the required final result.",
+  "dvt_prophylaxis_filter_omitted": "Queried inpatient medication orders broadly without isolating active DVT prophylaxis orders before deciding to create one.",
+  "removal_order_check_omitted": "Decided no removal order existed without actually querying for or verifying removal-order documentation.",
+  "six_hour_window_not_applied": "Computed the 6-hour average from a 12-hour retrieval instead of restricting to the last 6 hours.",
+  "ct_abdomen_code_misidentified": "Looked for the target CT abdomen using the wrong procedure code set, so the relevant prior study was missed.",
+  "absence_concluded_without_response_data": "Claimed no matching records existed despite not having usable response data to verify absence.",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "duplicate_orders_not_discontinued": "Identified duplicate active orders but failed to perform the required discontinuation action on older/incorrect duplicates.",
+  "malformed_six_hour_time_boundary": "Used an incorrect timestamp/window boundary for the 6-hour query, causing the 6-hour result to not reflect the requested period.",
+  "therapeutic_anticoagulants_misclassified_as_prophylaxis": "Counted full-dose anticoagulation or unrelated anticoagulant therapy as DVT prophylaxis when assessing prophylaxis orders.",
+  "pagination_stopped_before_exhausting_results": "Stopped after only part of a paginated search and concluded the result set without retrieving all pages.",
+  "opioid_naloxone_matching_not_verified_before_order": "Created a naloxone order without first confirming an active opioid lacked a matching naloxone prescription.",
+  "heart_rate_code_misqueried": "Looked for heart rate using an incorrect or overly narrow Observation code query, causing existing HR observations to be missed.",
+  "future_order_counted_as_active": "Counted an order authored after the evaluation time as an already-active current order.",
+  "active_order_search_limited_to_today": "Restricted active-order verification to orders authored on the current date, missing other still-active orders."
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When a task asks for statistics over a recent time span, first compute the exact start and end timestamps based on the provided “current time” and the required interval (e.g., now – 6 hours to now), expressed in ISO‑8601 UTC format, and use these precise bounds in the API query.",
+    "counter": 2
+  },
+  {
+    "text": "After each GET request, always check the Bundle’s `total` field (or entry list) before attempting any calculations; if no resources are returned, report that the data are unavailable rather than proceeding with assumptions.",
+    "counter": 2
+  },
+  {
+    "text": "For tasks that need results for multiple distinct windows (e.g., past 6 hours and past 12 hours), issue separate queries for each window (or a single query that covers the larger window and then filter locally), and compute each average independently to avoid mixing time ranges.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure date‑range parameters follow the API’s syntax exactly (e.g., `date=ge2023-11-12T10:00:00Z&date=le2023-11-12T16:00:00Z`) and that time‑zone offsets are correctly applied, preventing mismatches that could return empty result sets.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating a service request, always verify that no existing removal order or procedure exists for the same device by searching relevant resources (e.g., ServiceRequest, Procedure) for removal codes.",
+    "counter": 2
+  },
+  {
+    "text": "When assessing duration criteria (e.g., “> 48 hours”), include date filters in the initial FHIR search (using `date=gt` or `date=lt` with the appropriate cutoff) to retrieve only records that satisfy the time condition.",
+    "counter": 2
+  },
+  {
+    "text": "If multiple matching procedure records are returned, evaluate the most recent `performedDateTime` to determine the current age of the device and decide whether the duration threshold is met.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving data, explicitly compare the calculated elapsed time against the required threshold before proceeding to create any new resource; if the threshold is not met, finish with an appropriate statement instead of creating an unnecessary request.",
+    "counter": 2
+  },
+  {
+    "text": "Retrieve all observations that match the required code, category, and fall within the exact time window (using both `date=ge<start>` and `date=le<end>` parameters) before performing any aggregation.",
+    "counter": 2
+  },
+  {
+    "text": "Always filter vital‑sign observations by `category=vital-signs` and `code=HEARTRATE` (or the appropriate LOINC/code) to avoid mixing unrelated observation types such as laboratory results.",
+    "counter": 2
+  },
+  {
+    "text": "Compute averages by extracting the numeric `valueQuantity.value` from each matching Observation, summing them, and dividing by the count of observations; ensure units are consistent (e.g., bpm) before reporting the result.",
+    "counter": 2
+  },
+  {
+    "text": "If the query returns zero observations for a given window, handle the situation gracefully by indicating that insufficient data are available rather than assuming a default or single value.",
+    "counter": 2
+  },
+  {
+    "text": "Always construct the patient reference in FHIR requests using the full resource path (e.g., \"Patient/​{patient_id}\") unless the API explicitly requires a bare identifier.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating a new order, confirm that the search for prior administrations returned zero results; if the search includes a date filter, ensure the filter covers the full period needed to detect any previous dose.",
+    "counter": 2
+  },
+  {
+    "text": "Match the payload to the exact schema required by the endpoint—include all mandatory fields and use the correct resource type (e.g., ServiceRequest for orders, MedicationRequest for medication orders) and field names as defined in the API description.",
+    "counter": 2
+  },
+  {
+    "text": "In the final FINISH response, provide a single, clear statement that summarizes the finding and the action taken, avoiding duplicated or overly verbose messages.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating a new ServiceRequest, always retrieve the most recent Procedure matching the specified CPT codes, extract its date, and compare it to the current date to determine if it is older than the required interval (e.g., 12 months).",
+    "counter": 2
+  },
+  {
+    "text": "If no matching Procedure is found, treat the situation as “no prior study” and proceed to order the new procedure, as the requirement is effectively satisfied.",
+    "counter": 2
+  },
+  {
+    "text": "When issuing a ServiceRequest for a new imaging study, always include the clinical indication in the `note.text` field and use the correct CPT code and status (`active`, `order`, `stat`) as specified in the task.",
+    "counter": 2
+  },
+  {
+    "text": "Conclude the task with a FINISH action that reports both the date of the most recent relevant study (or states that none exists) and a clear confirmation that the new order has been placed, using a JSON‑loadable list of strings.",
+    "counter": 2
+  }
+]

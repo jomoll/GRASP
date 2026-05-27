@@ -1,0 +1,13 @@
+# Start the DBBench task worker for the skill-learning cycle.
+#
+# Usage:
+#   python -m src.start_task -a --config configs/start_skill_task_dbbench.yaml --controller-port 5010 --base-port 5011
+#
+# Then in a separate terminal:
+#   python -m src.grasp --config configs/grasp_dbbench.yaml --run-name run_001
+
+definition:
+  import: tasks/task_assembly.yaml
+
+start:
+  dbbench-std: 1

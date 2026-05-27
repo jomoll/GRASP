@@ -1,0 +1,13 @@
+{
+  "date_filter_omitted": "FHIR query omitted a required date filter, leading to an incorrect or missing result.",
+  "no_action_executed": "Assistant gave reasoning but performed no required FHIR request before finishing.",
+  "missing_value_returned_as_minus_one": "Assistant returned sentinel -1 to indicate missing data instead of handling the case properly.",
+  "quantity_unit_mismatch": "Numeric value returned without the required unit or with an incorrect unit.",
+  "answer_format_wrong_type": "Final answer returned in an incorrect data type or structure (e.g., string instead of number, wrong list format).",
+  "order_placed_without_verifying_low_value": "Placed a medication order without first checking that the lab value met the low‑threshold condition.",
+  "order_placed_without_valid_result": "Issued an order even though the retrieved lab result was null or invalid.",
+  "null_value_returned_for_missing_observation": "Returned null fields for a missing observation instead of handling the absence appropriately.",
+  "missing_order_when_low": "Failed to place a replacement order despite the lab value being below the low‑threshold.",
+  "unnecessary_service_request_placed": "Placed a ServiceRequest (order) when the task only required retrieving information, i.e., an unnecessary order was created.",
+  "answer_submitted_before_verification": "answer submitted before verification"
+}

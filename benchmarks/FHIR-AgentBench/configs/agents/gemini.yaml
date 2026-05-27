@@ -1,0 +1,6 @@
+# Gemini 3.1 Flash Lite via Vertex AI (LiteLLM "vertex_ai/" route).
+# Required env: GOOGLE_CLOUD_PROJECT + application-default credentials.
+# Optional: GOOGLE_CLOUD_LOCATION (default us-central1), GEMINI_MODEL.
+model: "vertex_ai/${GEMINI_MODEL:-gemini-3.1-flash-lite}"
+project_id: "${GOOGLE_CLOUD_PROJECT}"
+location: "${GOOGLE_CLOUD_LOCATION:-us-central1}"

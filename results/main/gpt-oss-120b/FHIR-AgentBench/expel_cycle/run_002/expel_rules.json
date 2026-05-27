@@ -1,0 +1,82 @@
+[
+  {
+    "text": "For any query that includes a temporal constraint, always filter the retrieved FHIR resources by the specified date range before determining the answer.",
+    "counter": 2
+  },
+  {
+    "text": "Perform all data extraction and logical checks inside an `execute_python_code` call; never rely on intuition or unverified assumptions.",
+    "counter": 2
+  },
+  {
+    "text": "After analysis, present a concise reasoning summary and conclude with the exact required phrase `The final answer is: …` to ensure proper processing.",
+    "counter": 2
+  },
+  {
+    "text": "When a question could be answered by more than one resource type (e.g., MedicationRequest, MedicationAdministration), retrieve and evaluate all relevant resources, and combine their results to form the final answer.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for specific observations, filter the retrieved Observation resources by matching the observation code, display, or text using case‑insensitive and whitespace‑insensitive comparisons to capture all variations.",
+    "counter": 2
+  },
+  {
+    "text": "Apply any temporal constraints explicitly by constructing precise start and end datetimes (e.g., the first and last moments of the requested month) and filter resources whose relevant timestamps fall within that range.",
+    "counter": 2
+  },
+  {
+    "text": "After filtering, use Python code to compute the required statistic (e.g., minimum value) and then identify the most recent resource that exhibits that statistic within the same filtered set.",
+    "counter": 2
+  },
+  {
+    "text": "Always conclude the response with the exact required format “The final answer is: …” and present the answer using the same datetime string format as it appears in the FHIR data.",
+    "counter": 2
+  },
+  {
+    "text": "When answering measurement comparison questions, first identify the specific encounter (e.g., first ICU visit) and then filter Observation resources to those linked to that encounter before any further analysis.",
+    "counter": 2
+  },
+  {
+    "text": "Determine the order of multiple measurements by sorting the filtered observations by their effectiveDateTime (or issued) values rather than assuming a fixed index; the “first” and “second” refer to chronological order.",
+    "counter": 2
+  },
+  {
+    "text": "Verify that the retrieved Observation resources actually contain the target vital sign code (e.g., respiratory rate) and that the values are numeric before performing arithmetic; handle missing or non‑numeric values explicitly.",
+    "counter": 2
+  },
+  {
+    "text": "After computing the result, cross‑check the calculation with a simple sanity test (e.g., ensure the difference is not based on swapped measurements) and format the final answer exactly as required, including the “The final answer is:” prefix.",
+    "counter": 2
+  },
+  {
+    "text": "When a question refers to a specific hospital encounter, first isolate that encounter (e.g., first or last “encounter‑hosp” by identifier or class) and use its reference to filter all subsequent resource searches.",
+    "counter": 2
+  },
+  {
+    "text": "Filter Observation resources by both the encounter reference and a case‑insensitive, whitespace‑trimmed match on the test description or code (e.g., “pleural fluid”) before attempting to extract values.",
+    "counter": 2
+  },
+  {
+    "text": "If the required information is not directly present in the Observation (e.g., organism name), follow any referenced resources such as Specimen or Observation.component/value to retrieve the data.",
+    "counter": 2
+  },
+  {
+    "text": "Retrieve only the minimal necessary subsets of resources (e.g., Observations linked to the identified encounter) to reduce data volume and avoid missing relevant entries during analysis.",
+    "counter": 2
+  },
+  {
+    "text": "Before answering a question about a specific event during a visit, first determine the exact encounter that represents the “last hospital visit” by selecting the encounter with the appropriate hospital identifier or class code and the most recent start date.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a particular lab test (e.g., bicarbonate), normalize both the Observation.code.coding.display and Observation.code.coding.code strings by stripping whitespace and making the comparison case‑insensitive, and consider all possible coding systems.",
+    "counter": 2
+  },
+  {
+    "text": "Always perform the filtering and verification of retrieved resources with execute_python_code; do not rely on a tool‑provided answer without programmatic confirmation.",
+    "counter": 2
+  },
+  {
+    "text": "If no Observation matching the normalized test name is found within the identified encounter (or its child encounters), explicitly state that the test was not given rather than assuming a positive answer.",
+    "counter": 2
+  }
+]

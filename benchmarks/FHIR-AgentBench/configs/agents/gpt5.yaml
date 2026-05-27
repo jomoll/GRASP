@@ -1,0 +1,5 @@
+# GPT-5.4 (low) via Azure OpenAI v1 endpoint.
+# Required env: AZURE_OPENAI_API_KEY, AZURE_OPENAI_BASE_URL.
+# Optional: GPT5_MODEL (default gpt-5.4).
+model: "${GPT5_MODEL:-gpt-5.4}"
+base_url: "${AZURE_OPENAI_BASE_URL}"

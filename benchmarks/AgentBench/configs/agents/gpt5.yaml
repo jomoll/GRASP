@@ -1,0 +1,13 @@
+# GPT-5.4 (low reasoning effort) via Azure OpenAI Responses API.
+# Required env: AZURE_OPENAI_API_KEY, AZURE_OPENAI_BASE_URL
+#   (e.g. https://YOUR-RESOURCE.openai.azure.com/openai/v1/).
+# Optional env: GPT5_MODEL (default "gpt-5.4"),
+#   GPT5_REASONING_EFFORT (default "low"), GPT5_TEXT_VERBOSITY (default "low").
+module: src.client.agents.OpenAIResponsesAgent
+parameters:
+  model: "${GPT5_MODEL:-gpt-5.4}"
+  base_url: "${AZURE_OPENAI_BASE_URL}"
+  reasoning_effort: "${GPT5_REASONING_EFFORT:-low}"
+  text_verbosity: "${GPT5_TEXT_VERBOSITY:-low}"
+  max_output_tokens: 32768
+  timeout: 300

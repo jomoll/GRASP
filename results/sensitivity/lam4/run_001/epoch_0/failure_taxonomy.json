@@ -1,0 +1,18 @@
+{
+  "observation_not_retrieved_before_assessment": "Did not retrieve the Observation resource before making a clinical assessment.",
+  "patient_lookup_missing_before_age": "Attempted to compute patient age without first retrieving the Patient resource.",
+  "invalid_answer_placeholder_returned": "Returned a placeholder or sentinel value (e.g., -1) instead of the actual answer.",
+  "answer_format_wrong_type": "Returned answer in an unexpected format or with extraneous explanatory text.",
+  "magnesium_low_assessment_incorrect": "Mis‑interpreted the magnesium level as not low when it should have triggered replacement.",
+  "quantity_unit_mismatch": "Returned a numeric value without the required measurement unit.",
+  "required_order_missing": "Failed to place a new test order when the existing result was older than the required threshold.",
+  "observation_query_missing": "Did not issue any Observation GET request before attempting to answer the query.",
+  "patient_lookup_failed_false_negative": "Incorrectly reported patient not found when the patient does exist.",
+  "answer_submitted_before_verification": "Returned final answer without confirming retrieved FHIR data contains the requested value.",
+  "unnecessary_order_placed": "Created an order for a test or medication when clinical criteria did not require it.",
+  "age_computation_error": "Calculated the patient's age incorrectly.",
+  "order_missing_when_no_recent_observation": "Did not place a replacement order when no recent observation was found, contrary to instruction.",
+  "missing_observation_post": "Failed to record a new Observation (e.g., blood pressure) after being instructed to do so.",
+  "patient_lookup_missing_before_mrn_extraction": "Did not perform a patient lookup before attempting to extract the MRN, resulting in a missing or placeholder answer.",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query"
+}

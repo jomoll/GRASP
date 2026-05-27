@@ -1,0 +1,49 @@
+_resume: true
+agent:
+  module: src.client.agents.LiteLLMAgent
+  parameters:
+    api_version: 2025-01-01-preview
+    base_url: <REDACTED>
+    max_output_tokens: 8192
+    model: azure/<REDACTED>-02-gpt-4.1-2025-04-14
+    temperature: 0.0
+    timeout: 360
+cycle:
+  batch_concurrency: 1
+  epochs: 5
+  run_baseline: true
+  seed: 1
+  update_every: 48
+data:
+  dev: data/medagentbench/split_dev.json
+  full: data/medagentbench/test_data_v2.json
+  id_test: data/medagentbench/split_id_test.json
+  test: data/medagentbench/split_test.json
+  val: data/medagentbench/split_val.json
+output_dir: outputs/skillx_cycle_gpt41
+skillx:
+  enable_llm_merge: true
+  extractor_max_retries: 2
+  filter_stage1: true
+  filter_stage2: false
+  max_action_chars: 600
+  max_actions: 12
+  max_history_messages: 24
+  max_message_chars: 1200
+  plan_extractor_max_retries: 1
+  retrieval_top_k: 5
+  skill_type: functional
+  use_plan_extraction: true
+task:
+  controller_address: http://localhost:5050/api
+  fhir_api_base: http://localhost:8080/fhir/
+  name: medagentbench-skill
+updater:
+  module: src.client.agents.LiteLLMAgent
+  parameters:
+    api_version: 2025-01-01-preview
+    base_url: <REDACTED>
+    max_output_tokens: 8192
+    model: azure/<REDACTED>-02-gpt-4.1-2025-04-14
+    temperature: 0.7
+    timeout: 360

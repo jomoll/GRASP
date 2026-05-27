@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When multiple observations match the requested code, select the one with the most recent effectiveDateTime by sorting descending and use that as the answer.",
+    "counter": 2
+  },
+  {
+    "text": "Compare the selected observation’s effectiveDateTime to the current time; if the interval exceeds the task‑specified limit (e.g., > 1 year), issue the required order (e.g., a ServiceRequest or MedicationRequest) before completing the task.",
+    "counter": 2
+  },
+  {
+    "text": "After sending any order request, wait for the system’s confirmation of success before calling FINISH; include both the retrieved value/date and, when an order was placed, a note that the order was submitted.",
+    "counter": 2
+  },
+  {
+    "text": "If no observations are returned for the requested code, answer with [-1] and, when the task calls for it, still create the appropriate order for a new measurement.",
+    "counter": 2
+  },
+  {
+    "text": "If a search for the required observation returns no entries, immediately finish with a JSON‑loadable list containing the sentinel value [-1] as specified by the task.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving the most recent observation, compare its effectiveDateTime to the current timestamp; if the result is older than one year, create a ServiceRequest (or equivalent order) for the lab before issuing the final answer.",
+    "counter": 2
+  },
+  {
+    "text": "The FINISH response must be a single JSON‑loadable list of strings, with each element quoted (e.g., [\"5.4%\", \"2023-11-02\"]), and the list order should follow the question’s required output sequence.",
+    "counter": 2
+  },
+  {
+    "text": "Use the observation’s effectiveDateTime as the primary date for the lab result; if that field is missing, fall back to the issued field to determine when the measurement was recorded.",
+    "counter": 2
+  },
+  {
+    "text": "Respond with exactly ONE action per turn—either a single GET/POST request line or a FINISH statement—and include no additional explanatory text or JSON wrappers.",
+    "counter": 2
+  },
+  {
+    "text": "When filtering observations by time, use the FHIR date search syntax (e.g., `date=ge2023-11-12T10:15:00Z&date=lt2023-11-13T10:15:00Z`) to reliably restrict results to the desired 24‑hour window.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving observation data, compare the numeric `valueQuantity.value` against predefined clinical thresholds before deciding to place an order; only generate a MedicationRequest if the value is below the relevant cutoff.",
+    "counter": 2
+  },
+  {
+    "text": "If the filtered observation search returns no entries, immediately issue a `FINISH([...])` response indicating that no recent result was found and that no medication order is required.",
+    "counter": 2
+  },
+  {
+    "text": "ALWAYS emit exactly ONE API action per turn following the prescribed response format (e.g., `GET url?...` or `POST url\\n{json}`); never include explanatory text, reasoning, or JSON wrappers in the output.",
+    "counter": 2
+  },
+  {
+    "text": "FOR tasks that require conditional decisions, structure the workflow as separate steps: first perform a data‑retrieval request, wait for the response, then evaluate the result internally and issue the appropriate follow‑up request (e.g., an order) or a FINISH statement.",
+    "counter": 2
+  },
+  {
+    "text": "WHEN a query must be limited to a specific time window (such as “last 24 hours”), include the appropriate date‑range parameters in the GET request rather than fetching all records and filtering later.",
+    "counter": 2
+  },
+  {
+    "text": "KEEP all reasoning and decision‑making internal to the assistant; only the final action (or FINISH list) is sent to the user, ensuring compliance with the “one action per turn” rule and avoiding malformed responses.",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving observations, always sort or select the entry with the latest effectiveDateTime to determine the most recent measurement.",
+    "counter": 2
+  },
+  {
+    "text": "Compare the effectiveDateTime of the latest observation against the current timestamp; if the difference exceeds 365 days, automatically create a ServiceRequest (LOINC 4548‑4) to order a new test.",
+    "counter": 2
+  },
+  {
+    "text": "If no observations are returned for the requested code, return [-1] as the measurement result and still create a ServiceRequest to order the missing test.",
+    "counter": 2
+  },
+  {
+    "text": "The final answer must be emitted with a single FINISH([ … ]) call, where the list contains only JSON‑serializable strings (e.g., the value and date or “[-1]”). No extra text or actions are allowed after the FINISH statement.",
+    "counter": 2
+  }
+]

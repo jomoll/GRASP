@@ -1,0 +1,12 @@
+{
+  "unnecessary_order_created": "Created a ServiceRequest/MedicationRequest when the clinical scenario did not require an order, leading to an incorrect side effect.",
+  "observation_missing_no_order": "Failed to handle a missing observation correctly, reporting no data instead of taking the required clinical action.",
+  "answer_format_unstructured_text": "Returned a free‑form sentence inside a list instead of the expected structured value(s).",
+  "empty_answer_returned": "Returned an empty list as the final answer, providing no result.",
+  "answer_format_combined_string": "Returned a single combined string (e.g., \"5.0% on 2023‑11‑09T10:06:00+00:00\") where separate value and date fields were expected.",
+  "answer_format_wrong_type": "Returned the answer in the wrong data type or container (e.g., list of string instead of scalar or vice‑versa).",
+  "quantity_unit_missing": "Returned a numeric value without the required unit (e.g., mg/dL, mmol/L).",
+  "placeholder_returned": "Returned a placeholder value such as \"-1\" instead of the actual required result.",
+  "conditional_check_missing": "Assistant omitted required conditional logic (e.g., date comparison) and returned raw value without evaluating the condition.",
+  "action_sequence_incomplete": "Assistant stopped after reasoning without performing required FHIR actions or returning a final answer."
+}

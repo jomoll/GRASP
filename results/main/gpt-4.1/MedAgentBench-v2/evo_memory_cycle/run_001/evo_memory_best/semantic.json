@@ -1,0 +1,338 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-15T00:39:59.407162",
+  "rules": [
+    "[P1] Calculate date intervals precisely using year, month, and day differences",
+    "[P1] Explicitly search all relevant sources for required procedures, orders, measurements, device status, immunization records, lab values, items, or observations within each specified time window before concluding absence or performing calculations",
+    "[P1] Enumerate all possible medication formulations, aliases, and alternate spellings (including generic/brand names) when searching active orders",
+    "[P1] Confirm device or item presence and placement duration before action",
+    "[P1] Always verify system state post-action to ensure desired outcome",
+    "[P1] Check date of last required intervention before acting",
+    "[P1] Order repeat intervention if interval since last exceeds protocol threshold",
+    "[P1] Always verify procedure timing against the required threshold before skipping actions",
+    "[P1] Verify completeness of data before reporting summary statistics",
+    "[P1] Only initiate new or repeat actions when triggering criteria are met and required intervals verified",
+    "[P1] Verify absence of removal or modification order before initiating removal or modification",
+    "[P1] Ensure exactly one active order by discontinuing duplicates and confirm completion",
+    "[P1] Avoid unnecessary actions when triggering items are absent",
+    "[P1] Execute required actions, not just describe workflow",
+    "[P1] Match every active order requiring a co-prescription with its required pair and initiate when missing after verification"
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_1b6fdce91677",
+      "text": "[P1] Calculate date intervals precisely using year, month, and day differences",
+      "tags": [
+        "date-calculation",
+        "interval-check",
+        "imaging",
+        "follow-up",
+        "calculate",
+        "date",
+        "intervals",
+        "precisely",
+        "using",
+        "year"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-15T00:33:37.804781",
+      "updated_at": "2026-05-15T00:34:00.366622"
+    },
+    {
+      "id": "rule_d6ba19017f7e",
+      "text": "[P1] Explicitly search all relevant sources for required procedures, orders, measurements, device status, immunization records, lab values, items, or observations within each specified time window before concluding absence or performing calculations",
+      "tags": [
+        "vitals",
+        "observation",
+        "time-window",
+        "data-completeness",
+        "explicitly",
+        "search",
+        "relevant",
+        "sources",
+        "required",
+        "procedures"
+      ],
+      "shown": 5,
+      "success": 2,
+      "failure": 3,
+      "created_at": "2026-05-15T00:32:56.695215",
+      "updated_at": "2026-05-15T00:34:00.366780"
+    },
+    {
+      "id": "rule_d8fd25bd09d6",
+      "text": "[P1] Enumerate all possible medication formulations, aliases, and alternate spellings (including generic/brand names) when searching active orders",
+      "tags": [
+        "medication-matching",
+        "order-verification",
+        "search-robustness",
+        "enumerate",
+        "possible",
+        "medication",
+        "formulations",
+        "aliases",
+        "alternate",
+        "spellings"
+      ],
+      "shown": 7,
+      "success": 3,
+      "failure": 3,
+      "created_at": "2026-05-15T00:31:53.587555",
+      "updated_at": "2026-05-15T00:34:00.366893"
+    },
+    {
+      "id": "rule_2ffecc1bebcc",
+      "text": "[P1] Confirm device or item presence and placement duration before action",
+      "tags": [
+        "immunization",
+        "interval-check",
+        "order-placement",
+        "confirm",
+        "device",
+        "item",
+        "presence",
+        "placement",
+        "duration",
+        "before"
+      ],
+      "shown": 16,
+      "success": 10,
+      "failure": 6,
+      "created_at": "2026-05-15T00:29:56.122101",
+      "updated_at": "2026-05-15T00:34:00.367144"
+    },
+    {
+      "id": "rule_a8eda56efae9",
+      "text": "[P1] Always verify system state post-action to ensure desired outcome",
+      "tags": [
+        "order-verification",
+        "post-action-check",
+        "always",
+        "verify",
+        "system",
+        "state",
+        "post",
+        "action",
+        "ensure",
+        "desired"
+      ],
+      "shown": 17,
+      "success": 10,
+      "failure": 7,
+      "created_at": "2026-05-15T00:30:10.227115",
+      "updated_at": "2026-05-15T00:34:00.366979"
+    },
+    {
+      "id": "rule_728501bc2751",
+      "text": "[P1] Check date of last required intervention before acting",
+      "tags": [
+        "immunization",
+        "interval-check",
+        "order-placement",
+        "check",
+        "date",
+        "last",
+        "required",
+        "intervention",
+        "before",
+        "acting"
+      ],
+      "shown": 17,
+      "success": 10,
+      "failure": 6,
+      "created_at": "2026-05-15T00:29:56.122603",
+      "updated_at": "2026-05-15T00:34:00.367056"
+    },
+    {
+      "id": "rule_3e52c2abbd5b",
+      "text": "[P1] Order repeat intervention if interval since last exceeds protocol threshold",
+      "tags": [
+        "immunization",
+        "interval-check",
+        "order-placement",
+        "order",
+        "repeat",
+        "intervention",
+        "interval",
+        "since",
+        "last",
+        "exceeds"
+      ],
+      "shown": 20,
+      "success": 12,
+      "failure": 7,
+      "created_at": "2026-05-15T00:29:56.122665",
+      "updated_at": "2026-05-15T00:34:00.367232"
+    },
+    {
+      "id": "rule_44ff01ecf6c2",
+      "text": "[P1] Always verify procedure timing against the required threshold before skipping actions",
+      "tags": [
+        "date-interval",
+        "procedure-order",
+        "threshold",
+        "always",
+        "verify",
+        "procedure",
+        "timing",
+        "against",
+        "required",
+        "before"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-15T00:34:00.368017",
+      "updated_at": "2026-05-15T00:34:00.368021"
+    },
+    {
+      "id": "rule_0daa67583b7e",
+      "text": "[P1] Verify completeness of data before reporting summary statistics",
+      "tags": [
+        "vitals",
+        "observation",
+        "time-window",
+        "data-completeness",
+        "verify",
+        "completeness",
+        "data",
+        "before",
+        "reporting",
+        "summary"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-15T00:32:56.696354",
+      "updated_at": "2026-05-15T00:34:00.367509"
+    },
+    {
+      "id": "rule_cdc5ad40f575",
+      "text": "[P1] Only initiate new or repeat actions when triggering criteria are met and required intervals verified",
+      "tags": [
+        "procedure-order",
+        "absence-verification",
+        "workflow",
+        "only",
+        "initiate",
+        "repeat",
+        "actions",
+        "when",
+        "triggering",
+        "criteria"
+      ],
+      "shown": 27,
+      "success": 17,
+      "failure": 8,
+      "created_at": "2026-05-15T00:28:15.043802",
+      "updated_at": "2026-05-15T00:34:00.367429"
+    },
+    {
+      "id": "rule_9b1eaa04d194",
+      "text": "[P1] Verify absence of removal or modification order before initiating removal or modification",
+      "tags": [
+        "immunization",
+        "interval-check",
+        "order-placement",
+        "verify",
+        "absence",
+        "removal",
+        "modification",
+        "order",
+        "before",
+        "initiating"
+      ],
+      "shown": 17,
+      "success": 9,
+      "failure": 8,
+      "created_at": "2026-05-15T00:29:56.122187",
+      "updated_at": "2026-05-15T00:34:00.367327"
+    },
+    {
+      "id": "rule_432a9cabb9a6",
+      "text": "[P1] Ensure exactly one active order by discontinuing duplicates and confirm completion",
+      "tags": [
+        "immunization",
+        "interval-check",
+        "order-placement",
+        "ensure",
+        "exactly",
+        "active",
+        "order",
+        "discontinuing",
+        "duplicates",
+        "confirm"
+      ],
+      "shown": 16,
+      "success": 8,
+      "failure": 6,
+      "created_at": "2026-05-15T00:29:56.122534",
+      "updated_at": "2026-05-15T00:34:00.367612"
+    },
+    {
+      "id": "rule_0e4b8c3b47e4",
+      "text": "[P1] Avoid unnecessary actions when triggering items are absent",
+      "tags": [
+        "verification",
+        "order-matching",
+        "dependency",
+        "avoid",
+        "unnecessary",
+        "actions",
+        "when",
+        "triggering",
+        "items",
+        "absent"
+      ],
+      "shown": 24,
+      "success": 14,
+      "failure": 10,
+      "created_at": "2026-05-15T00:26:48.077479",
+      "updated_at": "2026-05-15T00:34:00.367695"
+    },
+    {
+      "id": "rule_dd8f69716f82",
+      "text": "[P1] Execute required actions, not just describe workflow",
+      "tags": [
+        "order_management",
+        "workflow_execution",
+        "dvt_prophylaxis",
+        "execute",
+        "required",
+        "actions",
+        "just",
+        "describe",
+        "workflow",
+        "lab-values"
+      ],
+      "shown": 24,
+      "success": 14,
+      "failure": 9,
+      "created_at": "2026-05-15T00:26:09.456876",
+      "updated_at": "2026-05-15T00:34:00.367775"
+    },
+    {
+      "id": "rule_5d9f377f8572",
+      "text": "[P1] Match every active order requiring a co-prescription with its required pair and initiate when missing after verification",
+      "tags": [
+        "medication-matching",
+        "protocol-compliance",
+        "match",
+        "every",
+        "active",
+        "order",
+        "requiring",
+        "prescription",
+        "with",
+        "required"
+      ],
+      "shown": 41,
+      "success": 24,
+      "failure": 14,
+      "created_at": "2026-05-15T00:25:50.055752",
+      "updated_at": "2026-05-15T00:34:00.367880"
+    }
+  ]
+}

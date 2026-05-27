@@ -1,0 +1,19 @@
+{
+  "answer_returned_as_list_not_string": "Agent returned the answer as a list of strings instead of a single string.",
+  "answer_returned_as_string_not_number": "Agent returned a numeric answer as a string rather than a numeric type.",
+  "missing_observation_query": "Agent proceeded to answer without first retrieving the required Observation resource.",
+  "placeholder_value_returned": "Agent returned a placeholder like \"-1\" instead of the actual value.",
+  "unnecessary_service_request_created": "Agent created a ServiceRequest (order) when the task did not require ordering.",
+  "missing_quantity_unit": "Agent returned a numeric value without the required measurement unit.",
+  "answer_sentence_instead_of_scalar": "Agent returned a full sentence rather than the plain scalar value/unit expected.",
+  "answer_contains_unexpected_text": "Final answer includes extra explanatory sentences beyond the required concise value.",
+  "missing_patient_query": "Agent did not query the Patient resource before attempting to use patient information.",
+  "answer_returned_as_empty_list": "The agent finished with an empty list instead of providing the required answer value(s).",
+  "answer_returned_as_number_not_string": "The final answer was a numeric type when the specification required a string representation (e.g., age should be returned as a string).",
+  "answer_combined_value_and_date_string": "The agent combined the numeric value and its timestamp into a single string, rather than returning them as separate fields as required.",
+  "age_computation_error": "Returned an incorrect age value after querying the Patient resource.",
+  "missing_order_when_condition_met": "Failed to create a required ServiceRequest/order when the clinical condition (e.g., low potassium) was met.",
+  "service_request_not_created": "Failed to create the required ServiceRequest resource for an order.",
+  "missing_conditional_order_logic": "Did not create or suggest an order when a clinical condition required it (e.g., low potassium).",
+  "order_created_without_condition_check": "Created a medication order without first verifying that the lab result satisfied the required clinical condition (e.g., low potassium)."
+}

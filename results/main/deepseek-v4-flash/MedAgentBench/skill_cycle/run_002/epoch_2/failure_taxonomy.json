@@ -1,0 +1,13 @@
+{
+  "missing_unit_in_answer": "Agent returned a numeric value without the required unit (e.g., mg/dL, mmol/L) as specified in the instruction.",
+  "patient_not_found_incorrectly": "Agent returned 'Patient not found' despite the patient existing in the system, likely due to incorrect query parameters or parsing.",
+  "patient_identifier_not_resolved": "Agent used MRN string directly as identifier without proper FHIR search parameter formatting, resulting in empty response and incorrect answer.",
+  "missing_date_filter_on_observation": "Agent queried Observation without date filter when the instruction required the most recent or last value, retrieving all records and likely picking wrong one.",
+  "returned_placeholder_instead_of_value": "Agent returned a placeholder value (-1) instead of the actual lab result from the FHIR response.",
+  "ordered_lab_without_final_answer": "Agent performed a POST to order a lab but did not return the final answer as required by the instruction.",
+  "date_filter_too_restrictive": "Agent applied a date filter that excluded all results, leading to a false 'no results found' conclusion.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "normal_value_no_action_needed": "Agent correctly determined lab value is normal and no action needed, but failed to return the required final answer format (e.g., missing value and date).",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "missing_subject_reference_prefix": "Agent used a bare patient ID (e.g., 'S6537563') as the subject reference instead of the FHIR-required 'Patient/S6537563' format."
+}

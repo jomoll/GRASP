@@ -1,0 +1,4 @@
+{
+  "missing_answer_call": "Agent performed searches/clicks but never invoked the answer tool to submit a final response.",
+  "final_answer_empty_object": "Agent invoked the final_answer tool but supplied an empty object/dict instead of the required answer payload"
+}

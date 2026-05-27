@@ -1,0 +1,53 @@
+default:
+  module: src.server.tasks.alfworld.ALFWorld
+  docker:
+    image: longinyu/agentbench-alfworld
+    command: umask 0; [ -f /root/.setup.sh ] && bash /root/.setup.sh; python -m pip install --disable-pip-version-check --timeout 60 --retries 10 agentrl-worker;
+  parameters:
+    name: alfworld-std
+    data_path: "/AgentBench/data/alfworld"
+    config_path: "src/server/tasks/alfworld/configs/base_config.yaml"
+    prompts_path: "src/server/tasks/alfworld/prompts/alfworld_multiturn_plan_first.json"
+    split: "standard"
+    max_step: 35
+    tools:
+      - type: "function"
+        function:
+          name: "take_action"
+          description: "Take an action."
+          parameters:
+            type: "object"
+            properties:
+              action:
+                type: "string"
+                description: "The action you would like to take"
+            required:
+              - "action"
+            additionalProperties: False
+
+alfworld-dev:
+  parameters:
+    name: alfworld-dev
+    split: "dev"
+
+alfworld-std:
+  parameters:
+    name: alfworld-std
+    split: "standard"
+
+alfworld-skill:
+  parameters:
+    name: alfworld-skill
+    concurrency: 5
+    split: "standard_plus_dev"
+
+alfworld-env_train:
+  parameters:
+    name: alfworld-env_train
+    split: "train_valid"
+
+alfworld-skill-test:
+  parameters:
+    name: alfworld-skill-test
+    concurrency: 5
+    split: "standard_plus_dev"

@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-18T19:53:25.571573",
+  "rules": [
+    "[P1] Take no action if the triggering event or condition is absent",
+    "[P1] If a required value is missing, recommend ordering only if the protocol or clinical suspicion warrants it",
+    "[P1] Compare elapsed time against protocol thresholds",
+    "[P1] Confirm the date of the last relevant intervention before acting",
+    "[P1] Initiate new orders only when required interval has elapsed",
+    "[P1] Check for data entry errors or future-dated events before making decisions",
+    "[P1] Verify that procedure and reference dates are chronologically valid before comparing intervals",
+    "[P1] Search all available data sources (including vaccination, medication, procedure, lab records, and time-stamped observations) within specified timeframes or intervals before acting or calculating statistics",
+    "[P1] Expand medication search to include all opioid variants, aliases, and medication classes",
+    "[P1] Review all active orders comprehensively before concluding absence",
+    "[P1] Explicitly confirm the presence or absence of required items (prescriptions, orders, procedures, devices, data, labs) across all potential locations before acting",
+    "[P1] Only act when protocol triggers are met; take no action if conditions are already satisfied",
+    "[P1] Discontinue duplicate orders, retaining only the newest"
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_de9e68844e06",
+      "text": "[P1] Take no action if the triggering event or condition is absent",
+      "tags": [
+        "procedure-check",
+        "conditional-action",
+        "take",
+        "action",
+        "triggering",
+        "event",
+        "condition",
+        "absent",
+        "medication-reconciliation",
+        "order-verification"
+      ],
+      "shown": 1,
+      "success": 0,
+      "failure": 1,
+      "created_at": "2026-05-18T19:53:11.714676",
+      "updated_at": "2026-05-18T19:53:25.561807"
+    },
+    {
+      "id": "rule_a00b3a5a5a7a",
+      "text": "[P1] If a required value is missing, recommend ordering only if the protocol or clinical suspicion warrants it",
+      "tags": [
+        "lab-retrieval",
+        "protocol-action",
+        "missing-data",
+        "required",
+        "value",
+        "missing",
+        "recommend",
+        "ordering",
+        "only",
+        "protocol"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-18T19:53:02.974941",
+      "updated_at": "2026-05-18T19:53:25.561448"
+    },
+    {
+      "id": "rule_71153dbb34b0",
+      "text": "[P1] Compare elapsed time against protocol thresholds",
+      "tags": [
+        "vaccine",
+        "date-comparison",
+        "protocol",
+        "order",
+        "compare",
+        "elapsed",
+        "time",
+        "against",
+        "thresholds",
+        "lab-retrieval"
+      ],
+      "shown": 3,
+      "success": 2,
+      "failure": 1,
+      "created_at": "2026-05-18T19:52:49.634110",
+      "updated_at": "2026-05-18T19:53:25.561499"
+    },
+    {
+      "id": "rule_3190c2be3d72",
+      "text": "[P1] Confirm the date of the last relevant intervention before acting",
+      "tags": [
+        "vaccine",
+        "date-comparison",
+        "protocol",
+        "order",
+        "confirm",
+        "date",
+        "last",
+        "relevant",
+        "intervention",
+        "before"
+      ],
+      "shown": 3,
+      "success": 2,
+      "failure": 1,
+      "created_at": "2026-05-18T19:52:49.634015",
+      "updated_at": "2026-05-18T19:53:25.561546"
+    },
+    {
+      "id": "rule_92a346884f21",
+      "text": "[P1] Initiate new orders only when required interval has elapsed",
+      "tags": [
+        "vaccine",
+        "date-comparison",
+        "protocol",
+        "order",
+        "initiate",
+        "orders",
+        "only",
+        "when",
+        "required",
+        "interval"
+      ],
+      "shown": 3,
+      "success": 2,
+      "failure": 1,
+      "created_at": "2026-05-18T19:52:49.634207",
+      "updated_at": "2026-05-18T19:53:25.561592"
+    },
+    {
+      "id": "rule_8d8368db2424",
+      "text": "[P1] Check for data entry errors or future-dated events before making decisions",
+      "tags": [
+        "date-validation",
+        "temporal-reasoning",
+        "procedure-order",
+        "check",
+        "data",
+        "entry",
+        "errors",
+        "future",
+        "dated",
+        "events"
+      ],
+      "shown": 7,
+      "success": 5,
+      "failure": 2,
+      "created_at": "2026-05-18T19:52:15.397388",
+      "updated_at": "2026-05-18T19:53:25.561640"
+    },
+    {
+      "id": "rule_328260f45aa6",
+      "text": "[P1] Verify that procedure and reference dates are chronologically valid before comparing intervals",
+      "tags": [
+        "date-validation",
+        "temporal-reasoning",
+        "procedure-order",
+        "verify",
+        "that",
+        "procedure",
+        "reference",
+        "dates",
+        "chronologically",
+        "valid"
+      ],
+      "shown": 7,
+      "success": 5,
+      "failure": 2,
+      "created_at": "2026-05-18T19:52:15.397291",
+      "updated_at": "2026-05-18T19:53:25.561691"
+    },
+    {
+      "id": "rule_ac4f557e7a9b",
+      "text": "[P1] Search all available data sources (including vaccination, medication, procedure, lab records, and time-stamped observations) within specified timeframes or intervals before acting or calculating statistics",
+      "tags": [
+        "data-search",
+        "interval-analysis",
+        "statistical-calculation",
+        "search",
+        "available",
+        "data",
+        "sources",
+        "including",
+        "vaccination",
+        "medication"
+      ],
+      "shown": 10,
+      "success": 7,
+      "failure": 3,
+      "created_at": "2026-05-18T19:51:13.065554",
+      "updated_at": "2026-05-18T19:53:25.561760"
+    },
+    {
+      "id": "rule_bc9c59f4217b",
+      "text": "[P1] Expand medication search to include all opioid variants, aliases, and medication classes",
+      "tags": [
+        "medication-reconciliation",
+        "order-verification",
+        "alias-mapping",
+        "expand",
+        "medication",
+        "search",
+        "include",
+        "opioid",
+        "variants",
+        "aliases"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-18T19:53:25.562086",
+      "updated_at": "2026-05-18T19:53:25.562089"
+    },
+    {
+      "id": "rule_4428735815a1",
+      "text": "[P1] Review all active orders comprehensively before concluding absence",
+      "tags": [
+        "medication-reconciliation",
+        "order-verification",
+        "alias-mapping",
+        "review",
+        "active",
+        "orders",
+        "comprehensively",
+        "before",
+        "concluding",
+        "absence"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-18T19:53:25.562146",
+      "updated_at": "2026-05-18T19:53:25.562149"
+    },
+    {
+      "id": "rule_8dafe0aae51a",
+      "text": "[P1] Explicitly confirm the presence or absence of required items (prescriptions, orders, procedures, devices, data, labs) across all potential locations before acting",
+      "tags": [
+        "lab_assessment",
+        "protocol_workflow",
+        "explicitly",
+        "confirm",
+        "presence",
+        "absence",
+        "required",
+        "items",
+        "prescriptions",
+        "orders"
+      ],
+      "shown": 30,
+      "success": 13,
+      "failure": 16,
+      "created_at": "2026-05-18T19:41:55.833857",
+      "updated_at": "2026-05-18T19:53:25.561868"
+    },
+    {
+      "id": "rule_5f59d0e00d13",
+      "text": "[P1] Only act when protocol triggers are met; take no action if conditions are already satisfied",
+      "tags": [
+        "order-placement",
+        "protocol-check",
+        "imaging",
+        "only",
+        "when",
+        "protocol",
+        "triggers",
+        "take",
+        "action",
+        "conditions"
+      ],
+      "shown": 133,
+      "success": 80,
+      "failure": 46,
+      "created_at": "2026-05-18T19:11:56.018942",
+      "updated_at": "2026-05-18T19:53:25.561937"
+    },
+    {
+      "id": "rule_ae86e0fd23e6",
+      "text": "[P1] Discontinue duplicate orders, retaining only the newest",
+      "tags": [
+        "order-verification",
+        "duplicate-removal",
+        "protocol-check",
+        "discontinue",
+        "duplicate",
+        "orders",
+        "retaining",
+        "only",
+        "newest",
+        "device-check"
+      ],
+      "shown": 67,
+      "success": 34,
+      "failure": 28,
+      "created_at": "2026-05-18T19:36:23.728470",
+      "updated_at": "2026-05-18T19:53:25.562004"
+    }
+  ]
+}

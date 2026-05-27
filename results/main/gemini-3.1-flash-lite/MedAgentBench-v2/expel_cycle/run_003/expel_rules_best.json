@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When searching for historical clinical events (like vaccinations) to determine if a threshold has been met, do not assume the absence of results within a specific date range means no records exist; first search without restrictive date filters to establish a complete clinical history.",
+    "counter": 2
+  },
+  {
+    "text": "When performing a POST request for a resource, ensure all references (such as `subject.reference`) follow the required format (e.g., \"Patient/ID\") rather than using the raw ID string alone.",
+    "counter": 2
+  },
+  {
+    "text": "Before placing a new order based on the absence of a prior record, verify the search parameters (such as date ranges or codes) were sufficiently broad to avoid false negatives.",
+    "counter": 2
+  },
+  {
+    "text": "Always provide a clear, evidence-based justification in the `note` field of a `ServiceRequest` when ordering a procedure, summarizing the clinical reasoning and the data found (or not found) that necessitated the order.",
+    "counter": 2
+  },
+  {
+    "text": "When tasked with verifying an order, always inspect the full list of active medication requests to identify potential duplicates or existing relevant orders before deciding whether to create a new one.",
+    "counter": 2
+  },
+  {
+    "text": "If the task requires managing duplicates (e.g., discontinuation), compare the retrieved medication orders against the target drug and dosage details provided in the context to accurately identify which records to act upon.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple active orders are found, prioritize the assessment of their characteristics (e.g., medication name, dosage, route) against the clinical requirement before performing any POST actions.",
+    "counter": 2
+  },
+  {
+    "text": "If no active order matches the required criteria, ensure that the creation of a new order is the final step after a thorough review of the current medication list confirms the absence of the requested therapy.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for medications or other clinical resources, always retrieve the complete list by accounting for pagination links if present in the initial search result bundle.",
+    "counter": 2
+  },
+  {
+    "text": "If a search result indicates that there are more entries than the current page, use the provided \"next\" link URL directly to fetch the subsequent results rather than attempting to construct custom query parameters that may lead to errors.",
+    "counter": 2
+  },
+  {
+    "text": "When verifying clinical orders, ensure that the search query covers all relevant categories or filters, and if a large number of records is expected, iterate through all pages of the resource bundle before concluding that no matching orders exist.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for historical procedures to determine if an action is needed, if an initial search with a specific date constraint returns no results, perform a broader search without date constraints to confirm if the procedure has ever been documented before assuming it is overdue.",
+    "counter": 2
+  },
+  {
+    "text": "When creating a resource, ensure the `subject.reference` parameter follows the required format `Patient/[ID]` rather than just the ID string to avoid potential API validation errors.",
+    "counter": 2
+  },
+  {
+    "text": "Before performing an action based on the absence of data, verify the search parameters (e.g., date ranges, codes) to ensure the lack of results is not due to overly restrictive query criteria.",
+    "counter": 2
+  },
+  {
+    "text": "When checking for a condition lasting more than a specific duration (e.g., 48 hours), always retrieve all relevant events for the patient and calculate the elapsed time between the earliest relevant event and the current time, rather than assuming a single event represents the total duration.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating a new service request, always verify if there are any existing active, completed, or pending service requests for the same procedure to avoid duplication or unnecessary actions.",
+    "counter": 2
+  },
+  {
+    "text": "When performing time-sensitive calculations, ensure that all retrieved procedure dates are explicitly compared against the reference time provided in the task context to confirm the duration threshold is actually met.",
+    "counter": 2
+  },
+  {
+    "text": "When querying for procedures or observations, ensure the search parameters (such as date or category) are broad enough to capture the full history of the event, then perform the necessary filtering or duration calculation within the reasoning process.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical data such as vital signs, if a specific code search fails, verify the available categories and resources first, and consider searching by category alone to inspect the returned resource structures for the correct coding or display name.",
+    "counter": 2
+  },
+  {
+    "text": "When performing time-based calculations, always ensure the date range parameters in the API request are correctly formatted and consistent with the intended look-back period relative to the current context time.",
+    "counter": 2
+  }
+]

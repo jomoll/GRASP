@@ -1,0 +1,72 @@
+# WebShop skill-cycle worker image — built WITHOUT a GitHub clone or index rebuild.
+#
+# Why this exists (vs. the sibling upstream Dockerfile): the framework's task
+# worker imports `agentrl.worker` (requires Python >=3.9, pydantic ~=2) in the
+# SAME interpreter as `web_agent_site`. The upstream longinyu/agentbench-webshop
+# image runs WebShop on Python 3.8 with spacy 3.6 (pydantic v1), which cannot
+# host agentrl-worker. So we build a fresh Python 3.9 worker and bump spacy to
+# >=3.7 (pydantic-v2 compatible) so both stacks coexist.
+#
+# To avoid the blocked GitHub clone and the multi-hour Lucene index rebuild, the
+# WebShop repo + 5.3GB product data + prebuilt index are copied straight from the
+# upstream image. Only PyPI and the spacy model release host are used at build.
+#
+# Build from the AgentBench/ directory:
+#   docker build -f src/server/tasks/webshop/Dockerfile.local -t agentbench-webshop-worker:local .
+#
+# configs/tasks/webshop.yaml points `docker.image` at agentbench-webshop-worker:local.
+
+# Stage 1: prebuilt WebShop repo + data + Lucene index from the upstream image.
+FROM longinyu/agentbench-webshop:latest AS webshop-src
+
+# Stage 2: the worker, on a Python the framework supports.
+# bullseye (Debian 11) ships openjdk-11, which pyserini/Anserini target; the
+# newer slim/trixie base dropped openjdk-11.
+FROM python:3.9-bullseye AS worker
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    TQDM_DISABLE=1 \
+    PYTHONPATH=/usr/src/webshop \
+    JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+# Java + a toolchain for pyjnius/pyserini (no py3.9 wheel for pyjnius → builds from source).
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      openjdk-11-jdk-headless build-essential && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# WebShop repo + 5.3GB product data + prebuilt Lucene index (no clone, no rebuild).
+COPY --from=webshop-src /root/webshop /usr/src/webshop
+
+# Python stack. spacy 3.7.x is the key: it supports pydantic v2, so it coexists
+# with agentrl-worker (which the upstream py3.8 / spacy-3.6 stack could not host).
+# torch comes from PyPI (the cpu index host is MITM'd by the proxy and untrusted
+# in-container); the cp39 wheel runs fine on CPU. transformers is pinned to
+# ~=4.19.2 (the upstream WebShop pin): newer transformers treats torch 1.11 as
+# "unavailable", which breaks pyserini's import chain (NameError: torch).
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+      "torch==1.11.0" \
+      "transformers~=4.19.2" \
+      "spacy>=3.7,<3.8" \
+      "gym~=0.24.0" \
+      "pyserini==0.17.0" \
+      "faiss-cpu~=1.7.2" \
+      "Flask~=2.1.2" "Werkzeug<3.0" \
+      "numpy<2.0" \
+      beautifulsoup4 cleantext rank_bm25 thefuzz \
+      requests rich selenium tqdm \
+      agentrl-worker
+
+# The spacy model normally downloads from github.com, which the in-container
+# proxy MITMs with an untrusted cert. Instead copy the en_core_web_lg model that
+# already ships in the base image (3.6.0); spacy 3.7 loads it with a version
+# warning. WebShop only uses its word vectors for reward matching.
+COPY --from=webshop-src \
+     /root/miniconda3/envs/webshop/lib/python3.8/site-packages/en_core_web_lg \
+     /usr/local/lib/python3.9/site-packages/en_core_web_lg
+COPY --from=webshop-src \
+     /root/miniconda3/envs/webshop/lib/python3.8/site-packages/en_core_web_lg-3.6.0.dist-info \
+     /usr/local/lib/python3.9/site-packages/en_core_web_lg-3.6.0.dist-info
+
+WORKDIR /root/workspace

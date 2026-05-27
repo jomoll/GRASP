@@ -1,0 +1,18 @@
+# Generic OpenAI-compatible endpoint (any local or remote server speaking the
+# /chat/completions API). Use this for models other than the named presets.
+# Required env: LOCAL_API_BASE, LOCAL_MODEL.
+# Optional env: LOCAL_API_KEY (default "EMPTY").
+module: src.client.agents.HTTPAgent
+parameters:
+  url: "${LOCAL_API_BASE}/chat/completions"
+  headers:
+    Authorization: "Bearer ${LOCAL_API_KEY:-EMPTY}"
+    Content-Type: "application/json"
+  body:
+    model: "${LOCAL_MODEL}"
+    temperature: 0.0
+    max_tokens: 8192
+  prompter:
+    name: role_content_dict
+    args:
+      agent_role: "assistant"

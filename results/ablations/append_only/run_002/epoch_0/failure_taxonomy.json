@@ -1,0 +1,16 @@
+{
+  "patient_not_found_assumed": "Assumed patient does not exist and returned 'Patient not found' without verifying response.",
+  "missing_fhir_query": "Provided reasoning or answer without performing any FHIR GET request.",
+  "missing_followup_note": "Omitted required follow‑up note or status message in the answer.",
+  "unnecessary_order_placed": "Created a ServiceRequest order when the instruction did not require ordering.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "answer_format_wrong_type": "answer format wrong type",
+  "extraneous_information_in_answer": "Included additional explanatory text beyond the exact required answer format.",
+  "placeholder_value_returned": "Returned a placeholder like '-1' instead of the actual required value.",
+  "order_placed_without_reporting_confirmation": "Created an order but returned only the old lab value without confirming the new order in the final answer.",
+  "conditional_order_missing": "Did not place a new order when the existing lab result was older than the required date threshold.",
+  "age_calculation_error": "Computed the patient’s age incorrectly from the birthdate.",
+  "order_confirmation_missing_in_answer": "Placed the appropriate medication/service order but omitted any confirmation or details about the order in the final response.",
+  "missing_referral_note_content": "Failed to include the required free‑text note content in the created referral ServiceRequest.",
+  "missing_replacement_decision": "Did not include the required replacement order or decision statement when the lab value met the low‑threshold condition."
+}

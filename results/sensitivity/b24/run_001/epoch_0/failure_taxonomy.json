@@ -1,0 +1,9 @@
+{
+  "answer_submitted_without_query": "Provided a final answer without first performing the necessary FHIR resource query.",
+  "answer_type_string_instead_of_integer": "Returned a numeric answer as a string when an integer type was expected.",
+  "quantity_unit_missing": "Returned a numeric quantity without the required unit (e.g., mg/dL).",
+  "answer_format_wrong_type": "Returned answer in an unexpected list or multiple-string format instead of the required single formatted response.",
+  "placeholder_value_returned": "Returned a sentinel placeholder like -1 when the required observation value was missing.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "order_not_generated_when_needed": "Did not create or return the required medication order despite a low lab value that required treatment."
+}

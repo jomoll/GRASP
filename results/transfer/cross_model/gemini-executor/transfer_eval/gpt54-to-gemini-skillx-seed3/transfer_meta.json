@@ -1,0 +1,10 @@
+{
+  "method": "skillx",
+  "library_path": "../gpt-mab/skillx_cycle_gpt54_low/20260521_075336/skillx_library_best.json",
+  "memory_dir": null,
+  "splits": [
+    "test",
+    "id_test"
+  ],
+  "run_name": "gpt54-to-gemini-skillx-seed3"
+}

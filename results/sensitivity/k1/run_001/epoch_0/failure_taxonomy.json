@@ -1,0 +1,11 @@
+{
+  "quantity_unit_missing": "Numeric result was returned without the required unit (or with an incorrect unit), violating the expected answer format.",
+  "unnecessary_order_issued": "Agent created a ServiceRequest (order) when the instruction only required retrieving existing data and did not ask for a new order.",
+  "placeholder_value_returned": "Agent returned a sentinel placeholder such as -1 instead of the actual required value.",
+  "answer_format_wrong_type": "Final answer was returned in a structural type or format (e.g., list vs string) that does not match the expected specification.",
+  "answer_submitted_without_fhir_query": "Agent produced a final answer without performing any FHIR GET/POST actions to retrieve or verify the requested information.",
+  "patient_nonexistent_assumed_exists": "Returned a patient identifier when the patient does not exist, assuming existence incorrectly.",
+  "patient_not_found_assumption_error": "Returned \"Patient not found\" despite patient existing in the system.",
+  "missing_conditional_order_creation": "Did not create an order that should be conditionally issued based on result date or value.",
+  "missing_required_action_order_not_created": "Failed to create a required order when the clinical condition demanded it."
+}

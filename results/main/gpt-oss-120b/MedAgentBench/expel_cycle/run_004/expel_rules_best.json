@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When a task involves evaluating a laboratory result, retrieve all matching Observation resources and select the record with the most recent effectiveDateTime (or issued timestamp) as the current value for decision‑making.",
+    "counter": 2
+  },
+  {
+    "text": "Compare the selected lab value to the clinical threshold supplied in the task description; only if the value is below the threshold should a replacement medication be ordered.",
+    "counter": 2
+  },
+  {
+    "text": "Whenever a replacement medication order is generated, also create a paired ServiceRequest (or equivalent order) for the required follow‑up laboratory test at the specified future date/time, ensuring both orders are issued together.",
+    "counter": 2
+  },
+  {
+    "text": "If no recent Observation is found within an appropriate window (e.g., the last 24–48 hours), do not place replacement medication orders and optionally report the absence of recent data.",
+    "counter": 2
+  },
+  {
+    "text": "Always apply an explicit date filter in the Observation query that exactly matches the time window required by the task (e.g., `date=ge<now‑24h>`), and verify that all returned resources fall within that window before proceeding.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple observations are returned, determine the most recent result by comparing their `effectiveDateTime` (or `issued` if more reliable) and use that value for the answer.",
+    "counter": 2
+  },
+  {
+    "text": "If no observation satisfies the date constraint, output the predefined sentinel value (e.g., -1) as specified by the task, ensuring it is included in a JSON‑loadable list for the FINISH action.",
+    "counter": 2
+  },
+  {
+    "text": "The FINISH response must be a single JSON array containing only the answer(s) in the required type (string or number) with no extra text or formatting; any deviation will cause the trial to fail.",
+    "counter": 2
+  },
+  {
+    "text": "When querying Observation resources, always include a date range parameter that matches the required time window (e.g., the last 24 hours) to limit results to relevant measurements.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving Observation entries, sort them by `effectiveDateTime` in descending order and select the first entry as the most recent value.",
+    "counter": 2
+  },
+  {
+    "text": "If no Observation satisfies the time‑window filter, return the sentinel value **-1** as the answer.",
+    "counter": 2
+  },
+  {
+    "text": "The FINISH action must output a JSON‑loadable list containing only primitive values (numbers or strings); numeric answers should be returned as numbers, not quoted strings.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires the most recent value within a time window, first retrieve all relevant observations (or use a broad date filter) and then programmatically select the latest entry that falls inside the window, rather than relying solely on the server’s date filter.",
+    "counter": 2
+  },
+  {
+    "text": "Verify that the query parameters used (e.g., `date`, `effectiveDateTime`) match the FHIR server’s supported search criteria for the resource; use the correct parameter name and ISO‑8601 format to avoid unintentionally filtering out all results.",
+    "counter": 2
+  },
+  {
+    "text": "Always check the returned Bundle for the presence of `entry` items before attempting to read observation data; handle empty bundles by returning the designated fallback value (e.g., -1) without causing errors.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the `FINISH` response follows the required format: a JSON‑loadable list where each element is a string (e.g., `FINISH([\"-1\"])` or `FINISH([\"2.4\"])`). This guarantees the platform can parse the answer correctly.",
+    "counter": 2
+  },
+  {
+    "text": "Keep all internal reasoning private; each response must contain exactly one API action line (GET, POST, or FINISH) with no explanatory text.",
+    "counter": 2
+  },
+  {
+    "text": "For conditional tasks, first issue a GET request to obtain the required observation, then on the next turn evaluate the result and issue the appropriate POST actions based on the observed value.",
+    "counter": 2
+  },
+  {
+    "text": "If the required recent observation is absent or cannot be retrieved, respond with a FINISH action that clearly states no order will be placed.",
+    "counter": 2
+  },
+  {
+    "text": "When creating a follow‑up laboratory order, use a ServiceRequest with the correct LOINC code, set occurrenceDateTime to the desired future time, and include a note linking the request to the related medication order.",
+    "counter": 2
+  }
+]

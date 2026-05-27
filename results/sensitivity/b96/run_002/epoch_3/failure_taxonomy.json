@@ -1,0 +1,14 @@
+{
+  "unnecessary_service_request_created": "Created a ServiceRequest resource when the existing data made it unnecessary.",
+  "no_data_message_incorrect": "Returned a narrative 'no data' message when a specific placeholder or format was expected.",
+  "answer_includes_unexpected_extra_text": "Returned additional explanatory text beyond the required answer fields.",
+  "answer_missing_expected_fields": "Returned answer missing required components (e.g., value or date) expected by the task.",
+  "quantity_unit_missing": "Returned a numeric value without the required unit of measurement.",
+  "missing_fhir_query_before_action": "Assistant stopped without performing any FHIR request before attempting to answer.",
+  "placeholder_minus_one_returned": "Returned placeholder '-1' indicating missing data instead of the actual value.",
+  "answer_returned_as_list": "Returned the answer as a JSON list/string array instead of a scalar value.",
+  "answer_format_syntax_error": "Answer JSON syntax malformed (e.g., missing brackets).",
+  "no_answer_returned": "Did not produce any final answer after completing queries.",
+  "wrong_resource_type_queried": "Used an incorrect FHIR resource type for the required order (e.g., MedicationRequest instead of ServiceRequest).",
+  "order_created_without_condition_check": "Created a ServiceRequest without first evaluating the observation result to determine if the order was needed."
+}

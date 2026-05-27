@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Always ensure that the data used for calculations strictly matches the required time window specified in the task.",
+    "counter": 2
+  },
+  {
+    "text": "When calculating averages or aggregating values, explicitly filter and use only relevant data points based on their timestamps.",
+    "counter": 2
+  },
+  {
+    "text": "If the response data does not provide sufficient granularity for time-based calculations, request additional or more precise data before finalizing the answer.",
+    "counter": 2
+  },
+  {
+    "text": "Clearly document or reason about which observations are included in each calculation to ensure transparency and reproducibility.",
+    "counter": 2
+  },
+  {
+    "text": "When composing FHIR resource payloads, ensure all required references (such as patient references) follow the correct FHIR format (e.g., \"Patient/{id}\").",
+    "counter": 2
+  },
+  {
+    "text": "Maintain consistency in date and time formatting as required by the FHIR API, matching examples or standards (e.g., using just the date or full ISO timestamp as appropriate).",
+    "counter": 2
+  },
+  {
+    "text": "When no prior data is found for a clinical query, clearly document this finding in the final answer.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure that order payloads include all necessary and contextually correct fields, such as display names and references, in accordance with the FHIR specification.",
+    "counter": 2
+  },
+  {
+    "text": "Always retrieve all necessary data points within the required time windows before calculating averages or summaries.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the query parameters accurately represent the intended time intervals for each requested calculation.",
+    "counter": 2
+  },
+  {
+    "text": "Do not assume a single result applies to multiple distinct time intervals unless verified; handle each interval's data independently.",
+    "counter": 2
+  },
+  {
+    "text": "Clearly document and justify how each final answer is derived from the data retrieved.",
+    "counter": 2
+  },
+  {
+    "text": "When ordering a procedure or service request for a patient, ensure all FHIR resource references (such as patient, subject) use the correct format (e.g., \"Patient/<id>\" instead of just \"<id>\").",
+    "counter": 2
+  },
+  {
+    "text": "When no prior record of a vaccine/procedure is found, explicitly state in the answer that no prior record exists, referencing the searched code and resource.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the answer includes both the clinical reasoning (e.g., date check or absence of record) and the action performed (e.g., order placed) with relevant details.",
+    "counter": 2
+  },
+  {
+    "text": "Always match the display name and coding system in the ordered resource to the provided context and clinical task requirements.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure accurate calculation of elapsed time between procedure date and current date to determine if action criteria are met.",
+    "counter": 2
+  },
+  {
+    "text": "Interpret procedure codes and descriptions carefully to distinguish between placement and removal orders.",
+    "counter": 2
+  },
+  {
+    "text": "Only initiate new service requests if there is clear evidence that removal has not already been ordered or performed.",
+    "counter": 2
+  },
+  {
+    "text": "Clearly justify each action based on the retrieved data and task requirements before finalizing the response.",
+    "counter": 2
+  }
+]

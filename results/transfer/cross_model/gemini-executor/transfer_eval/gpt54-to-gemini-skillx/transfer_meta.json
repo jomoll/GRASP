@@ -1,0 +1,10 @@
+{
+  "method": "skillx",
+  "library_path": "outputs-gpt5.4/skillx_cycle_gpt54_low/20260513_171600/skillx_library_best.json",
+  "memory_dir": null,
+  "splits": [
+    "test",
+    "id_test"
+  ],
+  "run_name": "gpt54-to-gemini-skillx"
+}

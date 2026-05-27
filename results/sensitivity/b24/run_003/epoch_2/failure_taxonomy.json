@@ -1,0 +1,14 @@
+{
+  "unnecessary_repeat_test_scheduled": "Scheduled a repeat test or placed an order when the lab value did not meet the condition for ordering.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "missing_repeat_test_scheduling": "Failed to schedule a repeat test when the lab value was normal but the instruction required pairing a repeat test order.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "unnecessary_medication_order_placed": "Placed a medication order despite the lab value not meeting the low‑value trigger condition.",
+  "service_request_not_returned": "Created ServiceRequest was not included in the final answer output",
+  "observation_value_not_returned": "The final answer omitted the requested observation value (e.g., lab result) instead of returning it.",
+  "medication_order_missing_on_low": "Failed to place a required medication order when the lab value met the low‑value trigger.",
+  "no_fhir_query_executed": "Did not perform any FHIR API calls before attempting to answer the question.",
+  "unnecessary_service_request_created": "Created a ServiceRequest that was not required by the instruction.",
+  "date_filter_omitted": "date filter omitted",
+  "patient_not_found_assumed_without_check": "Returned 'Patient not found' without verifying patient existence from the FHIR response"
+}

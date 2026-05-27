@@ -1,0 +1,272 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-14T00:16:00.168807",
+  "rules": [
+    "[P1] Distinguish between conditional and unconditional steps before acting.",
+    "[P1] Always check for explicit evidence before proceeding with conditional tasks.",
+    "[P1] Do not assume the existence of entities without explicit context.",
+    "[P1] Do not make assertions about data presence or absence without explicit evidence.",
+    "[P1] Only retrieve or calculate information when explicit supporting context is available.",
+    "[P1] Withhold answers or actions if required data is not present in context.",
+    "[P1] Record exactly the provided measurement and identifiers.",
+    "[P1] Do not fabricate or assume details absent from the context.",
+    "[P1] Explicitly state when required or relevant data is missing or unavailable.",
+    "[P1] Apply protocol-specified thresholds and criteria exactly, without reinterpretation.",
+    "[P1] Execute all steps in multi-part instructions, including unconditional actions, regardless of conditional outcomes.",
+    "[P1] Mirror the instruction's decision structure and conditional logic in the response, including all conditional branches."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_7cf2908910d6",
+      "text": "[P1] Distinguish between conditional and unconditional steps before acting.",
+      "tags": [
+        "conditional_logic",
+        "instruction_adherence",
+        "distinguish",
+        "between",
+        "conditional",
+        "unconditional",
+        "steps",
+        "before",
+        "acting",
+        "missing-context"
+      ],
+      "shown": 3,
+      "success": 1,
+      "failure": 2,
+      "created_at": "2026-05-14T00:15:28.965633",
+      "updated_at": "2026-05-14T00:16:00.159862"
+    },
+    {
+      "id": "rule_fefdcebee30b",
+      "text": "[P1] Always check for explicit evidence before proceeding with conditional tasks.",
+      "tags": [
+        "data-check",
+        "conditional-action",
+        "clinical-workflow",
+        "always",
+        "check",
+        "explicit",
+        "evidence",
+        "before",
+        "proceeding",
+        "with"
+      ],
+      "shown": 10,
+      "success": 4,
+      "failure": 6,
+      "created_at": "2026-05-14T00:14:15.914847",
+      "updated_at": "2026-05-14T00:16:00.159920"
+    },
+    {
+      "id": "rule_04387a46a833",
+      "text": "[P1] Do not assume the existence of entities without explicit context.",
+      "tags": [
+        "data-absence",
+        "entity-lookup",
+        "assume",
+        "existence",
+        "entities",
+        "without",
+        "explicit",
+        "context",
+        "measurement-recording",
+        "medical"
+      ],
+      "shown": 13,
+      "success": 6,
+      "failure": 7,
+      "created_at": "2026-05-14T00:13:58.049199",
+      "updated_at": "2026-05-14T00:16:00.159969"
+    },
+    {
+      "id": "rule_f67d4b3657b9",
+      "text": "[P1] Do not make assertions about data presence or absence without explicit evidence.",
+      "tags": [
+        "assertion",
+        "data-evidence",
+        "protocol",
+        "make",
+        "assertions",
+        "about",
+        "data",
+        "presence",
+        "absence",
+        "without"
+      ],
+      "shown": 13,
+      "success": 6,
+      "failure": 6,
+      "created_at": "2026-05-14T00:13:40.584838",
+      "updated_at": "2026-05-14T00:16:00.160021"
+    },
+    {
+      "id": "rule_5b9492b1d13f",
+      "text": "[P1] Only retrieve or calculate information when explicit supporting context is available.",
+      "tags": [
+        "fabrication",
+        "context-awareness",
+        "medical-query",
+        "only",
+        "retrieve",
+        "calculate",
+        "information",
+        "when",
+        "explicit",
+        "supporting"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-14T00:16:00.160476",
+      "updated_at": "2026-05-14T00:16:00.160479"
+    },
+    {
+      "id": "rule_5a3c72bcd8de",
+      "text": "[P1] Withhold answers or actions if required data is not present in context.",
+      "tags": [
+        "data-absence",
+        "fabrication",
+        "clinical-protocol",
+        "withhold",
+        "answers",
+        "actions",
+        "required",
+        "data",
+        "present",
+        "context"
+      ],
+      "shown": 15,
+      "success": 7,
+      "failure": 7,
+      "created_at": "2026-05-14T00:13:32.979426",
+      "updated_at": "2026-05-14T00:16:00.160071"
+    },
+    {
+      "id": "rule_a7feb4ba8dae",
+      "text": "[P1] Record exactly the provided measurement and identifiers.",
+      "tags": [
+        "documentation",
+        "measurement",
+        "workflow",
+        "record",
+        "exactly",
+        "provided",
+        "identifiers",
+        "data-absence",
+        "fabrication",
+        "clinical-protocol"
+      ],
+      "shown": 17,
+      "success": 7,
+      "failure": 10,
+      "created_at": "2026-05-14T00:13:26.628212",
+      "updated_at": "2026-05-14T00:16:00.160115"
+    },
+    {
+      "id": "rule_866c6b66ad0f",
+      "text": "[P1] Do not fabricate or assume details absent from the context.",
+      "tags": [
+        "context-missing",
+        "fabrication",
+        "conditional-action",
+        "fabricate",
+        "assume",
+        "details",
+        "absent",
+        "from",
+        "context",
+        "missing-data"
+      ],
+      "shown": 24,
+      "success": 10,
+      "failure": 14,
+      "created_at": "2026-05-14T00:12:08.432858",
+      "updated_at": "2026-05-14T00:16:00.160161"
+    },
+    {
+      "id": "rule_2903d4bc3e5a",
+      "text": "[P1] Explicitly state when required or relevant data is missing or unavailable.",
+      "tags": [
+        "data_fabrication",
+        "context_absent",
+        "response_policy",
+        "explicitly",
+        "state",
+        "when",
+        "required",
+        "relevant",
+        "data",
+        "missing"
+      ],
+      "shown": 50,
+      "success": 23,
+      "failure": 26,
+      "created_at": "2026-05-13T23:55:54.683245",
+      "updated_at": "2026-05-14T00:16:00.160215"
+    },
+    {
+      "id": "rule_38bbf1481b07",
+      "text": "[P1] Apply protocol-specified thresholds and criteria exactly, without reinterpretation.",
+      "tags": [
+        "context-verification",
+        "order-procedure",
+        "clinical-data",
+        "apply",
+        "protocol",
+        "specified",
+        "thresholds",
+        "criteria",
+        "exactly",
+        "without"
+      ],
+      "shown": 95,
+      "success": 50,
+      "failure": 44,
+      "created_at": "2026-05-13T23:33:04.420114",
+      "updated_at": "2026-05-14T00:16:00.160265"
+    },
+    {
+      "id": "rule_56e40d1b117a",
+      "text": "[P1] Execute all steps in multi-part instructions, including unconditional actions, regardless of conditional outcomes.",
+      "tags": [
+        "conditional-instruction",
+        "workflow-omission",
+        "lab-order",
+        "execute",
+        "steps",
+        "multi",
+        "part",
+        "instructions",
+        "including",
+        "unconditional"
+      ],
+      "shown": 92,
+      "success": 40,
+      "failure": 42,
+      "created_at": "2026-05-13T23:55:47.365609",
+      "updated_at": "2026-05-14T00:16:00.160323"
+    },
+    {
+      "id": "rule_fd8eb23dd26d",
+      "text": "[P1] Mirror the instruction's decision structure and conditional logic in the response, including all conditional branches.",
+      "tags": [
+        "conditional_logic",
+        "workflow",
+        "clinical_protocol",
+        "mirror",
+        "instruction",
+        "decision",
+        "structure",
+        "conditional",
+        "logic",
+        "response"
+      ],
+      "shown": 178,
+      "success": 76,
+      "failure": 91,
+      "created_at": "2026-05-13T23:36:16.050974",
+      "updated_at": "2026-05-14T00:16:00.160381"
+    }
+  ]
+}

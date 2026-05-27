@@ -1,0 +1,15 @@
+{
+  "answer_format_count_mismatch": "Reported the wrong count of orders or failed to match the required count in the answer.",
+  "opioid_class_filter_omitted": "Failed to filter MedicationRequest by opioid analgesic class, leading to incorrect conclusion.",
+  "protocol_action_not_executed": "Did not execute the protocol-specified action after retrieving lab values.",
+  "answer_format_date_field_mismatch": "Returned the date in a format or field not matching the expected answer.",
+  "vaccine_procedure_code_only_checked": "Checked only Procedure resource for vaccine, missing possible Immunization records.",
+  "naloxone_ordered_without_opioid": "Ordered naloxone even though no active opioid order was present.",
+  "covid_vaccine_procedure_only_checked": "Checked only Procedure resource for COVID vaccine, missing Immunization resource.",
+  "missing_data_no_default_value": "Did not provide a default or fallback answer when no data was available.",
+  "catheter_removal_time_window_misapplied": "Incorrectly applied the time window for catheter removal assessment.",
+  "order_discontinuation_not_executed": "Did not discontinue duplicate orders as required by the instruction.",
+  "observation_time_window_too_short": "Used a time window that was too short, missing required observations for averaging.",
+  "answer_format_wrong_type": "Returned a value in the wrong type (e.g., list vs. scalar) or answer structure.",
+  "order_format_resource_type_mismatch": "Created order using wrong FHIR resource type (e.g., ServiceRequest vs. MedicationRequest)."
+}

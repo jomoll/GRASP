@@ -1,0 +1,414 @@
+[
+  {
+    "id": 300,
+    "description": "What is the Presentation of Credentials has a Termination of Mission listed as August 15, 2000?",
+    "type": "other",
+    "answer": [
+      "March 19, 1998"
+    ]
+  },
+  {
+    "id": 301,
+    "description": "his nickname is \"jimmy,\" but what is his full name?",
+    "type": "other",
+    "answer": [
+      "Checco D'Angelo"
+    ]
+  },
+  {
+    "id": 302,
+    "description": "how many weeks did julie covington's \"don't cry for me argentina\" spend at the top of australia's singles chart?",
+    "type": "other",
+    "answer": [
+      "7"
+    ]
+  },
+  {
+    "id": 303,
+    "description": "how many floors does the capitol square have?",
+    "type": "other",
+    "answer": [
+      "26"
+    ]
+  },
+  {
+    "id": 304,
+    "description": "What is the total game number with athlone town as the opponent?",
+    "type": "counting",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 305,
+    "description": "what is the total number of register listings from dover?",
+    "type": "counting",
+    "answer": [
+      "17"
+    ]
+  },
+  {
+    "id": 306,
+    "description": "who was the only wrestler to have a title reign in 1992?",
+    "type": "counting",
+    "answer": [
+      "Dick Murdoch"
+    ]
+  },
+  {
+    "id": 307,
+    "description": "Which Score has a Result of 2–1, and a Competition of friendly, and a Goal smaller than 17?",
+    "type": "comparison",
+    "answer": [
+      "1–0",
+      "2–0"
+    ]
+  },
+  {
+    "id": 308,
+    "description": "Which Average that has a W-L-T of 5-1, and a Season smaller than 2001, and Games smaller than 6?",
+    "type": "comparison",
+    "answer": [
+      "none"
+    ]
+  },
+  {
+    "id": 309,
+    "description": "What is the Average for South Carolina with an Interview less than 9.626?",
+    "type": "comparison",
+    "answer": [
+      "none"
+    ]
+  },
+  {
+    "id": 310,
+    "description": "Class of d, and a Frequency MHz smaller than 107.7, and a ERP W smaller than 232 has what call sign?",
+    "type": "comparison",
+    "answer": [
+      "K255AZ",
+      "K228EE",
+      "K220FA",
+      "K265DY",
+      "K237DN",
+      "K214AU",
+      "K222AX",
+      "K239AX",
+      "K243BD",
+      "K219DC",
+      "K204CD",
+      "K231BG"
+    ]
+  },
+  {
+    "id": 311,
+    "description": "which area is the largest in square km?",
+    "type": "ranking",
+    "answer": [
+      "Giza"
+    ]
+  },
+  {
+    "id": 312,
+    "description": "Name the least touchdowns for 11 points",
+    "type": "ranking",
+    "answer": [
+      "2.0"
+    ]
+  },
+  {
+    "id": 313,
+    "description": "Of the matches that had a home team score of 13.17 (95), which match had the largest crowd?",
+    "type": "ranking",
+    "answer": [
+      "21000.0"
+    ]
+  },
+  {
+    "id": 314,
+    "description": "When the transfer fee is £8.5m, what is the total ends?",
+    "type": "aggregation-SUM",
+    "answer": [
+      "2011.0"
+    ]
+  },
+  {
+    "id": 315,
+    "description": "With the given points of 51, what was the total number of the try bonus?",
+    "type": "aggregation-SUM",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 316,
+    "description": "What was the earlier round where Takashi Kogure got the fastest lap?",
+    "type": "aggregation-MIN",
+    "answer": [
+      "5.0"
+    ]
+  },
+  {
+    "id": 317,
+    "description": "What's the biggest Bronze that has less than 0 Silvers?",
+    "type": "aggregation-MAX",
+    "answer": [
+      "none"
+    ]
+  },
+  {
+    "id": 318,
+    "description": "Which Attendance is the highest one that has a Record of 15-28?",
+    "type": "aggregation-MAX",
+    "answer": [
+      "32502.0"
+    ]
+  },
+  {
+    "id": 319,
+    "description": "What is the average Total, when Gold is 0, and when Nation is Iran?",
+    "type": "aggregation-AVG",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 320,
+    "description": "Insert 'Madison High School' into 'School Location Table' with values 'San Diego' for 'Location', '1980' for 'Date moved', and 'nearby junior high school' for 'Currently at this location'.",
+    "type": "INSERT",
+    "answer": "[('09aa8fbf72f39362970f95a1276b957c',)]"
+  },
+  {
+    "id": 321,
+    "description": "Insert a new record into the 'Football Standings' table with the values of position 10, club 'FK Trakai', games played 18, wins 9, draws 2, losses 7, goals scored 29, goals conceded 24, and points 29.",
+    "type": "INSERT",
+    "answer": "[('67316479d3c0e46b7db1a1d43c6693ca',)]"
+  },
+  {
+    "id": 322,
+    "description": "Insert the winners of Golf Tournament into the table 'Golf Tournament Winners' with the player name 'Bernhard Langer', country 'Germany', winning years '1985, 1993', total score '290' and 'To par' score of '+2'.",
+    "type": "INSERT",
+    "answer": "[('f7886fbd8e379cb6d266f1a17148b096',)]"
+  },
+  {
+    "id": 323,
+    "description": "Insert into table 'Olympic Medals' with 5 columns 'Rank', 'Gold', 'Silver', 'Bronze' and 'Total'. The values for column 'Rank' is '7', for column 'Gold' is '0', for column 'Silver' is '1', for column 'Bronze' is '0' and for column 'Total' is '1'.",
+    "type": "INSERT",
+    "answer": "[('b392c838aa9d9bca57adbd1822071e00',)]"
+  },
+  {
+    "id": 324,
+    "description": "The Dallas Cowboys 1986 Season INSERT INTO table contains data for Week 18, played on January 4, 1987 at Texas Stadium against the Atlanta Falcons resulting in a 27-20 win for the Cowboys. The game was attended by 62,129 people and has been documented in the NFL Recap under [18].",
+    "type": "INSERT",
+    "answer": "[('343e4bbbe3c223408c5e22627f98d437',)]"
+  },
+  {
+    "id": 325,
+    "description": "Record the achievement of Jalani Sidek at All England Open in 1990 for Men's Doubles event at Birmingham, England under Badminton Achievements table.",
+    "type": "INSERT",
+    "answer": "[('43a54cd67ab403faf4d17bb44faeef5c',)]"
+  },
+  {
+    "id": 326,
+    "description": "On 2 January 1944, Willem van der Zaan, a ship registered in Netherlands with a tonnage of 5,200 GRT, was sunk.",
+    "type": "INSERT",
+    "answer": "[('aa254b4cb8ee6650a24d34e4409db3ce',)]"
+  },
+  {
+    "id": 327,
+    "description": "On August 11, 2021, Lilly King from the United States set a new world record of 2 minutes and 16.33 seconds in women's swimming in Tokyo, Japan. The record was achieved in the Swimming World Records and the data of the record shows the swimmer's name, time, date and place, which are Lilly King, 2:16.33, August 11, 2021 and Tokyo, Japan respectively.",
+    "type": "INSERT",
+    "answer": "[('2547ff6a314e63c84dd4122e32a73736',)]"
+  },
+  {
+    "id": 328,
+    "description": "The attendance of Tennessee Titans at Nissan Stadium is recorded as 64,798 on average, with a total of 518,384 attendance over 8 home games; the stadium's capacity percentage is 99.8%.",
+    "type": "INSERT",
+    "answer": "[('19246ae10e51bf5d982b7dbd222ffb81',)]"
+  },
+  {
+    "id": 329,
+    "description": "Insert data into the table named Parish_LGA_Towns, with values 'Harris' for Parish, 'Scenic Rim' for LGA, and 'Boonah' for Towns.",
+    "type": "INSERT",
+    "answer": "[('bf3977529e1d20e6e9b04446e3b82d29',)]"
+  },
+  {
+    "id": 330,
+    "description": "On 8 March 2007, in the Round of 16 Second leg, the match result for Porto was 1–0, with an attendance of 41,000. The match was played away from home.",
+    "type": "INSERT",
+    "answer": "[('9264e32312e223e25b5f8954f1127833',)]"
+  },
+  {
+    "id": 331,
+    "description": "In 1971, Kauai King, age 4, was trained by Henry Forrest and owned by Ford Stable, and was inserted into the horse_races table.",
+    "type": "INSERT",
+    "answer": "[('9fbde5ea357dfcb56030bf77be869409',)]"
+  },
+  {
+    "id": 332,
+    "description": "Insert a new row into the 'Doctor Who Episodes' table with the following values: Episode # as 'S4', Original airdate (UK) as '30 June 2007', Episode title as '\"Doctor Who Confidential: Music and Monsters\"', Doctor Who episode as 'Episodes 1-13', and Webcast link as 'N/A'.",
+    "type": "INSERT",
+    "answer": "[('8a400da35f6087e6fee0d2cb0a3746fc',)]"
+  },
+  {
+    "id": 333,
+    "description": "The character Natalia Boa Vista played by Eva LaRue in CSI:Miami Characters is still alive. She first appeared in the episode Rio and had a final episode with no specified name. Natalia appeared for a total of 177 episodes spanning from 04x25 to 10x19.",
+    "type": "INSERT",
+    "answer": "[('63fd7fe3409082f24b01d17ce5fbda14',)]"
+  },
+  {
+    "id": 334,
+    "description": "On 14 February 1917, the Romanian ship named Uranus with a tonnage of 1,429 was sunk.",
+    "type": "INSERT",
+    "answer": "[('50d78dc77cb73c6051350cd42d66f8cb',)]"
+  },
+  {
+    "id": 335,
+    "description": "Insert into the 'Football Draft Picks' table the values for Round, Pick, Player, Position, and School/Club Team, which are '33', '336', 'John Smith', 'Quarterback', and 'USC', respectively.",
+    "type": "INSERT",
+    "answer": "[('9df14bd8a2a4b2009e1fc8ec8854dea7',)]"
+  },
+  {
+    "id": 336,
+    "description": "Insert 'Another Plant' with 'Muskegon' into 'Power Plants and Rivers' table with power of '15' (in MW).",
+    "type": "INSERT",
+    "answer": "[('4601e3968820f0fb2668dad7f5a06431',)]"
+  },
+  {
+    "id": 337,
+    "description": "The team record for UCF in 2021 was 35-25 overall and 13-11 in conference play, finishing 5th in the standings and reaching the NCAA Regional postseason tournament. The record was inserted into the 'Team Season Record' table with the following values: Season = '2021', Team = 'UCF', Overall = '35-25', Conference = '13-11', Standing = '5th', Postseason = 'NCAA Regional'.",
+    "type": "INSERT",
+    "answer": "[('bcfbac5bcc0ac280d9747d39b9d0241a',)]"
+  },
+  {
+    "id": 338,
+    "description": "The game result for Game 16 in October against the San Jose Sharks was recorded with a final score of 4-3. Lundqvist's decision resulted in a loss, bringing the team's record to 13-2-1. This information was inserted into the game_results table.",
+    "type": "INSERT",
+    "answer": "[('4a8c698283148fbb3b0ca5a18cbef583',)]"
+  },
+  {
+    "id": 339,
+    "description": "The Surname Ranking table is being updated with data for the surname Hedlund. The data includes the rank of 23, 21.899 as the number of bearers in 2008, the type of landscape, and the etymology of heath+grove.",
+    "type": "INSERT",
+    "answer": "[('eb88cd25c04e2c31ef9b75325b9bfab7',)]"
+  },
+  {
+    "id": 340,
+    "description": "Update the results of the football team named Ballarat FL from Creswick with 5 wins, 3 byes, 8 losses, 2 draws and against a total score of 1305.",
+    "type": "UPDATE",
+    "answer": "[('e63818ea2e715870f6b76d69d94d6143',)]"
+  },
+  {
+    "id": 341,
+    "description": "Change the title of the film in the Actress Filmography table to 'Wonder Woman: 1984' where the year is '2017'.",
+    "type": "UPDATE",
+    "answer": "[('49199811f288371b1a3f0850cd3c278c',)]"
+  },
+  {
+    "id": 342,
+    "description": "Update the winner of the Sportswoman_of_the_Year_Award_1 to 'Naomi Osaka' for the sport of Tennis and the year 2015.",
+    "type": "UPDATE",
+    "answer": "[('c45c4e5daa08a8c3c3e18ee131494ba6',)]"
+  },
+  {
+    "id": 343,
+    "description": "Update the host city of the 2026 Central European Jamboree to Bratislava.",
+    "type": "UPDATE",
+    "answer": "[('4b6c7bffa0dc4b7749deeb42d2726a5d',)]"
+  },
+  {
+    "id": 344,
+    "description": "In the year 2002, update the Baseball Team Performance table to set the Affiliation as 'Red Sox' and Manager as 'Bill Belichick'.",
+    "type": "UPDATE",
+    "answer": "[('9f28d213337225a1c163e790dafa5c88',)]"
+  },
+  {
+    "id": 345,
+    "description": "Set the LGA value to Armadale for the primary school named Byford Primary School in the Western Australia database.",
+    "type": "UPDATE",
+    "answer": "[('4b5672aa4e7900af964d80e017ff494f',)]"
+  },
+  {
+    "id": 346,
+    "description": "Update the table 'Zodiac Decans Rulers Table' by setting the ruler for the first decan (0 - 9.999 deg.) to 'Venus', the ruler for the second decan (10 - 19.999 deg.) to 'Saturn', and the ruler for the third decan (20 - 29.999 deg.) to 'Mercury' where the sign is 'Taurus'.",
+    "type": "UPDATE",
+    "answer": "[('95b5c6485c29429231d9963df1dbaf07',)]"
+  },
+  {
+    "id": 347,
+    "description": "Change the country of Central Park Tower in the Skyscraper Database to Canada.",
+    "type": "UPDATE",
+    "answer": "[('93da7df776b62dbd5c24e4916f77681b',)]"
+  },
+  {
+    "id": 348,
+    "description": "On September 27, update the game results so the opponent name is 'vs. Connecticut' and the score is '70-73'.",
+    "type": "UPDATE",
+    "answer": "[('c3418710c5b67285057811f30081290c',)]"
+  },
+  {
+    "id": 349,
+    "description": "Tiger Woods won Golf Champions in 1997, 2001, 2002, and 2005, with a total score of 270 and finishing 18 strokes under par.",
+    "type": "UPDATE",
+    "answer": "[('a7275c82ae7547ce3e8696cf605b4409',)]"
+  },
+  {
+    "id": 350,
+    "description": "The table for Native American removal and emigration is being updated to reflect that 12,000 Navajo individuals were either forcibly removed or emigrated.",
+    "type": "UPDATE",
+    "answer": "[('c51ed778115fbfe607ea0c3db4def278',)]"
+  },
+  {
+    "id": 351,
+    "description": "Alter the 'Electorate' value to 'Auckland North' for the entry with 'Name' equal to 'John Smith' in the 'Elected Members of New Zealand Parliament' table.",
+    "type": "UPDATE",
+    "answer": "[('5714a08b6e4c53025a3a69bd7906cb55',)]"
+  },
+  {
+    "id": 352,
+    "description": "In the `Principal Assignments by Year` table, update the `Gorham Principal` column to 'Karen Lee' for the `Year` 2012-2013.",
+    "type": "UPDATE",
+    "answer": "[('83aca4d0437b0cf8ee3e408c09499dfc',)]"
+  },
+  {
+    "id": 353,
+    "description": "The score table for Japan has been updated with an E Score of 7.400 and a total of 22.950.",
+    "type": "UPDATE",
+    "answer": "[('ecbebc1fba3c5aa5eac434abfdd7fba9',)]"
+  },
+  {
+    "id": 354,
+    "description": "In the 'Basketball Tournament Results' table, update the 'Winner' column to 'Northeastern University' where the 'Year' column equals 2000.",
+    "type": "UPDATE",
+    "answer": "[('6e5be5df6a81c825cba000c75965d27f',)]"
+  },
+  {
+    "id": 355,
+    "description": "Change the source for soybean production statistics to 'USDA' in the Statistics table.",
+    "type": "UPDATE",
+    "answer": "[('816cbbaa111ecc4470b60570f4fc3ed2',)]"
+  },
+  {
+    "id": 356,
+    "description": "The statistics for the 2010-11 season have been updated with 7 matches played, 1 match drawn, 2 matches lost, and 82 goals against.",
+    "type": "UPDATE",
+    "answer": "[('d9f0ccdc52935cc21e73cc5248345aaf',)]"
+  },
+  {
+    "id": 357,
+    "description": "The 'Year(s) retired' column of the 'Locomotive Inventory Table' was updated to '1935–1960' for locomotives in the 'M-1' class.",
+    "type": "UPDATE",
+    "answer": "[('0227596d5d527d292c3ccd396fde5f75',)]"
+  },
+  {
+    "id": 358,
+    "description": "Update the football season results to W 28-10 and 16-2 record for week 19.",
+    "type": "UPDATE",
+    "answer": "[('a284811d133bd2cec86cb46335a21ed3',)]"
+  },
+  {
+    "id": 359,
+    "description": "Change the value of 'No. Specimens' to '190,000' in the 'Specimen Collection' table for the entry with 'Name' as 'University of Stockholm'.",
+    "type": "UPDATE",
+    "answer": "[('9f1274df98a0f73197553c6dd91c6cf8',)]"
+  }
+]

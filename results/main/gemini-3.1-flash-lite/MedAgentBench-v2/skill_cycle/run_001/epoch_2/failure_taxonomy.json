@@ -1,0 +1,14 @@
+{
+  "procedure_search_parameter_insufficient": "Failed to query for specific procedure codes required to identify the catheter.",
+  "fhir_search_date_filter_too_restrictive": "Used a date filter that excluded valid historical records.",
+  "observation_time_window_logic_error": "Incorrectly calculated or filtered observations based on the provided time window.",
+  "medication_order_discontinuation_action_omitted": "Identified duplicate orders but failed to perform the necessary discontinuation actions.",
+  "medication_order_duplication_logic_error": "Created a new order despite existing active orders being present.",
+  "resource_reference_format_mismatch": "Used 'Patient/ID' format when the system expected a raw ID string.",
+  "excessive_search_query_iteration": "Entered an infinite loop of search queries without narrowing down the target resource.",
+  "medication_search_filter_too_broad": "Failed to identify relevant medications due to overly generic search parameters.",
+  "protocol_action_logic_error": "Misinterpreted clinical guidelines resulting in an incorrect follow-up action.",
+  "observation_code_search_parameter_missing": "Failed to include specific LOINC or system codes in the observation query.",
+  "catheter_removal_logic_error": "Incorrectly identified catheter duration or triggered removal order prematurely.",
+  "conditional_logic_execution_error": "Executed an action despite the conditional criteria (e.g., time threshold) not being met."
+}

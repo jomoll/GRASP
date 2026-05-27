@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-14T13:10:29.587361",
+  "rules": [
+    "[P1] When a patient identifier is supplied, use it directly for lookup; skip name‑based searches.",
+    "[P1] Use FINISH([...]) for all responses, containing only the requested value(s) or an empty list, without extra commentary.",
+    "[P1] Insert any user‑provided free‑text verbatim into the description/note field of orders, referrals, or observations.",
+    "[P1] Issue exactly one FHIR action per turn; after issuing any order (including referrals), respond with FINISH([]) and no extra text.",
+    "[P1] Translate user intent into concrete FHIR API calls before any internal reasoning; internal reasoning must not appear in the final response.",
+    "[P1] Validate ages (0‑120 years), numeric plausibility, units, and formats (e.g., blood pressure systolic/diastolic mmHg) before use.",
+    "[P1] Extract patient identifier (most specific ID, else exact name+DOB) and measurement from the user request; perform patient lookup first.",
+    "[P1] Compare retrieved values against defined clinical thresholds; if below the low‑value threshold, issue the corresponding replacement order with required dosing and any paired orders.",
+    "[P1] Convert relative time windows (e.g., \"last 24 hours\") to absolute timestamps before filtering observations.",
+    "[P1] Retrieve observations matching the required code, sort by timestamp descending, and use the most recent value within any specified window.",
+    "[P1] Do not perform additional processing when the required data is already supplied in the request.",
+    "[P1] If patient lookup fails, respond with FINISH([\"Patient not found\"]).",
+    "[P1] Map laboratory test names (e.g., magnesium) to their standard codes before querying observations."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_dc415853fd6e",
+      "text": "[P1] When a patient identifier is supplied, use it directly for lookup; skip name‑based searches.",
+      "tags": [
+        "magnesium",
+        "observation-retrieval",
+        "time-window",
+        "when",
+        "patient",
+        "identifier",
+        "supplied",
+        "directly",
+        "lookup",
+        "skip"
+      ],
+      "shown": 1,
+      "success": 1,
+      "failure": 0,
+      "created_at": "2026-05-14T13:03:57.714919",
+      "updated_at": "2026-05-14T13:04:40.758966"
+    },
+    {
+      "id": "rule_8475edb07b62",
+      "text": "[P1] Use FINISH([...]) for all responses, containing only the requested value(s) or an empty list, without extra commentary.",
+      "tags": [
+        "patient_lookup",
+        "demographics",
+        "age_query",
+        "finish",
+        "responses",
+        "containing",
+        "only",
+        "requested",
+        "value",
+        "empty"
+      ],
+      "shown": 3,
+      "success": 3,
+      "failure": 0,
+      "created_at": "2026-05-14T13:02:22.881978",
+      "updated_at": "2026-05-14T13:04:40.758543"
+    },
+    {
+      "id": "rule_e028fd6bff32",
+      "text": "[P1] Insert any user‑provided free‑text verbatim into the description/note field of orders, referrals, or observations.",
+      "tags": [
+        "blood_pressure",
+        "observation",
+        "fhir",
+        "validation",
+        "insert",
+        "user",
+        "provided",
+        "free",
+        "text",
+        "verbatim"
+      ],
+      "shown": 8,
+      "success": 8,
+      "failure": 0,
+      "created_at": "2026-05-14T12:54:26.720665",
+      "updated_at": "2026-05-14T13:04:40.758594"
+    },
+    {
+      "id": "rule_8f0b190f6c0c",
+      "text": "[P1] Issue exactly one FHIR action per turn; after issuing any order (including referrals), respond with FINISH([]) and no extra text.",
+      "tags": [
+        "referral",
+        "order",
+        "free-text",
+        "finish",
+        "issue",
+        "exactly",
+        "fhir",
+        "action",
+        "turn",
+        "after"
+      ],
+      "shown": 8,
+      "success": 8,
+      "failure": 0,
+      "created_at": "2026-05-14T12:48:41.278177",
+      "updated_at": "2026-05-14T13:04:40.758627"
+    },
+    {
+      "id": "rule_93a14d9b01fc",
+      "text": "[P1] Translate user intent into concrete FHIR API calls before any internal reasoning; internal reasoning must not appear in the final response.",
+      "tags": [
+        "referral",
+        "order",
+        "free-text",
+        "finish",
+        "translate",
+        "user",
+        "intent",
+        "into",
+        "concrete",
+        "fhir"
+      ],
+      "shown": 10,
+      "success": 10,
+      "failure": 0,
+      "created_at": "2026-05-14T12:48:41.278568",
+      "updated_at": "2026-05-14T13:04:40.758660"
+    },
+    {
+      "id": "rule_0fb7c3c8df04",
+      "text": "[P1] Validate ages (0‑120 years), numeric plausibility, units, and formats (e.g., blood pressure systolic/diastolic mmHg) before use.",
+      "tags": [
+        "referral",
+        "order",
+        "free-text",
+        "finish",
+        "validate",
+        "ages",
+        "years",
+        "numeric",
+        "plausibility",
+        "units"
+      ],
+      "shown": 7,
+      "success": 6,
+      "failure": 1,
+      "created_at": "2026-05-14T12:48:41.278332",
+      "updated_at": "2026-05-14T13:04:40.758700"
+    },
+    {
+      "id": "rule_42261a671e9f",
+      "text": "[P1] Extract patient identifier (most specific ID, else exact name+DOB) and measurement from the user request; perform patient lookup first.",
+      "tags": [
+        "referral",
+        "order",
+        "free-text",
+        "finish",
+        "extract",
+        "patient",
+        "identifier",
+        "most",
+        "specific",
+        "else"
+      ],
+      "shown": 13,
+      "success": 12,
+      "failure": 1,
+      "created_at": "2026-05-14T12:48:41.278250",
+      "updated_at": "2026-05-14T13:04:40.758732"
+    },
+    {
+      "id": "rule_4aebffab6610",
+      "text": "[P1] Compare retrieved values against defined clinical thresholds; if below the low‑value threshold, issue the corresponding replacement order with required dosing and any paired orders.",
+      "tags": [
+        "referral",
+        "order",
+        "free-text",
+        "finish",
+        "compare",
+        "retrieved",
+        "values",
+        "against",
+        "defined",
+        "clinical"
+      ],
+      "shown": 14,
+      "success": 13,
+      "failure": 1,
+      "created_at": "2026-05-14T12:48:41.278427",
+      "updated_at": "2026-05-14T13:04:40.758783"
+    },
+    {
+      "id": "rule_b3f1a31cc1da",
+      "text": "[P1] Convert relative time windows (e.g., \"last 24 hours\") to absolute timestamps before filtering observations.",
+      "tags": [
+        "lab-retrieval",
+        "time-window",
+        "mrn-lookup",
+        "success",
+        "convert",
+        "relative",
+        "time",
+        "windows",
+        "last",
+        "hours"
+      ],
+      "shown": 12,
+      "success": 10,
+      "failure": 2,
+      "created_at": "2026-05-14T12:37:04.943586",
+      "updated_at": "2026-05-14T13:04:40.758813"
+    },
+    {
+      "id": "rule_6f34e0815ee1",
+      "text": "[P1] Retrieve observations matching the required code, sort by timestamp descending, and use the most recent value within any specified window.",
+      "tags": [
+        "potassium",
+        "conditional_ordering",
+        "paired_test",
+        "threshold_check",
+        "retrieve",
+        "observations",
+        "matching",
+        "required",
+        "code",
+        "sort"
+      ],
+      "shown": 12,
+      "success": 9,
+      "failure": 3,
+      "created_at": "2026-05-14T12:38:32.530012",
+      "updated_at": "2026-05-14T13:04:40.758847"
+    },
+    {
+      "id": "rule_c999fa9dc687",
+      "text": "[P1] Do not perform additional processing when the required data is already supplied in the request.",
+      "tags": [
+        "direct_measurement",
+        "skip_lookup",
+        "perform",
+        "additional",
+        "processing",
+        "when",
+        "required",
+        "data",
+        "already",
+        "supplied"
+      ],
+      "shown": 7,
+      "success": 4,
+      "failure": 3,
+      "created_at": "2026-05-14T12:35:07.951054",
+      "updated_at": "2026-05-14T13:04:40.758876"
+    },
+    {
+      "id": "rule_04b0dd402f14",
+      "text": "[P1] If patient lookup fails, respond with FINISH([\"Patient not found\"]).",
+      "tags": [
+        "potassium",
+        "conditional_ordering",
+        "paired_test",
+        "threshold_check",
+        "patient",
+        "lookup",
+        "fails",
+        "respond",
+        "with",
+        "finish"
+      ],
+      "shown": 14,
+      "success": 9,
+      "failure": 5,
+      "created_at": "2026-05-14T12:38:32.529971",
+      "updated_at": "2026-05-14T13:04:40.758902"
+    },
+    {
+      "id": "rule_4086b4f77db9",
+      "text": "[P1] Map laboratory test names (e.g., magnesium) to their standard codes before querying observations.",
+      "tags": [
+        "magnesium",
+        "observation-retrieval",
+        "time-window",
+        "laboratory",
+        "test",
+        "names",
+        "their",
+        "standard",
+        "codes",
+        "before"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-14T13:03:57.714954",
+      "updated_at": "2026-05-14T13:04:40.758930"
+    }
+  ]
+}

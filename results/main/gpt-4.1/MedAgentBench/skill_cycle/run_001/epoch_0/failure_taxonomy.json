@@ -1,0 +1,9 @@
+{
+  "no_observation_found_returned_minus_one": "Returned -1 instead of the expected null/empty or proper not-found format.",
+  "extraneous_action_unnecessary_order_placed": "Placed an order when only a report was required.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "extraneous_action_unnecessary_report_generated": "Returned a detailed report or explanation when only a scalar value was required.",
+  "no_observation_found_returned_extraneous_text": "Returned a not-found message as a string instead of the required null/empty or proper not-found format.",
+  "correct_multistep_action_wrong_final_format": "Completed all required actions but returned the answer in the wrong format.",
+  "threshold_logic_error_potassium_replacement": "Incorrectly determined potassium replacement need due to wrong threshold logic."
+}

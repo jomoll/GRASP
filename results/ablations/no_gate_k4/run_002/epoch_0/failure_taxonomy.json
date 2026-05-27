@@ -1,0 +1,18 @@
+{
+  "patient_not_found_incorrectly_returned": "Returned 'Patient not found' when a matching patient actually exists.",
+  "list_returned_instead_of_scalar": "Returned a list of values where a single scalar value was expected.",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "negative_one_placeholder_returned": "Returned sentinel value -1 to indicate missing data instead of the actual result.",
+  "unit_missing_from_quantity": "Returned a numeric quantity without the required unit of measurement.",
+  "age_calculation_error": "Computed the patient's age incorrectly from the MRN/birthdate.",
+  "patient_lookup_not_performed_before_observation": "Failed to query the Patient resource before attempting to create or reference an Observation.",
+  "scalar_returned_instead_of_list": "Returned a single scalar string where a list of values was expected.",
+  "answer_mismatch_with_executed_action": "Final answer contradicts or does not reflect the FHIR actions that were performed.",
+  "answer_contains_unexpected_explanatory_text": "Included additional explanatory sentences in the final answer beyond the required output format.",
+  "sentence_returned_instead_of_value": "Returned a full explanatory sentence rather than the raw numeric/value answer.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "no_fhir_query_performed": "Agent gave reasoning but did not execute any FHIR GET/POST before finishing.",
+  "no_action_performed": "Agent provided only reasoning content and did not perform any FHIR action before returning the final answer.",
+  "conditional_order_missing": "Agent failed to place the required order after evaluating the lab result (or placed order without checking the condition)."
+}

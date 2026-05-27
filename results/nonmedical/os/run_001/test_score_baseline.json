@@ -1,0 +1,7 @@
+{
+  "skills": "baseline",
+  "score": 0.4857142857142857,
+  "n_correct": 17,
+  "n_total": 35,
+  "test_split": "data/os_interaction/split_test.json"
+}

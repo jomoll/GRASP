@@ -1,0 +1,13 @@
+{
+  "medication_request_missing_required_pairing": "Agent failed to link the medication order to the required diagnostic observation or context.",
+  "unnecessary_service_request_creation": "Agent performed an order action when clinical criteria for the order were not met.",
+  "observation_not_found_sentinel_value": "Agent returned a sentinel value (e.g., -1) instead of handling missing data or re-querying.",
+  "excessive_unproductive_resource_queries": "Agent entered a loop of redundant or overly broad queries without finding the target data.",
+  "patient_age_calculation_error": "Agent returned an incorrect age value despite successful patient resource retrieval.",
+  "correct_behavior_no_failure": "Agent performed correctly but was marked failed due to evaluator mismatch.",
+  "missing_unit_in_answer": "Agent returned a numeric value without the required unit (e.g., years).",
+  "fhir_resource_wrong_field_extracted": "fhir resource wrong field extracted",
+  "answer_format_wrong_type": "returned a list when a scalar or specific string format was expected",
+  "medication_dosage_value_missing": "Agent created a medication request with a zero or missing dosage value.",
+  "stale_observation_data_used": "Agent acted on an observation older than the specified time window (24 hours)."
+}

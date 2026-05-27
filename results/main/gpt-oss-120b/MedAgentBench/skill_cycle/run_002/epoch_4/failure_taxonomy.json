@@ -1,0 +1,21 @@
+{
+  "paired_order_missing_when_required": "Failed to create a paired order when the instruction explicitly required it.",
+  "condition_threshold_misapplied": "Applied clinical threshold logic incorrectly, leading to a wrong decision about ordering or not ordering.",
+  "date_filter_misformatted_or_omitted": "Used an incorrect, missing, or malformed date filter parameter in the Observation query.",
+  "answer_missing_separate_date_field": "Combined the lab value and its date into a single string instead of returning them as separate fields as expected.",
+  "no_action_performed_before_answer": "Provided reasoning or final answer without executing any required FHIR GET/POST actions.",
+  "answer_format_wrong_type": "Returned the answer in an unexpected data type or structure (e.g., list vs string, string vs numeric).",
+  "service_request_note_format_incorrect": "Formatted the ServiceRequest note field incorrectly (e.g., object vs array) or omitted required free‑text content.",
+  "contradictory_order_and_explanation": "Explanation states no order is needed but still creates an order, causing a contradiction.",
+  "patient_not_found_assumed_without_response_check": "Returned \"Patient not found\" without checking the actual FHIR response for existence.",
+  "unnecessary_service_request_created": "Created a ServiceRequest (order) when the query did not require a new order.",
+  "answer_placeholder_returned_instead_of_value": "Returned a placeholder like -1 rather than the actual requested value.",
+  "quantity_unit_missing": "Returned a numeric measurement without the required unit (e.g., mg/dL, mmol/L).",
+  "missing_order_decision_field": "Final answer omitted the required order decision field (e.g., 'no replacement ordered')",
+  "missing_order_when_low": "Failed to create a replacement order when the lab value was below the low threshold",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "paired_order_not_created": "Failed to create the required paired ServiceRequest order when the instruction demanded a paired order.",
+  "date_filter_omitted": "date filter omitted",
+  "answer_missing_requested_field": "Final answer omitted the required measurement value (e.g., magnesium level) instead of providing it.",
+  "answer_submitted_before_verification": "answer submitted before verification"
+}

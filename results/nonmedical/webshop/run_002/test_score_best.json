@@ -1,0 +1,7 @@
+{
+  "skills": "best",
+  "score": 0.32,
+  "n_correct": 16,
+  "n_total": 50,
+  "test_split": "data/webshop/split_test.json"
+}

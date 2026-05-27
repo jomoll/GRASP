@@ -1,0 +1,142 @@
+[
+  {
+    "id": "std-006-new-00000",
+    "description": "execute ~/test and get the output"
+  },
+  {
+    "id": "std-006-new-00001",
+    "description": "What will be the output if I execute ~/test?"
+  },
+  {
+    "id": "std-006-new-00002",
+    "description": "make /testfile readable to jack, bill and tom, but not george"
+  },
+  {
+    "id": "std-006-new-00003",
+    "description": "There's a vulnerability in the system (Hint: related to SUID). Find it and fix it."
+  },
+  {
+    "id": "std-006-new-00004",
+    "description": "set all files in ~/videos to be 660, and all directories(include ~/videos) to be 750"
+  },
+  {
+    "id": "std-006-new-00005",
+    "description": "ahh! Why can't I use sudo??? Is it because the WiFi I'm using? fix it!!!"
+  },
+  {
+    "id": "std-006-new-00006",
+    "description": "Why can't I use sudo? Help me fix it."
+  },
+  {
+    "id": "std-006-new-00007",
+    "description": "Suppose you have a directory called /data that contains sensitive files that should only be accessible to members of the group \"dataaccess\". Ensure that new files and directories created in this directory inherit the group ownership, and that users can only delete files and directories that they own"
+  },
+  {
+    "id": "std-006-new-00008",
+    "description": "Why can't I use sudo?? fix it."
+  },
+  {
+    "id": "dev-001-dev-00000",
+    "description": "There's a program that writes 'succeed' into /root/log periodically. I only know the interval is 1 second, 2 seconds, or 3 seconds. Please find out the interval. Answer me only the integer number of seconds. (e.g. 1, 2, or 3)"
+  },
+  {
+    "id": "dev-001-dev-00001",
+    "description": "There's a program that writes something into /root every 1 second. I want to know what is the file. tell me the filename please. (without its directory)"
+  },
+  {
+    "id": "dev-001-dev-00002",
+    "description": "There's a program that writes something into /root every 1 second. I want to know what is the file. tell me the filename please. (without its directory)"
+  },
+  {
+    "id": "dev-001-dev-00003",
+    "description": "I would like to implement the following function: entering the \"calc\" command will enable the calculation of an expression. The expression can include addition, subtraction, multiplication, division, and parentheses. If the absolute error between the calculated answer and the expected answer is less than 1e-5, it will be considered correct. For example, I can calculate the result by entering \"calc 2 * (9 / 3)\", and the output will be 6."
+  },
+  {
+    "id": "dev-001-dev-00004",
+    "description": "There's a program that writes 'succeed' into /root/log periodically. I only know the interval is 1 second, 2 seconds, or 3 seconds. Please find out the interval. Answer me only the integer number of seconds. (e.g. 1, 2, or 3)"
+  },
+  {
+    "id": "dev-001-dev-00005",
+    "description": "I would like to implement the following function: entering the \"calc\" command will enable the calculation of an expression. The expression can include addition, subtraction, multiplication, division, and parentheses. If the absolute error between the calculated answer and the expected answer is less than 1e-5, it will be considered correct. For example, I can calculate the result by entering \"calc 2 * 1\", and the output will be 2."
+  },
+  {
+    "id": "dev-001-dev-00006",
+    "description": "How many hidden files are in /home? (not including subdirectories)"
+  },
+  {
+    "id": "dev-001-dev-00007",
+    "description": "How many files whose name starts with letter exist in /root?"
+  },
+  {
+    "id": "dev-001-dev-00008",
+    "description": "How much disk space is being used by /home and all of its contents? Tell me in human-readable format."
+  },
+  {
+    "id": "dev-001-dev-00009",
+    "description": "How many empty files are there in /home and all of its content?"
+  },
+  {
+    "id": "dev-001-dev-00010",
+    "description": "How many directories are in the root dir (excluding hidden directories)?"
+  },
+  {
+    "id": "dev-001-dev-00011",
+    "description": "How many directories (recursively) are in the /home directory?"
+  },
+  {
+    "id": "dev-001-dev-00012",
+    "description": "How many files in /home (recursively) were modified in the last 24 hours?"
+  },
+  {
+    "id": "dev-001-dev-00013",
+    "description": "What's the count of my CPUs?"
+  },
+  {
+    "id": "dev-001-dev-00014",
+    "description": "How many groups are in my system?"
+  },
+  {
+    "id": "dev-001-dev-00015",
+    "description": "Find out how many groups with an index greater than 50."
+  },
+  {
+    "id": "dev-001-dev-00016",
+    "description": "Find out how many groups with an index not greater than 70."
+  },
+  {
+    "id": "dev-001-dev-00017",
+    "description": "Find out count of users."
+  },
+  {
+    "id": "dev-001-dev-00018",
+    "description": "Find out count of users."
+  },
+  {
+    "id": "dev-001-dev-00019",
+    "description": "Find out count of users who belong to at least 2 groups."
+  },
+  {
+    "id": "dev-001-dev-00020",
+    "description": "Find out count of users who belong to at least 4 groups."
+  },
+  {
+    "id": "dev-001-dev-00021",
+    "description": "Recursively Find how many files have the extension .helloworld"
+  },
+  {
+    "id": "dev-001-dev-00022",
+    "description": "Tell me whether npm is installed or not. If so, return 'installed'. If not, return 'not-yet'"
+  },
+  {
+    "id": "dev-001-dev-00023",
+    "description": "Tell me the max number of threads in my computer."
+  },
+  {
+    "id": "dev-001-dev-00024",
+    "description": "what is the output if i execute ~/test?"
+  },
+  {
+    "id": "dev-001-dev-00025",
+    "description": "Stock logs are shown in /usr/stock.log. The last two columns are stock index and count respectively. Tell me how many times Bob sold a stock."
+  }
+]

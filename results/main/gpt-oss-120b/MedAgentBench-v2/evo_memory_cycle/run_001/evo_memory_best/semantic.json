@@ -1,0 +1,272 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-12T02:36:05.635453",
+  "rules": [
+    "[P1] Cite all retrieved data (values, timestamps, identifiers) before applying thresholds; if required data is missing, return a concise no‑data statement and halt further processing.",
+    "[P1] Compare retrieved timestamps or values against protocol‑specific thresholds (e.g., required interval, recency, dosage) using the current date/time; if the condition is met, create the specified order, otherwise issue a concise no‑action statement.",
+    "[P1] Do not create or cancel orders outside the defined category.",
+    "[P1] For count‑based decisions, retrieve all active orders of the specified type, count them, and if count = 0 create the order; if count > 1 keep the newest and discontinue older ones, citing identifiers and timestamps.",
+    "[P1] For device lifecycle actions, retrieve active DeviceUseStatement/Procedure, compute elapsed time, and create a removal ServiceRequest if the threshold is exceeded and no removal order exists; otherwise issue a concise no‑action statement.",
+    "[P1] Query required FHIR resources (Observation, MedicationRequest, Procedure, ImagingStudy, DeviceUseStatement, etc.) using appropriate codes or identifiers before any decision, retrieving the most recent instance and citing its value/timestamp (or explicitly stating none).",
+    "[P1] When multiple resources of the same type are needed, request them in a single API call using a comma‑separated code list or a superset time window, then filter locally.",
+    "[P1] Ensure the action string matches the expected schema (method, URL, parameters only).",
+    "[P1] Output exactly one action line per turn; no additional prose or reasoning.",
+    "[P1] Validate unit consistency and perform aggregation only when observations remain after filtering; otherwise return a concise no‑data statement.",
+    "[P1] After any creation or discontinuation, explicitly confirm the step taken (e.g., \"Created order X\", \"Discontinued order Y\").",
+    "[P1] When a task depends on the age of a prior event and no such event exists, treat the condition as unmet and follow the instruction’s default action (e.g., place the order)."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_32a5050b3849",
+      "text": "[P1] Cite all retrieved data (values, timestamps, identifiers) before applying thresholds; if required data is missing, return a concise no‑data statement and halt further processing.",
+      "tags": [
+        "imaging_lookup",
+        "date_interval",
+        "order_generation",
+        "cite",
+        "retrieved",
+        "data",
+        "values",
+        "timestamps",
+        "identifiers",
+        "before"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-12T02:29:00.841116",
+      "updated_at": "2026-05-12T02:30:43.216419"
+    },
+    {
+      "id": "rule_466e6bf53913",
+      "text": "[P1] Compare retrieved timestamps or values against protocol‑specific thresholds (e.g., required interval, recency, dosage) using the current date/time; if the condition is met, create the specified order, otherwise issue a concise no‑action statement.",
+      "tags": [
+        "imaging_lookup",
+        "date_interval",
+        "order_generation",
+        "compare",
+        "retrieved",
+        "timestamps",
+        "values",
+        "against",
+        "protocol",
+        "specific"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-12T02:29:00.841002",
+      "updated_at": "2026-05-12T02:30:43.216494"
+    },
+    {
+      "id": "rule_b5d7656f1d43",
+      "text": "[P1] Do not create or cancel orders outside the defined category.",
+      "tags": [
+        "imaging_lookup",
+        "date_interval",
+        "order_generation",
+        "create",
+        "cancel",
+        "orders",
+        "outside",
+        "defined",
+        "category",
+        "imagingstudy"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-12T02:29:00.841329",
+      "updated_at": "2026-05-12T02:30:43.216522"
+    },
+    {
+      "id": "rule_66e0f74f5b62",
+      "text": "[P1] For count‑based decisions, retrieve all active orders of the specified type, count them, and if count = 0 create the order; if count > 1 keep the newest and discontinue older ones, citing identifiers and timestamps.",
+      "tags": [
+        "imaging_lookup",
+        "date_interval",
+        "order_generation",
+        "count",
+        "based",
+        "decisions",
+        "retrieve",
+        "active",
+        "orders",
+        "specified"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-12T02:29:00.841064",
+      "updated_at": "2026-05-12T02:30:43.216581"
+    },
+    {
+      "id": "rule_68940623fafb",
+      "text": "[P1] For device lifecycle actions, retrieve active DeviceUseStatement/Procedure, compute elapsed time, and create a removal ServiceRequest if the threshold is exceeded and no removal order exists; otherwise issue a concise no‑action statement.",
+      "tags": [
+        "imaging_lookup",
+        "date_interval",
+        "order_generation",
+        "device",
+        "lifecycle",
+        "actions",
+        "retrieve",
+        "active",
+        "deviceusestatement",
+        "procedure"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-12T02:29:00.841224",
+      "updated_at": "2026-05-12T02:30:43.216650"
+    },
+    {
+      "id": "rule_191e298aca06",
+      "text": "[P1] Query required FHIR resources (Observation, MedicationRequest, Procedure, ImagingStudy, DeviceUseStatement, etc.) using appropriate codes or identifiers before any decision, retrieving the most recent instance and citing its value/timestamp (or explicitly stating none).",
+      "tags": [
+        "imaging_lookup",
+        "date_interval",
+        "order_generation",
+        "query",
+        "required",
+        "fhir",
+        "resources",
+        "observation",
+        "medicationrequest",
+        "procedure"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-12T02:29:00.840858",
+      "updated_at": "2026-05-12T02:30:43.216698"
+    },
+    {
+      "id": "rule_8ee086985929",
+      "text": "[P1] When multiple resources of the same type are needed, request them in a single API call using a comma‑separated code list or a superset time window, then filter locally.",
+      "tags": [
+        "imaging_lookup",
+        "date_interval",
+        "order_generation",
+        "when",
+        "multiple",
+        "resources",
+        "same",
+        "type",
+        "needed",
+        "request"
+      ],
+      "shown": 2,
+      "success": 1,
+      "failure": 1,
+      "created_at": "2026-05-12T02:29:00.840938",
+      "updated_at": "2026-05-12T02:30:43.216749"
+    },
+    {
+      "id": "rule_68ad07690c4d",
+      "text": "[P1] Ensure the action string matches the expected schema (method, URL, parameters only).",
+      "tags": [
+        "action_format",
+        "observation_retrieval",
+        "protocol_execution",
+        "ensure",
+        "action",
+        "string",
+        "matches",
+        "expected",
+        "schema",
+        "method"
+      ],
+      "shown": 4,
+      "success": 1,
+      "failure": 3,
+      "created_at": "2026-05-12T02:04:38.697806",
+      "updated_at": "2026-05-12T02:30:43.216781"
+    },
+    {
+      "id": "rule_8ebbcd3ef962",
+      "text": "[P1] Output exactly one action line per turn; no additional prose or reasoning.",
+      "tags": [
+        "action_format",
+        "observation_retrieval",
+        "protocol_execution",
+        "output",
+        "exactly",
+        "action",
+        "line",
+        "turn",
+        "additional",
+        "prose"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-12T02:04:38.697741",
+      "updated_at": "2026-05-12T02:30:43.216811"
+    },
+    {
+      "id": "rule_b0d47070cfd3",
+      "text": "[P1] Validate unit consistency and perform aggregation only when observations remain after filtering; otherwise return a concise no‑data statement.",
+      "tags": [
+        "imaging_lookup",
+        "date_interval",
+        "order_generation",
+        "validate",
+        "unit",
+        "consistency",
+        "perform",
+        "aggregation",
+        "only",
+        "when"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-12T02:29:00.841163",
+      "updated_at": "2026-05-12T02:30:43.216856"
+    },
+    {
+      "id": "rule_6fae14b06cc0",
+      "text": "[P1] After any creation or discontinuation, explicitly confirm the step taken (e.g., \"Created order X\", \"Discontinued order Y\").",
+      "tags": [
+        "search",
+        "recency",
+        "order-creation",
+        "citation",
+        "after",
+        "creation",
+        "discontinuation",
+        "explicitly",
+        "confirm",
+        "step"
+      ],
+      "shown": 11,
+      "success": 5,
+      "failure": 6,
+      "created_at": "2026-05-12T00:50:47.302844",
+      "updated_at": "2026-05-12T02:30:43.216891"
+    },
+    {
+      "id": "rule_536f47f26c32",
+      "text": "[P1] When a task depends on the age of a prior event and no such event exists, treat the condition as unmet and follow the instruction’s default action (e.g., place the order).",
+      "tags": [
+        "vaccination",
+        "missing-record",
+        "booster-order",
+        "when",
+        "task",
+        "depends",
+        "prior",
+        "event",
+        "such",
+        "exists"
+      ],
+      "shown": 50,
+      "success": 32,
+      "failure": 18,
+      "created_at": "2026-05-12T01:16:40.776092",
+      "updated_at": "2026-05-12T02:30:43.216944"
+    }
+  ]
+}

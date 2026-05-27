@@ -1,0 +1,18 @@
+{
+  "answer_includes_unnecessary_comment": "Added commentary (e.g., 'no new test needed') that was not part of the required answer.",
+  "answer_format_wrong_type_string_instead_of_number": "Returned the age as a string instead of a numeric type as expected.",
+  "answer_format_missing_prefix": "Returned raw value/date string without the required descriptive prefix.",
+  "missing_resource_query_before_answer": "Did not perform any FHIR GET request before producing the final answer.",
+  "quantity_unit_missing_in_answer": "Returned a numeric value without the required unit of measurement.",
+  "wrong_resource_type_used_for_medication_order": "Used an incorrect FHIR resource type for the medication order (e.g., MedicationRequest vs. ServiceRequest).",
+  "missing_paired_order_action": "Failed to create the additional paired order that the instruction demanded.",
+  "placeholder_value_returned_instead_of_result": "Returned a sentinel placeholder (e.g., -1) instead of the actual lab value.",
+  "missing_observation_post_before_finish": "Did not POST a new Observation (e.g., blood pressure) before finishing, despite instruction to record it.",
+  "patient_not_found_assumption_without_response_check": "Assumed patient absent and returned 'Patient not found' without verifying search response.",
+  "answer_format_extra_explanatory_text": "Included extra explanatory sentences beyond the expected concise answer format.",
+  "unnecessary_test_order_created": "Created a ServiceRequest for a test that was not required by the instruction.",
+  "answer_format_wrong_type": "Returned answer in an incorrect data type (e.g., a single string when a structured list or object was expected).",
+  "answer_missing_required_free_text": "The final answer omitted required free‑text details that were explicitly requested in the instruction.",
+  "duplicate_service_request_created": "Created multiple identical ServiceRequest resources for the same referral, resulting in duplicate orders.",
+  "date_filter_omitted": "date filter omitted"
+}

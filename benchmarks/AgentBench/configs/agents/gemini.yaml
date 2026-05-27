@@ -1,0 +1,12 @@
+# Gemini 3.1 Flash Lite via Google Vertex AI.
+# Required env: GOOGLE_CLOUD_PROJECT and application-default credentials
+#   (run `gcloud auth application-default login`).
+# Optional env: GOOGLE_CLOUD_LOCATION (default "us-central1"),
+#   GEMINI_MODEL (default "gemini-3.1-flash-lite").
+module: src.client.agents.VertexAgent
+parameters:
+  project_id: "${GOOGLE_CLOUD_PROJECT}"
+  location: "${GOOGLE_CLOUD_LOCATION:-us-central1}"
+  model: "${GEMINI_MODEL:-gemini-3.1-flash-lite}"
+  temperature: 0.0
+  max_output_tokens: 32768

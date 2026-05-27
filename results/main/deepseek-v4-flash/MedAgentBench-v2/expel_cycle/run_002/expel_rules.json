@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When a vital signs search returns observations but none matching the target measurement (e.g., heart rate), specifically query for that measurement using its code parameter rather than the category parameter to filter results precisely.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving a data response, always verify that the returned observations contain the required measurement type before performing calculations; if the target measurement is missing, issue a new query with the appropriate code parameter.",
+    "counter": 2
+  },
+  {
+    "text": "Use the \"date\" parameter with both lower and upper bounds (e.g., ge and le) to restrict observations to the exact time window required by the task, ensuring only relevant data is retrieved for calculations.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for specific medications (e.g., opioids), always filter MedicationRequest by `status=active` to retrieve only active orders and avoid processing irrelevant or historical entries.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving active medication orders, explicitly filter the results by checking the medication name or code against a provided list of target medications (e.g., opioid names) to correctly identify relevant orders before proceeding with verification or actions.",
+    "counter": 2
+  },
+  {
+    "text": "If the task requires creating a new order (e.g., naloxone) for a patient, verify that the patient has at least one active matching order from the specified list; do not conclude \"no action needed\" simply because the initial search returned no matches without confirming the target medications are absent.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for vital signs, use the \"vital-signs\" category parameter to retrieve all vitals, then filter client-side for the specific observation code (e.g., heart rate) rather than relying solely on the code parameter, as the vitals API may not support direct code filtering for all measurements.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify the current time from the task context and compute the exact date-time range for time-based queries (e.g., \"past 6 hours\" or \"past 12 hours\") before making the API request, ensuring the date parameter includes both a lower bound (ge) and upper bound (le) to avoid retrieving data outside the relevant window.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving a response from a FHIR API, check the \"total\" field in the Bundle to confirm if any observations were returned; if the total is 0 or no relevant entries exist, immediately conclude that the data is unavailable and proceed to FINISH with an appropriate message rather than making additional futile requests.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for medication orders, always include the `status=active` parameter to filter out inactive or discontinued orders and get a precise count of currently active medications.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving medication orders, explicitly check the `medicationCodeableConcept.text` field against the specific medication name (e.g., \"heparin\") to identify the correct orders, rather than relying solely on category filters.",
+    "counter": 2
+  },
+  {
+    "text": "If the initial search returns zero orders, do not conclude the task is complete; instead, verify by checking if the search parameters (e.g., category) were too restrictive and retry with broader parameters before creating a new order.",
+    "counter": 2
+  },
+  {
+    "text": "For tasks requiring verification of exactly one active order, after identifying relevant orders, count them and take appropriate action: if zero, create the order; if one, confirm and finish; if multiple, discontinue duplicates keeping the newest based on `authoredOn` date.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for vaccination records, always first use the Procedure resource with the appropriate CPT code or vaccine-specific code, as this directly captures administered vaccinations rather than medication orders.",
+    "counter": 2
+  },
+  {
+    "text": "If initial search parameters (e.g., code or category) return zero results, broaden the search by removing restrictive filters rather than adding new restrictive parameters; try searching without code or category to capture all relevant records.",
+    "counter": 2
+  },
+  {
+    "text": "When determining whether to order a vaccine based on timing, always retrieve the full history of previous vaccinations (without date restrictions) to find the most recent administration date, then compare that date to the current time to decide if a booster is needed.",
+    "counter": 2
+  },
+  {
+    "text": "When a task involves checking for prior vaccinations, do not conclude \"no records found\" based solely on one resource type (e.g., MedicationRequest); also query the Procedure resource with a broader search (e.g., without date or code filters) to ensure all vaccination records are captured.",
+    "counter": 2
+  },
+  {
+    "text": "When checking if a vaccine was administered more than 365 days ago, do not filter by date in the initial search; instead, retrieve all vaccination records and then identify the most recent one from the results to compute the time difference.",
+    "counter": 2
+  },
+  {
+    "text": "If a search for a vaccine by CPT code returns zero results, do not immediately conclude the vaccine was never given; instead, consider that the vaccine may have been administered outside the filtered date range or recorded under a different code, and perform an unfiltered search.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires ordering a new vaccine if the last dose was more than 365 days ago, after determining the last vaccination date, calculate the difference from the current time (provided in the context) and use the appropriate POST endpoint (e.g., MedicationRequest.Create or ServiceRequest.Create) to place the order, not just FINISH with a note.",
+    "counter": 2
+  }
+]

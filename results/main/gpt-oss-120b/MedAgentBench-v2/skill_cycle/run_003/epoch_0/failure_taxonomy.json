@@ -1,0 +1,16 @@
+{
+  "answer_format_wrong_type": "answer format wrong type",
+  "incorrect_date_range_used": "Applied an incorrect or mismatched date range when retrieving observations, leading to missing data.",
+  "order_discontinuation_not_executed": "Identified duplicate active orders but failed to issue a request to discontinue the extra order(s).",
+  "date_filter_omitted": "date filter omitted",
+  "medication_request_missing_code_filter": "Queried MedicationRequest without filtering for the required medication code (e.g., opioid or DVT prophylaxis).",
+  "answer_fabricated_without_data": "Provided numeric results (e.g., averages) without having retrieved any supporting data.",
+  "date_filter_malformed": "Used an invalid date filter syntax in the FHIR query, causing the server to ignore the filter.",
+  "answer_submitted_before_query": "Returned a final answer without issuing any FHIR query first.",
+  "service_request_not_created_when_needed": "Detected a condition requiring a ServiceRequest (e.g., catheter removal) but did not create the request.",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "procedure_date_filter_incorrect": "Applied an incorrect or insufficient date filter when checking procedure duration criteria (e.g., using a single date instead of a range).",
+  "lab_results_not_evaluated_before_order": "Retrieved lab observations but failed to evaluate their values before deciding on an order or intervention.",
+  "procedure_missing_code_filter": "Queried Procedure resources without filtering for the required procedure code, leading to potentially incorrect results."
+}

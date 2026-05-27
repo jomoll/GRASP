@@ -1,0 +1,14 @@
+{
+  "incorrect_resource_type_queried": "queried the wrong FHIR resource type for the requested clinical information",
+  "failure_to_remediate_multiple_orders": "identified multiple orders but failed to perform the required cleanup action",
+  "pagination_loop_without_data_extraction": "stuck in a loop of navigating search pages without extracting the target data",
+  "false_negative_medication_check": "incorrectly concluded no active orders existed when they were present",
+  "incorrect_calculation_logic_applied": "performed calculation using incorrect data points or time windows",
+  "insufficient_search_parameters_for_data": "failed to retrieve data due to overly restrictive or incorrect search filters",
+  "incorrect_date_logic_evaluation": "miscalculated the time interval between the last procedure and the current date",
+  "unnecessary_resource_creation_performed": "created a new resource despite existing valid records",
+  "incorrect_action_logic_applied": "performed an action that contradicted the protocol or failed to address the specific condition identified",
+  "false_negative_vital_sign_check": "incorrectly concluded no vital sign data existed when it was present in the records",
+  "false_negative_procedure_check": "incorrectly concluded no procedure records existed when they were present",
+  "incorrect_resource_field_value": "created a resource with an incorrect field value (e.g., lowercase unit instead of required format)"
+}

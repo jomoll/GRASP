@@ -1,0 +1,16 @@
+{
+  "replacement_not_needed_but_lab_ordered": "ordered follow-up lab even though replacement was not needed",
+  "date_filter_omitted": "date filter omitted",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "fhir_resource_wrong_field_extracted": "used valueString instead of proper component structure for blood pressure",
+  "answer_format_wrong_type": "answer format wrong type",
+  "age_computation_incorrect": "computed age incorrectly from patient birth date",
+  "patient_not_found_incorrectly": "returned 'Patient not found' when patient actually exists in system",
+  "no_lab_found_returned_minus_one": "returned -1 when no lab result found instead of appropriate null/not found",
+  "no_lab_found_but_ordered_lab": "No lab result found, but ordered a new lab instead of returning -1 as instructed",
+  "no_replacement_needed_correctly_skipped": "Correctly determined no replacement needed, but final answer was empty list instead of expected value",
+  "replacement_ordered_without_follow_up_lab": "Ordered replacement but did not order the required paired follow-up lab",
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "correct_behavior_no_failure": "correct behavior no failure",
+  "follow_up_lab_ordered_when_not_needed": "Ordered a follow-up lab even though the primary condition (low potassium) was not met, and the follow-up was only required when replacement was ordered"
+}

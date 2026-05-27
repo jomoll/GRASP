@@ -1,0 +1,9 @@
+{
+  "answer_format_wrong_type": "answer format wrong type",
+  "missing_value_representation_incorrect": "Returned '-1' or similar instead of the required missing value format.",
+  "lab_threshold_logic_error": "Incorrectly applied the threshold for 'low' or 'repletion' logic.",
+  "unnecessary_order_placed": "Placed an order when the lab value did not meet criteria for action.",
+  "date_filter_omitted": "date filter omitted",
+  "answer_format_includes_extra_text": "Returned the correct value but with extra explanatory or template text.",
+  "answer_submitted_before_verification": "answer submitted before verification"
+}

@@ -1,0 +1,37 @@
+# evo_memory_cycle — Evo-MedAgent
+# Model backend: select with --agent / GRASP_BACKEND, or change agent_preset.
+# See configs/agents/README.md for the available presets.
+output_dir: outputs/evo_memory_cycle
+agent_preset: gptoss
+updater:
+  module: src.client.agents.LiteLLMAgent
+  parameters:
+    model: azure/gpt-4.1
+    api_version: 2024-12-01-preview
+    temperature: 0.7
+    max_output_tokens: 32768
+    timeout: 120
+task:
+  name: medagentbench-skill
+  controller_address: http://localhost:5050/api
+  fhir_api_base: http://localhost:8080/fhir/
+data:
+  full: data/medagentbench/test_data_v2.json
+  dev: data/medagentbench/split_dev.json
+  val: data/medagentbench/split_val.json
+  test: data/medagentbench/split_test.json
+  id_test: data/medagentbench/split_id_test.json
+evo_memory:
+  episodic_enabled: true
+  semantic_enabled: true
+  episodic_top_k: 3
+  semantic_top_k: 8
+  max_episodes: 500
+  max_semantic_rules: 25
+  max_context_chars: 6000
+cycle:
+  epochs: 5
+  update_every: 48
+  batch_concurrency: 5
+  run_baseline: true
+  seed: 1

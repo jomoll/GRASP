@@ -1,0 +1,38 @@
+_resume: false
+agent:
+  module: src.client.agents.OpenAIResponsesAgent
+  parameters:
+    base_url: <REDACTED>
+    max_output_tokens: 65536
+    model: gpt-5.4
+    reasoning_effort: low
+    text_verbosity: low
+    timeout: 1800
+cycle:
+  batch_concurrency: 2
+  epochs: 5
+  run_baseline: true
+  seed: 18929
+  update_every: 48
+data:
+  dev: data/medagentbench/split_dev.json
+  full: data/medagentbench/test_data_v2.json
+  id_test: data/medagentbench/split_id_test.json
+  test: data/medagentbench/split_test.json
+  val: data/medagentbench/split_val.json
+memory:
+  max_bullets: 200
+output_dir: outputs/memory_cycle_gpt54radmetric_low
+task:
+  controller_address: http://localhost:5050/api
+  fhir_api_base: http://localhost:8080/fhir/
+  name: medagentbench-skill
+updater:
+  module: src.client.agents.OpenAIResponsesAgent
+  parameters:
+    base_url: <REDACTED>
+    max_output_tokens: 65536
+    model: gpt-5.4
+    reasoning_effort: low
+    text_verbosity: low
+    timeout: 1800

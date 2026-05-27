@@ -1,0 +1,18 @@
+{
+  "answer_contains_extra_order_details": "Agent adds extra order information in answer beyond what was asked.",
+  "missing_order_when_result_stale": "Agent fails to place a new test order when the existing result is older than the required threshold.",
+  "patient_not_found_assumption_without_verification": "Agent assumes patient absent and returns \"Patient not found\" without checking API response.",
+  "answer_format_wrong_type": "Agent returns answer in wrong data structure (e.g., scalar instead of list).",
+  "quantity_unit_missing": "Agent returns a numeric measurement without the required unit.",
+  "age_calculation_incorrect": "Agent computes patient age incorrectly.",
+  "answer_returned_invalid_placeholder": "Agent returns placeholder like \"-1\" instead of a real value.",
+  "missing_api_call_before_answer": "Agent returns a final answer or reasoning without first performing the required FHIR GET request.",
+  "missing_paired_order": "Agent omits the required paired follow‑up order specified in the instruction.",
+  "answer_includes_unrequested_order_message": "Agent includes an order confirmation in the final answer when only lab value was requested.",
+  "unrequested_order_placed": "Agent creates an order (e.g., ServiceRequest or MedicationRequest) even though the instruction only asked for a value retrieval.",
+  "low_threshold_check_missing": "Agent fails to place a replacement order when the lab result is below the defined low threshold.",
+  "free_text_content_mismatch": "Agent's free‑text field in an order does not match the exact required template or content specified in the instruction.",
+  "answer_extra_unrequested_flag": "Returned an extra field or flag (such as an \"order_needed\" boolean) that was not part of the requested answer format.",
+  "service_request_wrong_priority": "Created a ServiceRequest with a priority value that does not match the instruction (e.g., using 'stat' instead of the required 'routine').",
+  "order_needed_flag_incorrect": "Returned order_needed boolean flag with an incorrect value relative to the required date/threshold logic."
+}

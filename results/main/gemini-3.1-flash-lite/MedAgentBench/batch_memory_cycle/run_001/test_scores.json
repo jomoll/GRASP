@@ -1,0 +1,14 @@
+{
+  "test_eval_baseline": {
+    "split": "test",
+    "score": 0.2,
+    "n_correct": 12,
+    "n_total": 60
+  },
+  "id_test_eval_baseline": {
+    "split": "id_test",
+    "score": 0.546875,
+    "n_correct": 35,
+    "n_total": 64
+  }
+}

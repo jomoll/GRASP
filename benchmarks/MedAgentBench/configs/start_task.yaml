@@ -1,0 +1,16 @@
+# Start the MedAgentBench task worker for the skill-learning cycle.
+#
+# Usage:
+#   python -m src.start_task -a --config configs/start_task.yaml
+#
+# Then in a separate terminal:
+#   python -m src.grasp --config configs/grasp.yaml --run-name run_001
+
+controller: "http://localhost:5050/api"
+base_port: 5051
+
+definition:
+  import: tasks/task_assembly.yaml
+
+start:
+  medagentbench-skill: 1

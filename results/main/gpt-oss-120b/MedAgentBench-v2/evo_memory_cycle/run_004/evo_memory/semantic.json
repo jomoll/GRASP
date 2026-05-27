@@ -1,0 +1,382 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-17T16:08:49.313851",
+  "rules": [
+    "[P1] When multiple labs or observations are required, include all relevant LOINC/codes in a single query using a comma‑separated code parameter.",
+    "[P1] Only order a repeat test if no observation exists within the protocol‑defined look‑back period.",
+    "[P1] Verify each fetched order's status is \"active\" before applying duplicate‑handling or other order‑related logic.",
+    "[P1] For repeat vaccine eligibility, compute days since the last administration of the same vaccine and create a ServiceRequest only if the interval exceeds the protocol‑defined threshold.",
+    "[P1] If a protocol mandates follow‑up testing after a missing resource request, emit the required ServiceRequests before issuing FINISH.",
+    "[P1] Use the standard FHIR URL syntax (e.g., GET http://.../Procedure?...) and the full patient reference format patient=Patient/{id}.",
+    "[P1] When discontinuing duplicate orders, explicitly reference each order ID to be cancelled and retain the newest order based on creation timestamp.",
+    "[P1] Perform explicit date and duration arithmetic for recency, eligibility, and placement‑removal checks; compare calculated intervals against protocol‑defined limits.",
+    "[P1] Create a new order only when no active orders of the same type exist.",
+    "[P1] Output exactly one FHIR request per turn; do not include any explanatory text.",
+    "[P1] Retrieve prerequisite observations (e.g., catheter placement) before evaluating eligibility or emitting orders.",
+    "[P1] When observations are returned, compute the arithmetic mean of their numeric values for aggregate reporting.",
+    "[P1] Separate reasoning from the FINISH payload; FINISH must contain only the final structured result JSON without explanatory text.",
+    "[P1] Never fabricate or assume values; explicitly record missing data and summarize missing data or recommendations in a single FINISH payload.",
+    "[P1] When multiple overlapping time windows are needed, fetch data once for the longest window and derive shorter‑window aggregates from the same result set.",
+    "[P1] Emit all clinical actions (orders, ServiceRequests, etc.) as discrete JSON objects matching the platform schema, including all mandatory fields, clinical codes, timestamps, and exact indication text; never use textual descriptions for ordered tests.",
+    "[P1] When retrieving any FHIR resource, filter by patient identifier and exact code(s), paginate all pages, sort results by the appropriate timestamp field (e.g., effectiveDateTime, performedDateTime, occurrenceDateTime) descending, and verify existence before concluding absence."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_820fb767c785",
+      "text": "[P1] When multiple labs or observations are required, include all relevant LOINC/codes in a single query using a comma‑separated code parameter.",
+      "tags": [
+        "vaccination",
+        "booster",
+        "time-interval",
+        "eligibility",
+        "when",
+        "multiple",
+        "labs",
+        "observations",
+        "required",
+        "include"
+      ],
+      "shown": 3,
+      "success": 2,
+      "failure": 1,
+      "created_at": "2026-05-17T15:47:36.044497",
+      "updated_at": "2026-05-17T15:59:53.753074"
+    },
+    {
+      "id": "rule_2314ca631d73",
+      "text": "[P1] Only order a repeat test if no observation exists within the protocol‑defined look‑back period.",
+      "tags": [
+        "fhir_retrieval",
+        "observation_query",
+        "lab_ordering",
+        "protocol_compliance",
+        "only",
+        "order",
+        "repeat",
+        "test",
+        "observation",
+        "exists"
+      ],
+      "shown": 5,
+      "success": 3,
+      "failure": 2,
+      "created_at": "2026-05-17T15:50:07.510783",
+      "updated_at": "2026-05-17T15:59:53.753157"
+    },
+    {
+      "id": "rule_e38c4f5b4425",
+      "text": "[P1] Verify each fetched order's status is \"active\" before applying duplicate‑handling or other order‑related logic.",
+      "tags": [
+        "order_management",
+        "duplicate_handling",
+        "timestamp_sorting",
+        "creation",
+        "discontinue",
+        "verify",
+        "each",
+        "fetched",
+        "order",
+        "status"
+      ],
+      "shown": 7,
+      "success": 5,
+      "failure": 2,
+      "created_at": "2026-05-17T14:37:58.618715",
+      "updated_at": "2026-05-17T15:59:53.753120"
+    },
+    {
+      "id": "rule_0ef3bc9a818f",
+      "text": "[P1] For repeat vaccine eligibility, compute days since the last administration of the same vaccine and create a ServiceRequest only if the interval exceeds the protocol‑defined threshold.",
+      "tags": [
+        "vaccination",
+        "booster",
+        "time-interval",
+        "eligibility",
+        "repeat",
+        "vaccine",
+        "compute",
+        "days",
+        "since",
+        "last"
+      ],
+      "shown": 6,
+      "success": 3,
+      "failure": 3,
+      "created_at": "2026-05-17T15:47:36.044910",
+      "updated_at": "2026-05-17T15:59:53.753204"
+    },
+    {
+      "id": "rule_bdd77821890a",
+      "text": "[P1] If a protocol mandates follow‑up testing after a missing resource request, emit the required ServiceRequests before issuing FINISH.",
+      "tags": [
+        "vaccination",
+        "booster",
+        "time-interval",
+        "eligibility",
+        "protocol",
+        "mandates",
+        "follow",
+        "testing",
+        "after",
+        "missing"
+      ],
+      "shown": 6,
+      "success": 3,
+      "failure": 3,
+      "created_at": "2026-05-17T15:47:36.044812",
+      "updated_at": "2026-05-17T15:59:53.753244"
+    },
+    {
+      "id": "rule_5d696facb8f0",
+      "text": "[P1] Use the standard FHIR URL syntax (e.g., GET http://.../Procedure?...) and the full patient reference format patient=Patient/{id}.",
+      "tags": [
+        "vaccination",
+        "booster",
+        "time-interval",
+        "eligibility",
+        "standard",
+        "fhir",
+        "syntax",
+        "http",
+        "procedure",
+        "full"
+      ],
+      "shown": 6,
+      "success": 3,
+      "failure": 3,
+      "created_at": "2026-05-17T15:47:36.044538",
+      "updated_at": "2026-05-17T15:59:53.753341"
+    },
+    {
+      "id": "rule_f8c2949256e2",
+      "text": "[P1] When discontinuing duplicate orders, explicitly reference each order ID to be cancelled and retain the newest order based on creation timestamp.",
+      "tags": [
+        "vaccination",
+        "booster",
+        "time-interval",
+        "eligibility",
+        "when",
+        "discontinuing",
+        "duplicate",
+        "orders",
+        "explicitly",
+        "reference"
+      ],
+      "shown": 6,
+      "success": 3,
+      "failure": 3,
+      "created_at": "2026-05-17T15:47:36.044641",
+      "updated_at": "2026-05-17T15:59:53.753375"
+    },
+    {
+      "id": "rule_07e810a16ed7",
+      "text": "[P1] Perform explicit date and duration arithmetic for recency, eligibility, and placement‑removal checks; compare calculated intervals against protocol‑defined limits.",
+      "tags": [
+        "vaccination",
+        "booster",
+        "time-interval",
+        "eligibility",
+        "perform",
+        "explicit",
+        "date",
+        "duration",
+        "arithmetic",
+        "recency"
+      ],
+      "shown": 5,
+      "success": 2,
+      "failure": 3,
+      "created_at": "2026-05-17T15:47:36.044688",
+      "updated_at": "2026-05-17T15:59:53.753308"
+    },
+    {
+      "id": "rule_e2b4078a8173",
+      "text": "[P1] Create a new order only when no active orders of the same type exist.",
+      "tags": [
+        "order-management",
+        "duplicate-handling",
+        "active-order-verification",
+        "create",
+        "order",
+        "only",
+        "when",
+        "active",
+        "orders",
+        "same"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T15:59:53.753707",
+      "updated_at": "2026-05-17T15:59:53.753708"
+    },
+    {
+      "id": "rule_1ed207ea2238",
+      "text": "[P1] Output exactly one FHIR request per turn; do not include any explanatory text.",
+      "tags": [
+        "vaccination",
+        "booster",
+        "time-interval",
+        "eligibility",
+        "output",
+        "exactly",
+        "fhir",
+        "request",
+        "turn",
+        "include"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T15:47:36.044603",
+      "updated_at": "2026-05-17T15:59:53.753403"
+    },
+    {
+      "id": "rule_bc5028a8d0a3",
+      "text": "[P1] Retrieve prerequisite observations (e.g., catheter placement) before evaluating eligibility or emitting orders.",
+      "tags": [
+        "catheter",
+        "duration_check",
+        "service_request",
+        "verification",
+        "fabrication_prevention",
+        "retrieve",
+        "prerequisite",
+        "observations",
+        "placement",
+        "before"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T15:52:11.356576",
+      "updated_at": "2026-05-17T15:59:53.753433"
+    },
+    {
+      "id": "rule_584a9acc7bd0",
+      "text": "[P1] When observations are returned, compute the arithmetic mean of their numeric values for aggregate reporting.",
+      "tags": [
+        "heart_rate",
+        "observation_query",
+        "average_calculation",
+        "time_window",
+        "fhir",
+        "when",
+        "observations",
+        "returned",
+        "compute",
+        "arithmetic"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T15:57:46.276440",
+      "updated_at": "2026-05-17T15:59:53.753462"
+    },
+    {
+      "id": "rule_7421df350394",
+      "text": "[P1] Separate reasoning from the FINISH payload; FINISH must contain only the final structured result JSON without explanatory text.",
+      "tags": [
+        "finish_format",
+        "structured_output",
+        "order_creation",
+        "lab_retrieval",
+        "separate",
+        "reasoning",
+        "from",
+        "finish",
+        "payload",
+        "must"
+      ],
+      "shown": 15,
+      "success": 8,
+      "failure": 6,
+      "created_at": "2026-05-17T13:39:40.668617",
+      "updated_at": "2026-05-17T15:59:53.753494"
+    },
+    {
+      "id": "rule_e33266a51026",
+      "text": "[P1] Never fabricate or assume values; explicitly record missing data and summarize missing data or recommendations in a single FINISH payload.",
+      "tags": [
+        "procedure-retrieval",
+        "date-comparison",
+        "order-generation",
+        "recency-check",
+        "never",
+        "fabricate",
+        "assume",
+        "values",
+        "explicitly",
+        "record"
+      ],
+      "shown": 23,
+      "success": 11,
+      "failure": 12,
+      "created_at": "2026-05-17T12:26:04.717038",
+      "updated_at": "2026-05-17T15:59:53.753528"
+    },
+    {
+      "id": "rule_ccd0fe095502",
+      "text": "[P1] When multiple overlapping time windows are needed, fetch data once for the longest window and derive shorter‑window aggregates from the same result set.",
+      "tags": [
+        "heart-rate",
+        "average",
+        "time-window",
+        "observation-retrieval",
+        "when",
+        "multiple",
+        "overlapping",
+        "time",
+        "windows",
+        "needed"
+      ],
+      "shown": 18,
+      "success": 7,
+      "failure": 10,
+      "created_at": "2026-05-17T13:56:39.268313",
+      "updated_at": "2026-05-17T15:59:53.753572"
+    },
+    {
+      "id": "rule_83694bd43ba8",
+      "text": "[P1] Emit all clinical actions (orders, ServiceRequests, etc.) as discrete JSON objects matching the platform schema, including all mandatory fields, clinical codes, timestamps, and exact indication text; never use textual descriptions for ordered tests.",
+      "tags": [
+        "finish_format",
+        "structured_output",
+        "order_creation",
+        "lab_retrieval",
+        "emit",
+        "clinical",
+        "actions",
+        "orders",
+        "servicerequests",
+        "discrete"
+      ],
+      "shown": 6,
+      "success": 0,
+      "failure": 6,
+      "created_at": "2026-05-17T13:39:40.668728",
+      "updated_at": "2026-05-17T15:59:53.753616"
+    },
+    {
+      "id": "rule_63105c1936b2",
+      "text": "[P1] When retrieving any FHIR resource, filter by patient identifier and exact code(s), paginate all pages, sort results by the appropriate timestamp field (e.g., effectiveDateTime, performedDateTime, occurrenceDateTime) descending, and verify existence before concluding absence.",
+      "tags": [
+        "finish_format",
+        "structured_output",
+        "order_creation",
+        "lab_retrieval",
+        "when",
+        "retrieving",
+        "fhir",
+        "resource",
+        "filter",
+        "patient"
+      ],
+      "shown": 12,
+      "success": 1,
+      "failure": 11,
+      "created_at": "2026-05-17T13:39:40.668680",
+      "updated_at": "2026-05-17T15:59:53.753660"
+    }
+  ]
+}

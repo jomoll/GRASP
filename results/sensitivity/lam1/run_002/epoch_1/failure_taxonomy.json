@@ -1,0 +1,17 @@
+{
+  "observation_value_placeholder_used": "Returned a sentinel placeholder value (e.g., -1) instead of the actual observation result.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "observation_post_missing": "Failed to create the required Observation resource after planning; no POST Observation was performed.",
+  "missing_conditional_order_logic": "Did not execute the conditional check and subsequent ordering steps required by the task.",
+  "wrong_answer_for_not_found_case": "Returned an incorrect response for a 'not found' scenario (e.g., gave a generic message instead of the required 'Patient not found' or vice‑versa).",
+  "missing_patient_lookup_before_age": "Did not query the Patient resource to obtain birthdate before computing and returning the patient’s age.",
+  "unnecessary_service_request_created": "Created a ServiceRequest/order when the instruction did not require ordering a new test or medication.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "observation_query_missing_patient_prefix": "Observation GET request used an incorrect patient reference format (missing 'Patient/' prefix).",
+  "date_filter_omitted": "date filter omitted",
+  "answer_placeholder_used": "Returned a sentinel placeholder value (e.g., -1) instead of the actual answer.",
+  "patient_lookup_missing_before_answer": "Did not perform a Patient lookup before attempting to answer the query.",
+  "wrong_resource_type_for_referral": "Used ServiceRequest instead of the appropriate Referral resource type for a referral request.",
+  "no_answer_returned": "The agent did not produce any final answer after completing actions.",
+  "answer_missing_free_text": "Returned a success message without including the required free‑text details in the response."
+}

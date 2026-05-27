@@ -1,0 +1,40 @@
+output_dir: "outputs/grasp_dbbench"
+
+# Model backend: select with --agent / GRASP_BACKEND, or change the default here.
+# See configs/agents/README.md for presets (gptoss, deepseek, gemini, gpt4, gpt5, local).
+agent_preset: gptoss
+agent_temperature: 0.0
+
+# Task worker (must be running before starting this script)
+# Start with: python -m src.start_task -a --config configs/start_skill_task_dbbench.yaml
+task:
+  name: "dbbench-std"
+  controller_address: "http://localhost:5010/api"
+
+# Data splits produced by data/dbbench/split_dataset.py
+data:
+  dev: "data/dbbench/split_dev.json"   # 240 samples (176 real + 64 synthetic aggregation) — skill learning
+  val: "data/dbbench/split_val.json"   # 124 samples (40% of standard.jsonl, stratified) — monitoring
+  # test: data/dbbench/split_test.json  # 60 samples (dev.jsonl, never used during training)
+
+# Task-specific eval function
+eval:
+  module: src.server.tasks.dbbench.eval
+
+# Skill library
+skills:
+  base_dir: "skills/dbbench/base"
+
+# Training loop hyperparameters
+# DBBench shares one MySQL container with per-thread connections — concurrency > 1 is safe.
+cycle:
+  epochs: 10
+  update_every: 120        # 4 updates per epoch over 240 dev samples (240/60 = 4 exactly)
+  batch_concurrency: 5    # matches task worker concurrency (per-thread MySQL connections)
+  max_proposals: 1        # one change per proposal call; best-of-K selects the winner
+  max_learned_skills: 10
+  grpo_k: 4               # candidate proposals sampled per update
+  grpo_eval_n: 60         # ~20% of dev — reliable signal now that dev set is larger
+  run_baseline: true      # run a silent val eval before epoch 0
+  proposal_temperature: 0.8  # high temperature for diverse skill proposals (separate from agent temperature)
+  seed: 1                  # RNG seed for data shuffling and probe sampling (change for multi-seed runs)

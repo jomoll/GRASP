@@ -1,0 +1,17 @@
+# Start the OS Interaction task worker for the skill-learning cycle.
+#
+# Usage:
+#   python -m src.start_task -a --config configs/start_skill_task_os.yaml --controller-port 5040 --base-port 5041
+#
+# Then in a separate terminal:
+#   python -m src.grasp --config configs/grasp_os.yaml --run-name run_001
+
+definition:
+  import: tasks/task_assembly.yaml
+
+controller: "http://localhost:5040/api"
+controller_port: 5040
+base_port: 5041
+
+start:
+  os-std: 1

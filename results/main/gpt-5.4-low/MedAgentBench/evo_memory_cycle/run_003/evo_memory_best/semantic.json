@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-20T21:43:26.672690",
+  "rules": [
+    "[P1] For lab queries or protocol-driven treatment/replacement, verify the exact requested analyte, specimen type, and required lookback window using the encounter/task time as the reference point; use only the most recent finalized matching result by result timestamp/date, apply the stated chart/protocol criteria exactly—including task-specific definitions such as what counts as 'low'—and do not infer thresholds from goals, normal ranges, or other unstated criteria.",
+    "[P1] Preserve requested free-text instructions verbatim and maintain any user-specified structured formatting.",
+    "[P1] When declining a conditional order or task, state the verified triggering result (or its absence) and why it does not meet the stated criteria.",
+    "[P1] Confirm an exact match to the requested patient or record identifier before retrieving, documenting, ordering, or returning patient-specific information; use all provided identifiers/demographics (including MRN when given), retry lookup via alternate search fields or chart navigation when needed, and if confirmation fails, return a clear not-found or uncertainty response rather than guessing.",
+    "[P1] Complete all parts of a multi-step instruction, and for linked follow-up or monitoring orders, determine from the wording whether they are always required or only contingent on the primary condition/order.",
+    "[P1] Do not complete a conditional chart task or place a dependent order until the required record/result check is completed; compare the relevant finalized result and its date to the stated threshold or age/date-based protocol criteria (including against the current date when required), and only order when the criteria are met.",
+    "[P1] Compute age from the recorded date of birth at query time; do not guess.",
+    "[P1] Resolve relative scheduling phrases from the order context to an exact calendar date/time before placing the order; do not guess.",
+    "[P1] Report lab results with the recorded value, units when available, and lab result date.",
+    "[P1] For referral tasks, once the patient is confirmed, place the requested referral to the specified specialty and include any required free text verbatim.",
+    "[P1] For charting tasks, create the requested new record entry rather than only restating provided data.",
+    "[P1] Record measurements exactly as provided, preserving values and units, and include a timestamp when documenting a new clinical measurement.",
+    "[P2] Return a concise confirmation of what was recorded."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_82a29d222cbe",
+      "text": "[P1] For lab queries or protocol-driven treatment/replacement, verify the exact requested analyte, specimen type, and required lookback window using the encounter/task time as the reference point; use only the most recent finalized matching result by result timestamp/date, apply the stated chart/protocol criteria exactly—including task-specific definitions such as what counts as 'low'—and do not infer thresholds from goals, normal ranges, or other unstated criteria.",
+      "tags": [
+        "conditional-order",
+        "time-window",
+        "lab-review",
+        "medication-order",
+        "queries",
+        "protocol",
+        "driven",
+        "treatment",
+        "replacement",
+        "verify"
+      ],
+      "shown": 23,
+      "success": 8,
+      "failure": 15,
+      "created_at": "2026-05-20T21:20:41.972817",
+      "updated_at": "2026-05-20T21:35:01.181595"
+    },
+    {
+      "id": "rule_91e7efafbe7c",
+      "text": "[P1] Preserve requested free-text instructions verbatim and maintain any user-specified structured formatting.",
+      "tags": [
+        "referral-order",
+        "free-text",
+        "instruction-following",
+        "preserve",
+        "requested",
+        "free",
+        "text",
+        "instructions",
+        "verbatim",
+        "maintain"
+      ],
+      "shown": 93,
+      "success": 49,
+      "failure": 31,
+      "created_at": "2026-05-20T18:53:48.694149",
+      "updated_at": "2026-05-20T21:34:45.108393"
+    },
+    {
+      "id": "rule_cc3a54ebfa9f",
+      "text": "[P1] When declining a conditional order or task, state the verified triggering result (or its absence) and why it does not meet the stated criteria.",
+      "tags": [
+        "lab-review",
+        "conditional-ordering",
+        "time-window",
+        "patient-identification",
+        "when",
+        "declining",
+        "conditional",
+        "order",
+        "task",
+        "state"
+      ],
+      "shown": 39,
+      "success": 15,
+      "failure": 24,
+      "created_at": "2026-05-20T21:12:29.426671",
+      "updated_at": "2026-05-20T21:35:01.181501"
+    },
+    {
+      "id": "rule_ef07a8189800",
+      "text": "[P1] Confirm an exact match to the requested patient or record identifier before retrieving, documenting, ordering, or returning patient-specific information; use all provided identifiers/demographics (including MRN when given), retry lookup via alternate search fields or chart navigation when needed, and if confirmation fails, return a clear not-found or uncertainty response rather than guessing.",
+      "tags": [
+        "patient-lookup",
+        "referral-order",
+        "confirm",
+        "exact",
+        "match",
+        "requested",
+        "patient",
+        "record",
+        "identifier",
+        "before"
+      ],
+      "shown": 42,
+      "success": 16,
+      "failure": 26,
+      "created_at": "2026-05-20T21:10:21.194292",
+      "updated_at": "2026-05-20T21:35:01.181460"
+    },
+    {
+      "id": "rule_1645f8a355a7",
+      "text": "[P1] Complete all parts of a multi-step instruction, and for linked follow-up or monitoring orders, determine from the wording whether they are always required or only contingent on the primary condition/order.",
+      "tags": [
+        "conditional-orders",
+        "lab-review",
+        "follow-up-order",
+        "scheduling",
+        "complete",
+        "parts",
+        "multi",
+        "step",
+        "instruction",
+        "linked"
+      ],
+      "shown": 74,
+      "success": 33,
+      "failure": 41,
+      "created_at": "2026-05-20T20:33:48.107682",
+      "updated_at": "2026-05-20T21:35:01.181650"
+    },
+    {
+      "id": "rule_24b0df413a9d",
+      "text": "[P1] Do not complete a conditional chart task or place a dependent order until the required record/result check is completed; compare the relevant finalized result and its date to the stated threshold or age/date-based protocol criteria (including against the current date when required), and only order when the criteria are met.",
+      "tags": [
+        "conditional-ordering",
+        "lab-review",
+        "date-threshold",
+        "follow-through",
+        "complete",
+        "conditional",
+        "chart",
+        "task",
+        "place",
+        "dependent"
+      ],
+      "shown": 115,
+      "success": 51,
+      "failure": 64,
+      "created_at": "2026-05-20T20:19:54.771863",
+      "updated_at": "2026-05-20T21:35:01.181682"
+    },
+    {
+      "id": "rule_9d7528eb108e",
+      "text": "[P1] Compute age from the recorded date of birth at query time; do not guess.",
+      "tags": [
+        "mrn-lookup",
+        "age-calculation",
+        "demographics",
+        "no-guessing",
+        "compute",
+        "from",
+        "recorded",
+        "date",
+        "birth",
+        "query"
+      ],
+      "shown": 197,
+      "success": 93,
+      "failure": 103,
+      "created_at": "2026-05-20T19:13:42.835063",
+      "updated_at": "2026-05-20T21:35:01.181525"
+    },
+    {
+      "id": "rule_613df89024eb",
+      "text": "[P1] Resolve relative scheduling phrases from the order context to an exact calendar date/time before placing the order; do not guess.",
+      "tags": [
+        "relative-datetime",
+        "order-scheduling",
+        "lab-followup",
+        "protocol-ordering",
+        "resolve",
+        "relative",
+        "scheduling",
+        "phrases",
+        "from",
+        "order"
+      ],
+      "shown": 126,
+      "success": 54,
+      "failure": 72,
+      "created_at": "2026-05-20T19:00:05.765564",
+      "updated_at": "2026-05-20T21:34:45.108838"
+    },
+    {
+      "id": "rule_d384160427e4",
+      "text": "[P1] Report lab results with the recorded value, units when available, and lab result date.",
+      "tags": [
+        "lab-recency",
+        "conditional-order",
+        "multi-step-instruction",
+        "hba1c",
+        "report",
+        "results",
+        "with",
+        "recorded",
+        "value",
+        "units"
+      ],
+      "shown": 214,
+      "success": 93,
+      "failure": 121,
+      "created_at": "2026-05-20T19:29:20.529004",
+      "updated_at": "2026-05-20T21:35:01.181548"
+    },
+    {
+      "id": "rule_cb851dcd3019",
+      "text": "[P1] For referral tasks, once the patient is confirmed, place the requested referral to the specified specialty and include any required free text verbatim.",
+      "tags": [
+        "patient-identification",
+        "referral-order",
+        "premature-abort",
+        "referral",
+        "tasks",
+        "once",
+        "patient",
+        "confirmed",
+        "place",
+        "requested"
+      ],
+      "shown": 199,
+      "success": 81,
+      "failure": 118,
+      "created_at": "2026-05-20T19:55:08.785836",
+      "updated_at": "2026-05-20T21:35:01.181622"
+    },
+    {
+      "id": "rule_4c9e5401095b",
+      "text": "[P1] For charting tasks, create the requested new record entry rather than only restating provided data.",
+      "tags": [
+        "vitals",
+        "blood-pressure",
+        "charting",
+        "patient-identification",
+        "tasks",
+        "create",
+        "requested",
+        "record",
+        "entry",
+        "rather"
+      ],
+      "shown": 133,
+      "success": 43,
+      "failure": 89,
+      "created_at": "2026-05-20T19:43:37.473233",
+      "updated_at": "2026-05-20T21:34:45.109003"
+    },
+    {
+      "id": "rule_77a4e010e875",
+      "text": "[P1] Record measurements exactly as provided, preserving values and units, and include a timestamp when documenting a new clinical measurement.",
+      "tags": [
+        "lab-recency",
+        "conditional-order",
+        "multi-step-instruction",
+        "hba1c",
+        "record",
+        "measurements",
+        "exactly",
+        "provided",
+        "preserving",
+        "values"
+      ],
+      "shown": 40,
+      "success": 5,
+      "failure": 35,
+      "created_at": "2026-05-20T19:29:20.529353",
+      "updated_at": "2026-05-20T21:34:45.109063"
+    },
+    {
+      "id": "rule_b4f190d1c1de",
+      "text": "[P2] Return a concise confirmation of what was recorded.",
+      "tags": [
+        "ehr-documentation",
+        "vitals",
+        "patient-identification",
+        "timestamping",
+        "return",
+        "concise",
+        "confirmation",
+        "what",
+        "recorded",
+        "patient-lookup"
+      ],
+      "shown": 3,
+      "success": 2,
+      "failure": 0,
+      "created_at": "2026-05-20T18:52:22.932373",
+      "updated_at": "2026-05-20T21:34:45.109108"
+    }
+  ]
+}

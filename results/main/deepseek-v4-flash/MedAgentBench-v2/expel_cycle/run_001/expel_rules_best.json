@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When a search returns zero results, do not immediately conclude the data is absent; instead, broaden the search by removing date filters or trying alternative codes before making a final decision.",
+    "counter": 2
+  },
+  {
+    "text": "For tasks involving procedures or studies, use the appropriate resource (e.g., ServiceRequest for ordering new studies, Procedure for retrieving completed ones) and ensure the correct code format (single code per parameter, not comma-separated) in API calls.",
+    "counter": 2
+  },
+  {
+    "text": "After completing a conditional action (like ordering a new study), always include a confirmation summary in the FINISH output that clearly states what was done and why, referencing the specific condition that triggered the action.",
+    "counter": 2
+  },
+  {
+    "text": "When given specific codes for existing records, first search without a date filter to retrieve all records, then evaluate the most recent date locally to determine if it is older than the threshold (e.g., 12 months) before deciding to order new ones.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for COVID-19 vaccination history, first query the Procedure resource with code \"COVIDVACCINE\" and a broad date range (e.g., ge2020-01-01) to capture administered vaccines, and also query MedicationRequest without category filter to catch any vaccine-related orders with text containing \"COVID-19 VAC\". Avoid restricting to specific categories (e.g., Community, Outpatient) which may miss relevant records.",
+    "counter": 2
+  },
+  {
+    "text": "If all searches for vaccination records return empty results, do not immediately conclude no vaccine exists; instead, consider that the patient may have no record, and then apply the rule: if no record of a COVID-19 vaccine in the last 12 months (including no records at all), proceed to order the booster as specified (single-dose COVID vaccine CPT 91320) using a POST to MedicationRequest with status \"active\" and intent \"order\".",
+    "counter": 2
+  },
+  {
+    "text": "Always use the full base URL (e.g., http://localhost:8080/fhir/) instead of placeholder like {api_base} in GET/POST requests to avoid invalid URL errors. Verify the API base URL from the provided context before making any call.",
+    "counter": 2
+  },
+  {
+    "text": "When ordering a COVID booster via MedicationRequest.Create, include the medicationCodeableConcept with both coding (system \"http://hl7.org/fhir/sid/ndc\", code \"91320\", display \"COVID-19 vaccine, single-dose\") and text \"COVID-19 VAC\", set authoredOn to the current timestamp, and ensure the subject reference uses the correct patient ID format (e.g., \"Patient/S6549951\").",
+    "counter": 2
+  },
+  {
+    "text": "When searching for COVID-19 vaccination records, search across all relevant FHIR resources (Procedure with code 'COVIDVACCINE' and MedicationRequest with text containing 'COVID-19 VAC') without date restrictions first to ensure no records are missed, then filter by date if needed.",
+    "counter": 2
+  },
+  {
+    "text": "If initial searches return no results, do not immediately conclude no records exist; instead, broaden the search by removing date filters or searching across all categories before making a final determination.",
+    "counter": 2
+  },
+  {
+    "text": "When ordering a medication, ensure the medication code (e.g., CPT 91320) is correctly mapped to the appropriate coding system (e.g., use CPT system for CPT codes, not NDC) to avoid potential errors in the order.",
+    "counter": 2
+  },
+  {
+    "text": "Always use the full base URL (e.g., http://localhost:8080/fhir/) instead of placeholders like {api_base} in API calls to prevent invalid URL errors.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for procedures by code, provide codes individually in separate requests rather than concatenated with commas, as FHIR search parameters may not support comma-separated multi-code queries.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving procedure records, always check the actual date of the most recent procedure to determine if it falls within the required time window (e.g., 12 months), rather than relying solely on a date filter that may exclude older but relevant records.",
+    "counter": 2
+  },
+  {
+    "text": "If no procedures are found in the initial search, do not automatically conclude the task is complete; instead, broaden the search (e.g., remove date filter or use alternative codes) to ensure all relevant records are considered.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires ordering a new service or procedure, use the appropriate FHIR resource (e.g., ServiceRequest) with the correct code system (e.g., CPT) and include all required fields, rather than using a different resource type or incomplete payload.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for vaccination records, query Procedure with appropriate date range spanning the full period vaccines have been available (e.g., from 2020) to ensure no records are missed, not just the last 12 months.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding no vaccination records exist, exhaust all relevant FHIR endpoints including Procedure (for administered vaccines) and MedicationRequest (for ordered vaccines) with comprehensive date parameters.",
+    "counter": 2
+  },
+  {
+    "text": "When the task specifies both a procedure code and medication text for identifying COVID vaccines, use both search approaches (Procedure with code and MedicationRequest with text filter) to maximize coverage.",
+    "counter": 2
+  },
+  {
+    "text": "After determining that a booster is needed, immediately create the order via POST MedicationRequest using the specified CPT code and medication text, without providing a summary FINISH that doesn't complete the required action.",
+    "counter": 2
+  }
+]

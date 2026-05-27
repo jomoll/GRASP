@@ -1,0 +1,12 @@
+{
+  "extraneous_action_unnecessary_followup_order": "Performed an unnecessary follow-up action (e.g., order) when not indicated.",
+  "no_result_found_explanation_instead_of_action": "Returned an explanation for missing result instead of taking required action.",
+  "no_result_found_value_format_mismatch": "Returned -1 or similar instead of required null/empty/structured value when no result found.",
+  "conditional_action_omitted_after_result_check": "Failed to perform required conditional action (e.g., order test) after checking result.",
+  "answer_format_string_instead_of_scalar": "Returned a string sentence when a scalar value was required.",
+  "extraneous_explanation_in_final_answer": "Included unnecessary explanation or justification in the final answer.",
+  "date_filter_incorrect_format": "Used an incorrect date filter format in FHIR query.",
+  "answer_format_scalar_instead_of_string": "Returned a scalar (e.g., 50) when a string answer was required.",
+  "date_filter_omitted": "date filter omitted",
+  "low_value_action_condition_misapplied": "Failed to correctly apply the 'if low' condition before ordering replacement or reporting value."
+}

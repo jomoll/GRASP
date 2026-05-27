@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Verify observation availability before concluding lack of data; if the initial search returns zero results, consider alternative codes, coding systems, or broader date ranges rather than immediately reporting “no data”.",
+    "counter": 2
+  },
+  {
+    "text": "Construct date‑range query parameters using precise ISO‑8601 syntax (e.g., `date=ge2023-11-07T10:47:00Z` and `date=le2023-11-07T22:47:00Z`) without extra spaces to ensure the FHIR server interprets the filters correctly.",
+    "counter": 2
+  },
+  {
+    "text": "Avoid repeating identical API calls after an empty response; instead, adjust the query (e.g., omit the `code` filter, use a different `category`, or query related Observation resources) to increase the chance of retrieving relevant data.",
+    "counter": 2
+  },
+  {
+    "text": "When no relevant observations are found, return a concise, informative answer stating the data gap and, if appropriate, suggest alternative actions (such as checking other sources or expanding the search criteria).",
+    "counter": 2
+  },
+  {
+    "text": "When verifying a patient’s vaccination history, query all relevant FHIR resources (e.g., Immunization, Procedure, Observation) that may record vaccine administrations and consolidate the results before deciding whether a new dose is needed.",
+    "counter": 2
+  },
+  {
+    "text": "If a search returns an empty Bundle, interpret this as “no prior record found” and proceed with the appropriate ordering logic rather than treating it as an error.",
+    "counter": 2
+  },
+  {
+    "text": "Use the resource type prescribed by the implementation guide for ordering vaccines (e.g., MedicationRequest or ServiceRequest); confirm which endpoint is accepted before constructing the order payload.",
+    "counter": 2
+  },
+  {
+    "text": "Always perform date arithmetic using the provided current‑time context and the 365‑day threshold, explicitly handling time‑zone offsets to avoid off‑by‑one‑day errors.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating any order, search all relevant FHIR resources that may record the target intervention (e.g., Immunization, Procedure, Observation) to confirm whether a prior occurrence exists.",
+    "counter": 2
+  },
+  {
+    "text": "Use the most appropriate FHIR resource for ordering a vaccine—prefer a ServiceRequest (or Immunization) with correct CPT coding and a patient reference in the form “Patient/{id}” rather than a MedicationRequest unless the medication domain is explicitly required.",
+    "counter": 2
+  },
+  {
+    "text": "Perform explicit date arithmetic using the supplied “current time” and the performedDateTime of the most recent record; only place a new order if the interval exceeds 365 days or if no prior record is found.",
+    "counter": 2
+  },
+  {
+    "text": "emit exactly one API action per turn, include no extraneous text, and ensure the FINISH list is a valid JSON‑loadable array of quoted strings.",
+    "counter": 2
+  },
+  {
+    "text": "Respond with exactly ONE action per turn using only the allowed formats (GET url?... , POST url\\n{json}, or FINISH([...])—no additional explanatory text.",
+    "counter": 2
+  },
+  {
+    "text": "When querying time‑restricted observations, use FHIR date prefixes (e.g., `ge` for “greater‑or‑equal”, `le` for “less‑or‑equal”) in the `date` parameter to define the interval boundaries.",
+    "counter": 2
+  },
+  {
+    "text": "Retrieve the largest required time window in a single request (e.g., past 12 hours) and compute any shorter‑interval aggregates (e.g., past 6 hours) from that data before issuing the FINISH response.",
+    "counter": 2
+  },
+  {
+    "text": "Include all mandatory query parameters in Observation GET requests—`code` for the observation code, `category=vital-signs`, `patient` identifier, and a correctly formatted `date` range (e.g., `date=ge2023-11-07T10:47:00Z`).",
+    "counter": 2
+  },
+  {
+    "text": "Always retrieve all pages of a MedicationRequest search result (follow “next” links) to ensure no orders are missed due to pagination.",
+    "counter": 2
+  },
+  {
+    "text": "Identify opioid analgesic orders by matching the medicationCodeableConcept text or coding against a predefined opioid list (e.g., hydromorphone, oxycodone, fentanyl, hydrocodone, morphine) using case‑insensitive comparison.",
+    "counter": 2
+  },
+  {
+    "text": "Consider only MedicationRequest resources whose status is “active” when evaluating opioid‑naloxone pairing.",
+    "counter": 2
+  },
+  {
+    "text": "Create a naloxone MedicationRequest only if at least one active opioid order for the patient does not already have a matching active naloxone order.",
+    "counter": 2
+  }
+]

@@ -1,0 +1,1127 @@
+{
+  "version": "1.0",
+  "benchmark": "appworld",
+  "created_at": "2026-05-16T14:38:11.630162",
+  "skills": {
+    "planning": {},
+    "functional": [
+      {
+        "name": "extract patient mrn or not found",
+        "document": "Given a list of patient resource objects returned from a FHIR search, extract the Medical Record Number (MRN) of the first matching patient. If no patient exists in the list, return the string 'Patient not found'.\n\nParameters\n----------\npatients : list[dict]\n    List of patient resource objects, typically FHIR-compliant, each containing identifiers.\n\nOutputs\n-------\noutput : str\n    The MRN value if at least one patient is found; otherwise, the string 'Patient not found'.\n\nNotes\n-----\n1. Assumes MRN is stored in the 'identifier' field of the patient resource object, and that a system identifier with the label 'MRN' or similar is present.\n2. In cases where multiple identifiers are present, attempts to select the one most likely to be the MRN.\n3. If no patient is found, returns 'Patient not found'.\n4. Designed for single-patient retrieval scenarios; if multiple patients exist, returns the MRN of the first one.",
+        "content": "if patients:\n    patient = patients[0]\n    mrn = None\n    for ident in patient.get('identifier', []):\n        # Check for MRN label in system or type\n        if ident.get('type', {}).get('text', '').lower() == 'mrn' or 'mrn' in ident.get('system', '').lower():\n            mrn = ident.get('value')\n            break\n    if not mrn and patient.get('identifier'):\n        # Fall back to first identifier if MRN not labeled\n        mrn = patient['identifier'][0].get('value')\n    output = mrn if mrn else 'Patient not found'\nelse:\n    output = 'Patient not found'",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659774",
+          "modified_at": "2026-05-16T14:59:03.659947"
+        }
+      },
+      {
+        "name": "fhir order orthopedic referral with SBAR note",
+        "document": "Submit an orthopedic surgery referral for a patient using FHIR ServiceRequest, embedding SBAR (Situation, Background, Assessment, Recommendation) details as free-text in the note field.\n\nParameters\n----------\npatient_id : str\n    FHIR patient identifier (e.g., 'S6550627').\nsbar_text : str\n    Free-text containing SBAR (Situation, Background, Assessment, Recommendation) details for clinical context.\nauthored_on : str\n    ISO 8601 timestamp for when the referral is authored (e.g., '2023-11-13T10:15:00+00:00').\npriority : str\n    FHIR priority for the referral (e.g., 'routine', 'urgent', 'stat').\n\nOutputs\n-------\nservice_request_response : dict\n    FHIR ServiceRequest resource response confirming successful creation of the referral.\n\nNotes:\n-------\n1. Uses SNOMED code for orthopedic referral: system 'http://snomed.info/sct', code '306181000000106'.\n2. The 'note' field must include the SBAR text as specified.\n3. Ensure 'subject.reference' is populated as 'Patient/{patient_id}'.\n4. Set 'intent' to 'order' and 'status' to 'active' for new referrals.\n5. The timestamp and priority are parameterized for flexibility.\n",
+        "content": "service_request_payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": \"306181000000106\",\n                \"display\": \"Orthopedic surgery referral\"\n            }\n        ]\n    },\n    \"authoredOn\": authored_on,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority,\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"note\": {\n        \"text\": sbar_text\n    }\n}\nservice_request_response = apis.fhir.ServiceRequest(service_request_payload)",
+        "tools": [
+          "apis.fhir.ServiceRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659794",
+          "modified_at": "2026-05-16T14:59:03.659952"
+        }
+      },
+      {
+        "name": "place iv magnesium order based on deficiency protocol",
+        "document": "Place an IV magnesium sulfate medication order for a patient based on serum magnesium deficiency and dosing protocol.\n\nParameters\n----------\npatient_id : str\n    Unique patient identifier in the medical system.\nlatest_observation : dict\n    Most recent serum magnesium FHIR Observation resource.\nreplacement_threshold : float\n    Minimum acceptable serum magnesium value for replacement (units must match observation).\ndosing_instructions : dict\n    Protocol for IV magnesium dose selection based on deficiency value (mapping from cutoffs to dose information).\n\nOutputs\n-------\norder_id : str or None\n    The order identifier if IV magnesium is placed, else None.\n\nNotes:\n-------\n1. Only place an order if the observation value is below the replacement threshold.\n2. Select dose based on dosing_instructions logic; if no match, use 'default' if provided.\n3. Ensure units match between threshold and observation; add conversion if needed.\n4. Order must specify medication, dose, route, frequency, and clinical reason.\n5. If magnesium value is normal or above threshold, do not place an order.\n",
+        "content": "order_id = None\nmg_value = float(latest_observation.get('valueQuantity', {}).get('value', 0))\nmg_unit = latest_observation.get('valueQuantity', {}).get('unit', '')\nif mg_value < replacement_threshold:\n    dose_info = None\n    for cutoff, protocol in dosing_instructions.items():\n        if mg_value < cutoff:\n            dose_info = protocol\n            break\n    if dose_info is None:\n        dose_info = dosing_instructions.get('default', {})\n    order_details = {\n        'medication': 'IV magnesium sulfate',\n        'dose': dose_info.get('dose', ''),\n        'route': dose_info.get('route', 'IV'),\n        'frequency': dose_info.get('frequency', ''),\n        'reason': f'Low magnesium: {mg_value} {mg_unit}'\n    }\n    order_id = apis.order.place_medication_order(\n        patient_id=patient_id,\n        medication=order_details['medication'],\n        dose=order_details['dose'],\n        route=order_details['route'],\n        frequency=order_details['frequency'],\n        reason=order_details['reason']\n    )\n# order_id is str or None",
+        "tools": [
+          "apis.order.place_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659803",
+          "modified_at": "2026-05-16T14:59:03.659954"
+        }
+      },
+      {
+        "name": "order iv magnesium replacement by lab value",
+        "document": "Place an intravenous magnesium replacement order for a patient based on a low serum magnesium lab value, using standardized dosing instructions.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nmagnesium_lab_value : float\n    The most recent serum magnesium lab value (in mg/dL).\ndosing_instructions : dict\n    A dictionary mapping lab value thresholds to appropriate IV magnesium doses (e.g., {'<1.5': 2, '1.5-1.8': 1, ...}).\n\nOutputs\n-------\norder_confirmation : dict\n    The resulting order confirmation/status object from the IV medication order API.\n\nNotes:\n-------\n1. The skill matches the magnesium_lab_value to the closest dosing category in dosing_instructions. Caller must ensure dosing_instructions covers all relevant clinical ranges.\n2. This skill does not handle lab retrieval or threshold comparison; it assumes magnesium_lab_value is already identified as low and dosing_instructions are provided.\n3. Order will only be placed if the lab value is below the lowest threshold defined in dosing_instructions.\n4. Final output is the confirmation/status of the IV magnesium order for the specified patient.",
+        "content": "dose = None\nfor range_str, range_dose in dosing_instructions.items():\n    if '<' in range_str:\n        threshold = float(range_str[1:])\n        if magnesium_lab_value < threshold:\n            dose = range_dose\n            break\n    elif '-' in range_str:\n        low, high = map(float, range_str.split('-'))\n        if low <= magnesium_lab_value <= high:\n            dose = range_dose\n            break\nif dose is not None:\n    order_confirmation = apis.order.place_iv_medication_order(\n        patient_id=patient_id,\n        medication_name='Magnesium Sulfate',\n        dose=dose,\n        route='IV',\n        frequency='once'\n    )\nelse:\n    order_confirmation = {'status': 'no order placed', 'reason': 'lab value does not meet replacement criteria'}",
+        "tools": [
+          "apis.order.place_iv_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659809",
+          "modified_at": "2026-05-16T14:59:03.659957"
+        }
+      },
+      {
+        "name": "fhir get recent magnesium observations",
+        "document": "Retrieve all serum magnesium observations for a patient using FHIR API, then filter for those recorded within the last 24 hours.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\ncurrent_time : str\n    ISO8601 datetime string representing the current time.\n\nOutputs\n-------\nlist[dict]\n    List of observation records for serum magnesium measured in the last 24 hours.\n\nNotes:\n-------\n1. The observation code for serum magnesium is 'MG'.\n2. Filtering is done using each observation's 'effectiveDateTime' field.\n3. All times must be compared in UTC; if the API returns local times, convert to UTC first.\n4. If no recent observations exist, output will be an empty list.",
+        "content": "observations = apis.fhir.search_observation(code='MG', patient=patient_id)\nrecent_observations = []\nfor obs in observations:\n    obs_time = obs['effectiveDateTime']  # assumed to be ISO8601 string\n    # calculate time difference in hours\n    obs_dt = obs_time  # If conversion from local to UTC is needed, do so here\n    time_diff_hours = (current_time - obs_dt).total_seconds() / 3600\n    if 0 <= time_diff_hours <= 24:\n        recent_observations.append(obs)",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829781",
+          "modified_at": "2026-05-16T15:09:54.830010"
+        }
+      },
+      {
+        "name": "fhir get patient lab results by code and time",
+        "document": "Retrieve all laboratory results for a specified patient and lab test code (e.g., magnesium) within a defined time window (e.g., the last 24 hours).\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient.\nlab_code : str\n    The standard laboratory code for the test (e.g., 'MG' for magnesium).\nhours_window : int\n    The lookback period in hours (e.g., 24 for the last 24 hours).\n\nOutputs\n-------\nlist[dict]\n    A list of laboratory observation records matching the criteria. Each record should contain observation time, value, and units if present.\n\nNotes:\n-------\n1. You must filter the results to include only those observations with timestamps within the specified time window from the current time.\n2. This skill is general for any laboratory test code; not limited to magnesium.\n3. If no labs are found within the window, the output will be an empty list.\n",
+        "content": "recent_results = []\nnow = datetime.datetime.now()\nobservations = apis.fhir.get_observations(patient_id=patient_id, lab_code=lab_code)\nfor obs in observations:\n    obs_time = obs.get('effectiveDateTime')\n    if obs_time:\n        obs_dt = datetime.datetime.fromisoformat(obs_time)\n        if (now - obs_dt).total_seconds() <= hours_window * 3600:\n            recent_results.append(obs)",
+        "tools": [
+          "apis.fhir.get_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659823",
+          "modified_at": "2026-05-16T14:59:03.659962"
+        }
+      },
+      {
+        "name": "evaluate lab result against threshold",
+        "document": "Determine whether a specified laboratory result value for a patient falls below a defined threshold indicating abnormality (e.g., hypomagnesemia).\n\nParameters\n----------\nlab_results : list[dict]\n    List of lab observation records, each containing value and units.\nthreshold : float\n    The minimum acceptable value for the lab test (e.g., magnesium).\nvalue_key : str\n    The dictionary key used for the numeric result (e.g., 'value').\n\nOutputs\n-------\nbool\n    True if the most recent result is below the threshold, False otherwise.\n\nNotes:\n-------\n1. Assumes lab_results is ordered so that the first record is the most recent.\n2. Units are not evaluated in this skill; ensure the threshold is appropriate for the units of the result.\n3. If lab_results is empty, output should default to False (no abnormal result detected).\n",
+        "content": "is_low = False\nif lab_results:\n    latest = lab_results[0]\n    val = latest.get(value_key)\n    if val is not None:\n        if float(val) < threshold:\n            is_low = True",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659829",
+          "modified_at": "2026-05-16T14:59:03.659965"
+        }
+      },
+      {
+        "name": "fhir create referral servicerequest with sbar note",
+        "document": "Create and submit a FHIR ServiceRequest to refer a patient to a specified clinical service (e.g., orthopedic surgery), embedding structured clinical context using the SBAR (Situation, Background, Assessment, Recommendation) format in the free-text note field.\n\nParameters\n----------\npatient_id : str\n    The FHIR Patient resource id or reference (e.g., 'Patient/1234') to whom the referral applies.\nservice_code : str\n    The SNOMED or relevant code indicating the referral target service (e.g., '306181000000106' for orthopedic surgery service).\nservice_display : str\n    Human-readable display name for the target specialty/service.\nsbar_situation : str\n    Brief description of the current clinical situation.\nsbar_background : str\n    Relevant background information, such as imaging or history.\nsbar_assessment : str\n    Clinical assessment summary (e.g., diagnosis, grade).\nsbar_recommendation : str\n    Explicit recommendation for the receiving service (e.g., evaluation, management advice).\nauthored_on : str\n    ISO 8601 datetime string indicating when the referral is authored.\npriority : str\n    Clinical urgency of the request (e.g., 'routine', 'urgent', 'stat').\n\nOutputs\n-------\nservicerequest_response : dict\n    The FHIR ServiceRequest resource as returned by the API after successful creation.\n\nNotes\n------\n1. The SBAR elements are concatenated into a single note string in the order: Situation, Background, Assessment, Recommendation.\n2. The ServiceRequest is submitted with 'status' set to 'active' and 'intent' set to 'order'.\n3. Ensure the service code and display values match the intended referral specialty.\n4. Use the correct patient FHIR reference in the 'subject' field.\n5. Adjust the 'priority' parameter as clinically appropriate. If omitted, defaults to 'routine'.",
+        "content": "note_text = (\n    f\"Situation: {sbar_situation} \"\n    f\"Background: {sbar_background} \"\n    f\"Assessment: {sbar_assessment} \"\n    f\"Recommendation: {sbar_recommendation}\"\n)\nservicerequest_payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": service_code,\n                \"display\": service_display\n            }\n        ]\n    },\n    \"authoredOn\": authored_on,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority if priority else \"routine\",\n    \"subject\": {\n        \"reference\": patient_id\n    },\n    \"note\": [\n        {\n            \"text\": note_text\n        }\n    ]\n}\nservicerequest_response = apis.fhir.create_servicerequest(\n    body=servicerequest_payload\n)",
+        "tools": [
+          "apis.fhir.create_servicerequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659836",
+          "modified_at": "2026-05-16T14:59:03.659968"
+        }
+      },
+      {
+        "name": "fhir submit referral with structured free text note",
+        "document": "Compose and submit a ServiceRequest resource for a clinical referral using FHIR. The referral targets a specific service (e.g., Orthopedic surgery), includes patient reference, and incorporates a structured free text note in SBAR (Situation, Background, Assessment, Recommendation) format.\n\nParameters\n----------\npatient_id: str\n    The FHIR Patient resource ID (e.g., 'S6549951').\nfhir_base_url: str\n    The base URL of the FHIR server (e.g., 'http://localhost:8080/fhir').\nservice_code: str\n    The SNOMED or other code for the requested service (e.g., '306181000000106' for Orthopedic surgery referral).\nservice_display: str\n    Human-readable service name (e.g., 'Orthopedic surgery referral').\nsbar_situation: str\n    The 'Situation' portion of the SBAR note.\nsbar_background: str\n    The 'Background' portion of the SBAR note.\nsbar_assessment: str\n    The 'Assessment' portion of the SBAR note.\nsbar_recommendation: str\n    The 'Recommendation' portion of the SBAR note.\nauthored_on: str\n    Timestamp for order creation in ISO datetime format (e.g., '2023-11-13T10:15:00+00:00').\npriority: str\n    Referral urgency (e.g., 'stat', 'urgent', 'routine').\n\nOutputs\n-------\nservice_request: dict\n    The posted ServiceRequest resource as returned by the FHIR server.\n\nNotes\n-----\n1. The note field is created by concatenating SBAR components in the order: Situation, Background, Assessment, Recommendation.\n2. Ensure the patient reference uses the format 'Patient/{patient_id}'.\n3. The 'status' field should usually be 'active' and 'intent' as 'order' for new referrals.\n4. Confirm that the FHIR server returns a valid response and handle failure cases as needed.",
+        "content": "note_text = (\n    'Situation: ' + sbar_situation.strip() + '\\n'\n    'Background: ' + sbar_background.strip() + '\\n'\n    'Assessment: ' + sbar_assessment.strip() + '\\n'\n    'Recommendation: ' + sbar_recommendation.strip()\n)\nservice_request_body = {\n    'resourceType': 'ServiceRequest',\n    'code': {\n        'coding': [\n            {\n                'system': 'http://snomed.info/sct',\n                'code': service_code,\n                'display': service_display\n            }\n        ]\n    },\n    'authoredOn': authored_on,\n    'status': 'active',\n    'intent': 'order',\n    'priority': priority,\n    'subject': {\n        'reference': 'Patient/' + patient_id\n    },\n    'note': [\n        {'text': note_text}\n    ]\n}\nendpoint = fhir_base_url + '/ServiceRequest'\nservice_request = apis.requests.post(endpoint, json=service_request_body)",
+        "tools": [
+          "apis.requests.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659842",
+          "modified_at": "2026-05-16T14:59:03.659971"
+        }
+      },
+      {
+        "name": "fhir create referral service request with clinical note",
+        "document": "Create a FHIR ServiceRequest resource to initiate a referral to a clinical service, embedding detailed clinical context in the note field.\n\nParameters\n----------\npatient_fhir_id : str\n    The FHIR resource ID or reference string for the patient (e.g., 'Patient/S3241217').\nservice_code : str\n    SNOMED CT or other coding system code representing the target referral service (e.g., orthopedic surgery).\nservice_display : str\n    Human-readable display name for the referral service.\nnote_text : str\n    Free-text clinical summary, typically structured as SBAR (Situation, Background, Assessment, Recommendation) or other standardized format.\nauthored_datetime : str\n    ISO 8601 datetime string for when the referral was authored.\npriority : str\n    Referral urgency (e.g., 'routine', 'urgent', 'stat').\n\nOutputs\n-------\nservice_request_response : dict\n    The ServiceRequest resource as created on the FHIR server, including assigned resource ID and metadata.\n\nNotes:\n------\n1. The code field must be specified using the appropriate coding system for the target specialty/service.\n2. The note_text should be comprehensive and follow institutional or referral best-practices documentation (e.g., SBAR for clinical context).\n3. The authored_datetime must be in valid ISO 8601 format.\n4. Ensure the patient_fhir_id is correct and obtained via prior patient lookup.\n5. This skill does not handle downstream provider assignment or workflow beyond ServiceRequest creation.\n",
+        "content": "service_request_body = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": service_code,\n                \"display\": service_display\n            }\n        ]\n    },\n    \"authoredOn\": authored_datetime,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority,\n    \"subject\": {\n        \"reference\": patient_fhir_id\n    },\n    \"note\": [\n        {\n            \"text\": note_text\n        }\n    ]\n}\nservice_request_response = apis.fhir.ServiceRequest(**service_request_body)",
+        "tools": [
+          "apis.fhir.ServiceRequest"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659849",
+          "modified_at": "2026-05-16T14:59:03.659973"
+        }
+      },
+      {
+        "name": "fhir order iv medication replacement by protocol",
+        "document": "Order intravenous (IV) medication replacement for a patient using protocol-driven dosing instructions after a low lab value has been confirmed.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nmedication_code : str\n    Standard code for the IV medication to be administered (e.g., RxNorm code for magnesium sulfate).\ndose_instructions : dict\n    Dosing information according to protocol, such as amount, unit, route, frequency (e.g., { 'dose': 2, 'unit': 'g', 'route': 'IV', 'frequency': 'once' }).\nobs_id : str\n    Observation ID of the lab value that triggered the replacement (for linking order to clinical context, if required).\n\nOutputs\n-------\ndict\n    The resulting medication order resource as a dict, containing order details, patient, medication, and dosing information.\n\nNotes\n-----\n- This skill creates a medication order in the FHIR system using protocol-based dosing (not arbitrary free-text dosing).\n- Ensure that dose_instructions strictly follow clinical protocol for the specific scenario (e.g., hypomagnesemia).\n- Designed for use after confirming a low lab value and retrieving protocol instructions for replacement.\n- Downstream consumers should confirm the order result and handle errors or order status updates as needed.",
+        "content": "med_order = {\n    'resourceType': 'MedicationRequest',\n    'status': 'active',\n    'intent': 'order',\n    'subject': { 'reference': f'Patient/{patient_id}' },\n    'medicationCodeableConcept': { 'coding': [{ 'system': 'http://www.nlm.nih.gov/research/umls/rxnorm', 'code': medication_code }] },\n    'dosageInstruction': [{\n        'doseAndRate': [{\n            'doseQuantity': {\n                'value': dose_instructions['dose'],\n                'unit': dose_instructions['unit']\n            }\n        }],\n        'route': { 'coding': [{ 'code': dose_instructions['route'], 'system': 'http://terminology.hl7.org/CodeSystem/route-codes' }] },\n        'timing': { 'repeat': { 'frequency': 1, 'period': 1, 'periodUnit': 'd' } } if dose_instructions.get('frequency', 'once') == 'once' else { 'repeat': { 'frequency': dose_instructions['frequency'] } }\n    }],\n    'reasonReference': [{ 'reference': f'Observation/{obs_id}' }] if obs_id else []\n}\norder_result = apis.fhir.create_medication_order(med_order)",
+        "tools": [
+          "apis.fhir.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659855",
+          "modified_at": "2026-05-16T14:59:03.659976"
+        }
+      },
+      {
+        "name": "fhir find patient by MRN",
+        "document": "Locate a patient record within a FHIR server using the Medical Record Number (MRN) identifier. This skill queries the patient resource endpoint with the MRN to verify patient existence and retrieve the unique patient reference needed for further clinical data operations.\n\nParameters\n----------\nmrn : str\n    The Medical Record Number assigned to the patient.\nfhir_base_url : str\n    The base URL of the FHIR server (e.g., \"http://localhost:8080/fhir\").\n\nOutputs\n-------\npatient_reference : str\n    The FHIR reference string for the patient (e.g., \"Patient/S6537563\").\n\nNotes:\n-------\n1. This skill assumes the MRN is unique and correctly formatted.\n2. If no patient is found, handle this case (e.g., by logging or error handling).\n3. The patient reference is typically used for linking subsequent clinical observations or procedures.\n4. Avoid exposing sensitive patient information in logs or outputs.\n",
+        "content": "patient_search_url = fhir_base_url + \"/Patient?identifier=\" + mrn\npatient_list = apis.fhir.get(patient_search_url)\n\nif patient_list and 'entry' in patient_list and len(patient_list['entry']) > 0:\n    patient_resource = patient_list['entry'][0]['resource']\n    patient_reference = \"Patient/\" + patient_resource['id']\nelse:\n    patient_reference = None  # Handle missing patient as appropriate",
+        "tools": [
+          "apis.fhir.get"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659862",
+          "modified_at": "2026-05-16T14:59:03.659979"
+        }
+      },
+      {
+        "name": "fhir search patient by identifier",
+        "document": "Locate a patient's FHIR record by searching for a unique patient identifier (e.g., MRN).\n\nParameters\n----------\nidentifier: str\n    The unique Medical Record Number or other patient identifier.\n\nOutputs\n-------\ndict or None\n    The patient resource dictionary if found; otherwise, None.\n\nNotes\n-----\n1. This skill queries the FHIR Patient endpoint with the provided identifier.\n2. Ensure the identifier format matches the system's requirements for accurate search results.\n3. Always verify that the result is not empty before proceeding to reference the patient in subsequent actions.",
+        "content": "patient_list = apis.fhir.Patient.search(identifier=identifier)\nif patient_list and len(patient_list) > 0:\n    patient_resource = patient_list[0]\nelse:\n    patient_resource = None",
+        "tools": [
+          "apis.fhir.Patient.search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659868",
+          "modified_at": "2026-05-16T14:59:03.659982"
+        }
+      },
+      {
+        "name": "fhir get patient observations by code and recent time window",
+        "document": "Retrieve all FHIR Observation records for a given patient and observation code (e.g., 'MG' for serum magnesium) that were recorded within a specified recent time window (in hours).\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient within the FHIR system.\nobservation_code : str\n    LOINC or internal code used to specify the type of laboratory observation to fetch (e.g., 'MG' for serum magnesium).\nhours_lookback : int\n    The time window (in hours) to look back from the current time to identify recent observations.\n\nOutputs\n-------\nlist[dict]\n    List of observation resources matching the patient, observation code, and within the time window.\n\nNotes:\n------\n- The skill assumes the FHIR API supports filtering by code and patient, but filtering by time window must be implemented after retrieval if not natively supported.\n- Returned observations may need to be further sorted or filtered for downstream tasks (e.g., finding the most recent value).\n- Always check the time field in each observation to ensure it falls within the lookback window.",
+        "content": "all_observations = apis.fhir.get_observations(\n    patient_id=patient_id,\n    code=observation_code\n)\nrecent_observations = []\nnow = datetime.now()\nfor obs in all_observations:\n    obs_time = parse_fhir_datetime(obs['effectiveDateTime'])\n    delta_hours = (now - obs_time).total_seconds() / 3600.0\n    if 0 <= delta_hours <= hours_lookback:\n        recent_observations.append(obs)",
+        "tools": [
+          "apis.fhir.get_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829830",
+          "modified_at": "2026-05-16T15:09:54.830046"
+        }
+      },
+      {
+        "name": "order IV magnesium replacement by lab result and dosing instructions",
+        "document": "Places an intravenous magnesium replacement order for a patient if their most recent serum magnesium lab value is below a specified threshold, using provided dosing instructions. The skill checks the lab result, determines the need for replacement, and then configures and places the IV magnesium order according to dosing parameters.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient.\nobservation_records : list[dict]\n    List of lab observation records for the patient, sorted with most recent first.\nlab_threshold : float\n    The lower limit of normal for serum magnesium that triggers replacement.\nvalue_key : str\n    Key in the observation dict for the numeric result value (e.g., 'value').\ndose_amount : float\n    The amount of magnesium (in mmol or mg as per instruction) to be ordered.\ndose_unit : str\n    The unit for magnesium dose (e.g., 'mmol', 'mg').\nroute : str\n    The route of administration (e.g., 'IV').\nschedule : str\n    The frequency or scheduling instructions (e.g., 'once', 'q12h').\n\nOutputs\n-------\norder_result : dict or None\n    The medication order result object if placed, or None if no replacement needed.\n\nNotes:\n-------\n1. Only places order if the most recent magnesium value is below threshold; otherwise, does nothing.\n2. Carefully configure all medication order parameters according to clinical instructions.\n3. Assumes observation records are structured and value_key extracts the numeric result.\n4. Always confirm units and dosing instructions are appropriate for the clinical context.\n",
+        "content": "order_result = None\nif observation_records:\n    latest_obs = observation_records[0]\n    obs_val = latest_obs[value_key]\n    try:\n        obs_val_num = float(obs_val)\n        if obs_val_num < lab_threshold:\n            order_result = apis.order.place_medication_order(\n                patient_id=patient_id,\n                medication_code='IV_MAGNESIUM',  # replace as needed for formulary\n                dose_amount=dose_amount,\n                dose_unit=dose_unit,\n                route=route,\n                schedule=schedule\n            )\n    except:\n        order_result = None  # do not place if unable to interpret value",
+        "tools": [
+          "apis.order.place_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659880",
+          "modified_at": "2026-05-16T14:59:03.659988"
+        }
+      },
+      {
+        "name": "fhir create service request with sbar note",
+        "document": "Create and submit a ServiceRequest resource to a FHIR server for any clinical referral, embedding SBAR (Situation, Background, Assessment, Recommendation) details in the note field to provide structured clinical context.\n\nParameters\n----------\npatient_reference : str\n    Reference string to the patient resource (e.g., 'Patient/S6530813').\nservice_code : dict\n    Dictionary specifying the referral type using SNOMED or other coding system (e.g., {'system': 'http://snomed.info/sct', 'code': '306181000000106', 'display': 'Orthopedic surgery referral'}).\nauthored_on : str\n    ISO 8601 datetime string for when the request is authored.\nsbar_details : dict\n    Dictionary with the following keys, each mapped to a string:\n        - 'situation'\n        - 'background'\n        - 'assessment'\n        - 'recommendation'\nstatus : str\n    Status of the ServiceRequest (e.g., 'active').\nintent : str\n    The intent of the order (e.g., 'order').\npriority : str\n    Urgency (e.g., 'stat', 'routine').\n\nOutputs\n-------\ndict\n    The created FHIR ServiceRequest resource as returned by the server.\n\nNotes:\n------\n1. This skill abstracts any clinical referral using SBAR, not limited to orthopedics.\n2. SBAR details are formatted as a single string in the note.text field for clinical clarity.\n3. Ensure patient_reference is obtained from a reliable patient lookup step.\n4. The 'service_code' parameter must follow the FHIR coding structure for interoperability.\n5. If FHIR server returns errors, error handling is left to the caller.",
+        "content": "sbar_note = (\n    f\"Situation: {sbar_details['situation']}, \"\n    f\"Background: {sbar_details['background']}. \"\n    f\"Assessment: {sbar_details['assessment']}. \"\n    f\"Recommendation: {sbar_details['recommendation']}\"\n)\n\nservice_request_payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [service_code]\n    },\n    \"authoredOn\": authored_on,\n    \"status\": status,\n    \"intent\": intent,\n    \"priority\": priority,\n    \"subject\": {\n        \"reference\": patient_reference\n    },\n    \"note\": {\n        \"text\": sbar_note\n    }\n}\n\nresult = apis.fhir.post(\n    endpoint='/ServiceRequest',\n    json=service_request_payload\n)\n# The result is the created ServiceRequest resource.",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659887",
+          "modified_at": "2026-05-16T14:59:03.659991"
+        }
+      },
+      {
+        "name": "fhir create service request with clinical note",
+        "document": "Create a FHIR ServiceRequest resource for a clinical referral, specifying the referral type (code), linking to a patient, and including detailed free-text clinical context in the note. Useful for specialty referrals (e.g., orthopedic surgery) where the SBAR format or similar structured clinical details are required.\n\nParameters\n----------\nservice_code_system : str\n    The coding system used for the referral type (e.g., SNOMED CT).\nservice_code : str\n    The code representing the referral type (e.g., orthopedic surgery referral code).\nservice_display : str\n    Human-readable display name for the referral type.\npatient_id : str\n    FHIR Patient resource identifier (e.g., 'S2863714').\nnote_text : str\n    Free-text clinical context (Situation, Background, Assessment, Recommendation or other relevant details).\nstatus : str\n    Status of the ServiceRequest (e.g., 'active').\nintent : str\n    Intent of the ServiceRequest (e.g., 'order').\npriority : str\n    Priority of the ServiceRequest (e.g., 'stat', 'routine').\nauthored_on : str\n    ISO8601 datetime string for authorship (e.g., '2023-11-13T10:15:00+00:00').\n\nOutputs\n-------\nservice_request_resource : dict\n    The created FHIR ServiceRequest resource as a dictionary.\n\nNotes:\n------\n1. The note_text should be formatted to include all relevant clinical context for the referral.\n2. Ensure patient_id is referenced correctly in the 'subject' field.\n3. Use appropriate SNOMED CT codes or other coding systems for service_code.\n4. This skill is suitable for any specialty referral where free-text clinical context is needed.",
+        "content": "service_request_resource = apis.fhir.post(\n    resource_type=\"ServiceRequest\",\n    body={\n        \"resourceType\": \"ServiceRequest\",\n        \"code\": {\n            \"coding\": [\n                {\n                    \"system\": service_code_system,\n                    \"code\": service_code,\n                    \"display\": service_display\n                }\n            ]\n        },\n        \"authoredOn\": authored_on,\n        \"status\": status,\n        \"intent\": intent,\n        \"priority\": priority,\n        \"subject\": {\n            \"reference\": f\"Patient/{patient_id}\"\n        },\n        \"note\": [\n            {\n                \"text\": note_text\n            }\n        ]\n    }\n)\n# Ensure the result is checked for success and the referral details match the clinical context provided.",
+        "tools": [
+          "apis.fhir.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659893",
+          "modified_at": "2026-05-16T14:59:03.659994"
+        }
+      },
+      {
+        "name": "fhir search patient by mrn",
+        "document": "Search for a patient record in the FHIR server using the Medical Record Number (MRN) as an identifier. This skill ensures the patient exists before proceeding with further clinical documentation or actions.\n\nParameters\n----------\nmrn : str\n    The medical record number for the patient to be searched.\n\nOutputs\n-------\npatient_record : dict\n    The FHIR-compliant dictionary representing the patient record. If no patient is found, the dictionary may be empty or contain an error structure.\n\nNotes:\n-------\n1. Always check if the resulting patient_record contains valid patient data before proceeding to subsequent steps (e.g., recording observations).\n2. The MRN must be exact and properly formatted to ensure successful retrieval.\n3. The output is expected to comply with the structure of FHIR Patient resources.",
+        "content": "patient_record = apis.fhir.patient_search(identifier=mrn)\n# Consider inspecting patient_record['entry'] or similar fields for existence.",
+        "tools": [
+          "apis.fhir.patient_search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659899",
+          "modified_at": "2026-05-16T14:59:03.659997"
+        }
+      },
+      {
+        "name": "fhir create vital signs observation",
+        "document": "Create an Observation resource in the FHIR server to record a vital sign measurement for a patient. This skill supports various vital signs (e.g., blood pressure, heart rate) and properly encodes the category, code, value, patient reference, and effective timestamp.\n\nParameters\n----------\npatient_id : str\n    The FHIR resource id or identifier string of the patient (e.g., 'S6352985').\nvital_code : str\n    The code representing the specific vital sign (e.g., 'BP' for blood pressure).\nvital_display : str\n    Human-readable vital sign name (e.g., 'Blood Pressure').\nvital_value : str\n    The measured value with units as a string (e.g., '118/77 mmHg').\neffective_datetime : str\n    Timestamp in ISO 8601 format (e.g., '2023-11-13T10:15:00+00:00').\n\nOutputs\n-------\nobservation_result : dict\n    The FHIR-compliant dictionary representing the created Observation resource, as returned from the FHIR server.\n\nNotes:\n-------\n1. The skill always sets the Observation category to vital-signs per FHIR guidance.\n2. The 'valueString' is used for non-numeric or complex values (such as BP in '118/77 mmHg' format), but consider using 'component' for structured data if possible.\n3. Ensure the patient_id is correctly referenced as 'Patient/{identifier}'.\n4. Always confirm that the observation_result contains an 'id' or success indicator.",
+        "content": "observation_payload = {\n    \"resourceType\": \"Observation\",\n    \"category\": [\n        {\n            \"coding\": [\n                {\n                    \"system\": \"http://hl7.org/fhir/observation-category\",\n                    \"code\": \"vital-signs\",\n                    \"display\": \"Vital Signs\"\n                }\n            ]\n        }\n    ],\n    \"code\": {\n        \"text\": vital_code,\n        \"coding\": [\n            {\n                \"system\": \"http://loinc.org\",\n                \"code\": vital_code,\n                \"display\": vital_display\n            }\n        ]\n    },\n    \"status\": \"final\",\n    \"effectiveDateTime\": effective_datetime,\n    \"valueString\": vital_value,\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    }\n}\nobservation_result = apis.fhir.observation_create(observation_payload)",
+        "tools": [
+          "apis.fhir.observation_create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659905",
+          "modified_at": "2026-05-16T14:59:03.660001"
+        }
+      },
+      {
+        "name": "fhir get latest observation by code and patient within timeframe",
+        "document": "Fetch the latest observation of a specified type (e.g., serum magnesium) for a given patient within a specified time window using the FHIR Observation search API.\n\nParameters\n----------\ncode: str\n    The observation code (e.g., 'MG' for magnesium).\npatient_id: str\n    The unique identifier for the patient.\nstart_time: str\n    ISO 8601 formatted datetime string representing the earliest time for the search window.\nend_time: str\n    ISO 8601 formatted datetime string representing the latest time for the search window.\n\nOutputs\n-------\nobservation: dict or None\n    The most recent observation object found in the window, or None if no matching observation is found.\n\nNotes\n-----\n1. Always sort descending by date to ensure the most recent result is retrieved.\n2. If no result is found, the skill should clearly indicate this using None.\n3. The API expects ISO formatted date/time values and a valid patient ID.\n",
+        "content": "latest_obs = None\nsearch_results = apis.fhir.Observation_search(\n    code=code,\n    patient=patient_id,\n    date=f'{start_time},{end_time}',\n    _sort='-date'\n)\nif search_results and len(search_results) > 0:\n    latest_obs = search_results[0]\nelse:\n    latest_obs = None",
+        "tools": [
+          "apis.fhir.Observation_search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659912",
+          "modified_at": "2026-05-16T14:59:03.660004"
+        }
+      },
+      {
+        "name": "order iv magnesium replacement by serum level",
+        "document": "Place an order for intravenous (IV) magnesium replacement for a patient according to dosing instructions based on their most recent serum magnesium observation.\n\nParameters\n----------\npatient_id: str\n    The patient's identifier for whom the order is being placed.\nserum_mg_obs: dict\n    The FHIR Observation resource containing the serum magnesium measurement (must include value and units).\nthreshold: float\n    The minimum serum magnesium level (in mg/dL or mmol/L) below which replacement is indicated.\ndose_instructions: dict\n    Mapping of serum magnesium ranges to IV magnesium doses and administration details (e.g., {\"<1.2\": {\"dose\": 2, \"unit\": \"g\", \"route\": \"IV\", \"infusion_time\": \"2h\"}, ...}).\n\nOutputs\n-------\norder_result: dict\n    Result of order entry, including confirmation and order details, or None if no order was placed (level not low).\n\nNotes\n-----\n1. The serum magnesium value should be extracted from the Observation resource and compared to the threshold.\n2. The dosing instructions mapping should be checked to determine the correct dose and infusion parameters for the measured value.\n3. If the level is not below the threshold, no order should be placed and the output should be None.\n4. Ensure units are compatible between the observation and the threshold/dosing instructions; convert if necessary.\n",
+        "content": "order_result = None\nmg_value = None\nmg_unit = None\nif serum_mg_obs and 'valueQuantity' in serum_mg_obs:\n    mg_value = serum_mg_obs['valueQuantity']['value']\n    mg_unit = serum_mg_obs['valueQuantity']['unit']\n    # Assume threshold and dosing instructions use the same units\n    if mg_value < threshold:\n        # Find appropriate dose from dosing instructions\n        selected_dose = None\n        for range_str, dose_info in dose_instructions.items():\n            if range_str.startswith('<') and mg_value < float(range_str[1:]):\n                selected_dose = dose_info\n                break\n            elif '-' in range_str:\n                low, high = map(float, range_str.split('-'))\n                if low <= mg_value < high:\n                    selected_dose = dose_info\n                    break\n        if selected_dose:\n            order_result = apis.orders.iv_magnesium_order(\n                patient_id=patient_id,\n                dose=selected_dose['dose'],\n                unit=selected_dose['unit'],\n                route=selected_dose['route'],\n                infusion_time=selected_dose['infusion_time']\n            )\n    # else: value not below threshold; order_result remains None",
+        "tools": [
+          "apis.orders.iv_magnesium_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659918",
+          "modified_at": "2026-05-16T14:59:03.660008"
+        }
+      },
+      {
+        "name": "fhir create orthopedic surgery referral with SBAR note",
+        "document": "Create a ServiceRequest resource for an orthopedic surgery referral on a FHIR server, embedding a supplied SBAR-format clinical summary in the free-text 'note' field.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier (e.g., MRN or FHIR resource ID).\nsbar_text : str\n    The clinical summary in SBAR format (Situation, Background, Assessment, Recommendation).\nauthored_on : str\n    The ISO-formatted date/time when the referral is authored.\npriority : str\n    The urgency of the referral (e.g., 'stat', 'routine').\n\nOutputs\n-------\nservice_request : dict\n    The created ServiceRequest resource as a dictionary.\n\nNotes:\n-------\n1. The referral uses SNOMED CT code 306181000000106 for 'Orthopedic surgery referral'.\n2. The SBAR text is placed in the 'note' field for clinical communication.\n3. The ServiceRequest is created with status 'active' and intent 'order'.\n4. Always use the correct patient reference format: 'Patient/{patient_id}'.\n5. Ensure proper encoding of the SBAR note to avoid truncation or formatting errors.\n",
+        "content": "service_request_payload = {\n    \"resourceType\": \"ServiceRequest\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": \"306181000000106\",\n                \"display\": \"Orthopedic surgery referral\"\n            }\n        ]\n    },\n    \"authoredOn\": authored_on,\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"priority\": priority,\n    \"subject\": {\n        \"reference\": f\"Patient/{patient_id}\"\n    },\n    \"note\": [\n        {\n            \"text\": sbar_text\n        }\n    ]\n}\nservice_request = apis.fhir.ServiceRequest_create(service_request_payload)",
+        "tools": [
+          "apis.fhir.ServiceRequest_create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 1,
+          "created_at": "2026-05-16T14:59:03.659924",
+          "modified_at": "2026-05-16T14:59:03.660011"
+        }
+      },
+      {
+        "name": "order iv magnesium replacement per protocol",
+        "document": "Place an order for intravenous magnesium replacement for a patient using a computerized provider order entry (CPOE) system, following provided dosing protocol instructions.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\ndosing_protocol : dict\n    Dictionary containing dosing instructions for IV magnesium (e.g., dose, frequency, route, duration, clinical indications, etc.).\norderer_id : str\n    Identifier of the clinician placing the order (may be required for audit trail).\n\nOutputs\n-------\ndict\n    Confirmation record of the medication order as returned by the CPOE API.\n\nNotes:\n------\n1. This skill assumes the magnesium deficiency has already been confirmed and all clinical checks (allergies, contraindications) have been completed upstream.\n2. The dosing_protocol must specify the exact medication name as recognized by the CPOE system (e.g., 'IV magnesium sulfate') and all required dosing fields.\n3. Ensure the order is submitted with the correct patient and ordering provider information for traceability and audit.\n4. If the API call fails, handle the error gracefully by recording the exception in the confirmation record.\n",
+        "content": "try:\n    confirmation = apis.cpoe.order_medication(\n        medication=dosing_protocol['medication_name'],\n        patient=patient_id,\n        dose=dosing_protocol['dose'],\n        dose_unit=dosing_protocol['dose_unit'],\n        route=dosing_protocol['route'],\n        frequency=dosing_protocol['frequency'],\n        duration=dosing_protocol['duration'],\n        indication=dosing_protocol.get('indication', ''),\n        orderer=orderer_id\n    )\nexcept Exception as e:\n    confirmation = {'success': False, 'error': str(e)}",
+        "tools": [
+          "apis.cpoe.order_medication"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829806",
+          "modified_at": "2026-05-16T15:09:54.830027"
+        }
+      },
+      {
+        "name": "fhir search patients by name and birthdate",
+        "document": "Search for patients in a FHIR server by given name, family name, and birthdate.\n\nParameters\n----------\ngiven : str\n    Patient's given (first) name.\nfamily : str\n    Patient's family (last) name.\nbirthdate : str\n    Patient's date of birth in YYYY-MM-DD format.\n\nOutputs\n-------\nlist[dict]\n    List of patient resources matching the search criteria, each as a dictionary. If no patient matches, the list is empty.\n\nNotes:\n------\n1. The search may return multiple patients if names and birthdates are not unique; always check the result count.\n2. The search is exact: given, family, and birthdate must match.\n3. Always verify the output structure before further processing (e.g., extracting MRNs).\n",
+        "content": "results = apis.fhir.Patient(\n    given=given,\n    family=family,\n    birthdate=birthdate\n)\npatients = []\nfor patient in results:\n    patients.append(patient)",
+        "tools": [
+          "apis.fhir.Patient"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829819",
+          "modified_at": "2026-05-16T15:09:54.830039"
+        }
+      },
+      {
+        "name": "fhir order magnesium replacement IV by dosing protocol",
+        "document": "Submit a FHIR MedicationRequest for IV magnesium replacement therapy for a patient whose serum magnesium is low. This skill determines the appropriate dose based on clinical dosing guidelines (e.g., weight-based or fixed dosing), constructs the medication order resource, and submits it via the FHIR order entry API.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient within the FHIR system.\nserum_magnesium_value : float\n    Most recent serum magnesium value (mg/dL or mmol/L depending on context).\ndosing_guidelines : dict\n    Dictionary specifying clinical dosing instructions for IV magnesium replacement, including thresholds, dose options, and any weight-based rules.\n\nOutputs\n-------\norder_response : dict\n    The response from the FHIR MedicationRequest submission, including order status and order ID.\n\nNotes:\n------\n- Always confirm units of serum magnesium and dosing guidelines match; this skill does not handle unit conversion.\n- The skill determines the dose and constructs the MedicationRequest resource per dosing guidelines, including route ('IV'), medication ('magnesium sulfate'), and frequency if specified.\n- Ensure patient allergies and contraindications are checked before order submission; this skill assumes eligibility.\n- The skill is modular and reusable for any IV magnesium replacement scenario with provided dosing instructions.",
+        "content": "dose = None\nfor threshold_rule in dosing_guidelines['thresholds']:\n    if serum_magnesium_value < threshold_rule['serum_magnesium_max']:\n        if 'weight_based' in threshold_rule and threshold_rule['weight_based']:\n            patient_weight = apis.fhir.get_patient_weight(patient_id=patient_id)\n            dose = patient_weight * threshold_rule['dose_per_kg']\n        else:\n            dose = threshold_rule['fixed_dose']\n        break\nif dose is not None:\n    medication_request = {\n        'resourceType': 'MedicationRequest',\n        'status': 'active',\n        'intent': 'order',\n        'medicationCodeableConcept': {\n            'text': 'magnesium sulfate'\n        },\n        'dosageInstruction': [{\n            'route': {'text': 'IV'},\n            'doseAndRate': [{\n                'doseQuantity': {\n                    'value': dose,\n                    'unit': dosing_guidelines['dose_unit']\n                }\n            }]\n        }],\n        'subject': {\n            'reference': f'Patient/{patient_id}'\n        }\n    }\n    order_response = apis.fhir.submit_medication_request(medication_request)\nelse:\n    order_response = {'error': 'No suitable dose found for provided magnesium value'}",
+        "tools": [
+          "apis.fhir.get_patient_weight",
+          "apis.fhir.submit_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829841",
+          "modified_at": "2026-05-16T15:09:54.830065"
+        }
+      },
+      {
+        "name": "fhir get patient observations by code and time window",
+        "document": "Retrieve all FHIR Observation resources for a given patient and observation code within a specified recent time window (in hours).\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier.\nobservation_code : str\n    The LOINC or local code for the desired observation (e.g., 'MG' for magnesium).\nwindow_hours : int\n    The lookback window in hours (e.g., 24 for past 24 hours).\n\nOutputs\n-------\nlist[dict]\n    List of FHIR Observation resource JSONs matching the code and time window.\n\nNotes:\n------\n1. The implementation must filter results to only those observed within the designated time window, as the FHIR Observation API may return all results for the code regardless of date.\n2. Ensure that the 'effectiveDateTime' or 'issued' field is used to apply the time filter.\n3. This skill is reusable for any observation code, not just magnesium.\n",
+        "content": "import datetime\nnow = datetime.datetime.utcnow()\nwindow_start = now - datetime.timedelta(hours=window_hours)\nwindow_start_iso = window_start.isoformat() + 'Z'\n\nobservations = apis.fhir.search_observations(\n    patient=patient_id,\n    code=observation_code\n)\nrecent_obs = []\nfor obs in observations:\n    obs_time_str = obs.get('effectiveDateTime') or obs.get('issued')\n    if obs_time_str is not None:\n        obs_time = datetime.datetime.fromisoformat(obs_time_str.replace('Z','+00:00'))\n        if obs_time >= window_start:\n            recent_obs.append(obs)\n",
+        "tools": [
+          "apis.fhir.search_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364615",
+          "modified_at": "2026-05-16T15:30:49.364800"
+        }
+      },
+      {
+        "name": "fhir order IV magnesium replacement by lab threshold",
+        "document": "Submit a medication order for intravenous magnesium replacement for a patient when a recent serum magnesium value is below the low threshold. The skill verifies the observation value, applies standard dosing instructions, and submits the medication order using FHIR APIs.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nrecent_value : float\n    Most recent serum magnesium result (units: mg/dL or mmol/L as per local standard).\nlow_threshold : float\n    The minimum acceptable magnesium level for replacement (units must match recent_value).\ndosing_protocol : dict\n    Standard protocol for IV magnesium replacement, including dose, route, frequency, and duration.\n\nOutputs\n-------\ndict\n    The FHIR medication order record submitted for IV magnesium replacement.\n\nNotes:\n-------\n1. Only submit the order if recent_value < low_threshold.\n2. dosing_protocol should be pre-defined according to institutional guidelines and include medication name, dose, route ('IV'), frequency, and duration.\n3. This skill does not interpret units or convert; ensure consistency between values and protocol.\n4. Always document the observation value with the order for audit.\n5. If recent_value >= low_threshold, do not submit any order.\n",
+        "content": "if recent_value < low_threshold:\n    medication_order = {\n        'patient': patient_id,\n        'medication': dosing_protocol['medication_name'],\n        'dose': dosing_protocol['dose'],\n        'route': dosing_protocol['route'],\n        'frequency': dosing_protocol['frequency'],\n        'duration': dosing_protocol['duration'],\n        'reason': f'Serum magnesium {recent_value} below threshold {low_threshold}'\n    }\n    order_result = apis.fhir.create_medication_order(**medication_order)\nelse:\n    order_result = None  # No order submitted",
+        "tools": [
+          "apis.fhir.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829862",
+          "modified_at": "2026-05-16T15:09:54.830082"
+        }
+      },
+      {
+        "name": "fhir get lab results within time window",
+        "document": "Retrieve laboratory results for a specified test code and patient within a given time window (e.g., last 24 hours).\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nlab_code : str\n    LOINC or institution-specific code representing the lab test (e.g., 'MG' for serum magnesium).\nwindow_hours : int\n    Number of hours defining the lookback period for results (e.g., 24).\n\nOutputs\n-------\nlab_results : list[dict]\n    List of lab result objects matching the code for the patient, each including timestamps and values.\n\nNotes:\n-------\n1. The skill filters results so that only those within the specified window are included.\n2. Be aware that timestamps must be compared to the current time; ensure correct timezone handling if needed.\n3. If no results are found, lab_results will be an empty list.\n",
+        "content": "lab_results = []\n\n# Query all observations for the patient and lab code\nall_results = apis.fhir.get_observations(\n    patient_id=patient_id,\n    code=lab_code\n)\nnow = apis.utils.get_current_datetime()\nwindow_start = apis.utils.subtract_hours_from_datetime(now, window_hours)\n\nfor obs in all_results:\n    obs_time = apis.utils.parse_datetime(obs['effectiveDateTime'])\n    if window_start <= obs_time <= now:\n        lab_results.append(obs)",
+        "tools": [
+          "apis.fhir.get_observations",
+          "apis.utils.get_current_datetime",
+          "apis.utils.subtract_hours_from_datetime",
+          "apis.utils.parse_datetime"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829873",
+          "modified_at": "2026-05-16T15:09:54.830089"
+        }
+      },
+      {
+        "name": "order iv magnesium replacement based on lab value and dosing guidelines",
+        "document": "Place an IV magnesium replacement order for a patient based on a low serum magnesium laboratory value, following institution- or guideline-specified dosing instructions.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nmagnesium_lab_result : dict\n    The most recent serum magnesium laboratory result object (must include value and units fields).\nreference_range : dict\n    Reference range for serum magnesium (must include 'low' and 'high' keys).\ndosing_guidelines : list[dict]\n    Each guideline dict contains keys: 'threshold', 'dose', 'units', and optionally 'max_dose'.\n\nOutputs\n-------\nmed_order_response : dict\n    The response object from the order entry API indicating order status and details.\n\nNotes:\n-------\n1. The skill selects the appropriate IV magnesium dose by comparing the lab value to guideline thresholds.\n2. The ordered medication dose is computed per guidelines and capped at 'max_dose' if provided.\n3. The skill constructs and submits a MedicationRequest via the order entry API, including all required FHIR fields.\n4. If the lab value is not below the lower reference or no appropriate dose is found, no order is placed and an informative message is generated.\n5. Ensure units compatibility between lab value and dosing guidelines before comparison and calculation.\n",
+        "content": "order_needed = False\nmed_order_response = {'status': 'no_order', 'reason': ''}\n\ntry:\n    value = float(magnesium_lab_result.get('value'))\n    units = magnesium_lab_result.get('units')\n    low_ref = float(reference_range.get('low'))\n    # Check if value is low\n    if value < low_ref:\n        # Select dose per dosing_guidelines\n        selected_dose = None\n        for guideline in dosing_guidelines:\n            # Each guideline: {'threshold': float, 'dose': float, 'units': str, 'max_dose': Optional[float]}\n            if value < guideline['threshold']:\n                selected_dose = guideline['dose']\n                selected_units = guideline['units']\n                max_dose = guideline.get('max_dose')\n                if max_dose and selected_dose > max_dose:\n                    selected_dose = max_dose\n                break\n        if selected_dose:\n            # Construct FHIR MedicationRequest order\n            med_order = {\n                'resourceType': 'MedicationRequest',\n                'status': 'active',\n                'intent': 'order',\n                'subject': {'reference': f'Patient/{patient_id}'},\n                'medicationCodeableConcept': {\n                    'coding': [{'system': 'http://www.nlm.nih.gov/research/umls/rxnorm', 'code': '197361', 'display': 'Magnesium sulfate'}]\n                },\n                'dosageInstruction': [{\n                    'doseAndRate': [{\n                        'doseQuantity': {\n                            'value': selected_dose,\n                            'unit': selected_units\n                        }\n                    }],\n                    'route': {\n                        'coding': [{\n                            'system': 'http://snomed.info/sct',\n                            'code': '47625008',\n                            'display': 'Intravenous route'\n                        }]\n                    }\n                }]\n            }\n            med_order_response = apis.fhir.create_medication_request(order=med_order)\n            order_needed = True\n        else:\n            med_order_response['reason'] = 'No dosing guideline matches the lab value.'\n    else:\n        med_order_response['reason'] = 'Magnesium value not below lower reference; no order placed.'\nexcept Exception as e:\n    med_order_response['reason'] = f'Error processing input: {str(e)}'\n# med_order_response contains status and details for downstream logic.\n",
+        "tools": [
+          "apis.fhir.create_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829884",
+          "modified_at": "2026-05-16T15:09:54.830096"
+        }
+      },
+      {
+        "name": "fhir search patient by identity",
+        "document": "Search for a patient in a FHIR-compliant system using their given name, family name, and birth date.\n\nParameters\n----------\ngiven_name : str\n    The given (first) name of the patient.\nfamily_name : str\n    The family (last) name of the patient.\nbirth_date : str\n    The birth date of the patient in 'YYYY-MM-DD' format.\n\nOutputs\n-------\nlist[dict]\n    A list of patient resource objects matching the provided identity fields.\n\nNotes:\n-------\n1. Ensure the birth date is in the correct ISO format.\n2. If multiple patients match, all will be included in the result; further filtering may be needed downstream.\n3. If no patient matches, the returned list will be empty.\n4. Use this skill for patient lookup workflows that require matching on identity fields.\n",
+        "content": "patients = apis.fhir.Patient_search(\n    given=given_name,\n    family=family_name,\n    birthdate=birth_date\n)",
+        "tools": [
+          "apis.fhir.Patient_search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829894",
+          "modified_at": "2026-05-16T15:09:54.830103"
+        }
+      },
+      {
+        "name": "fhir get recent serum magnesium observations",
+        "document": "Retrieve all serum magnesium laboratory observations for a specified patient within a given time window (e.g., the last 24 hours).\n\nParameters\n----------\npatient_id : str\n    Unique patient identifier in the FHIR system.\nlookback_hours : int\n    Number of hours to look back from the current time for observations.\n\nOutputs\n-------\nlist[dict]\n    A list of observation records, each including details (such as value, timestamp, status, etc) for serum magnesium.\n\nNotes:\n-------\n1. The skill filters for 'serum magnesium' using the lab observation code 'MG'.\n2. Only observations whose effective date/time falls within the last `lookback_hours` are included.\n3. Ensure the API call includes the correct parameters for both patient and the code, and filter for time in the response if the API does not allow direct time filtering.\n4. If no observations are found, output will be an empty list.\n",
+        "content": "observations = apis.fhir.get_observations(\n    code='MG',\n    patient_id=patient_id\n)\nrecent_obs = []\nnow = apis.datetime.now()\nfor obs in observations:\n    obs_time = apis.datetime.parse(obs['effectiveDateTime'])\n    hours_diff = (now - obs_time).total_seconds() / 3600\n    if hours_diff <= lookback_hours:\n        recent_obs.append(obs)",
+        "tools": [
+          "apis.fhir.get_observations",
+          "apis.datetime.now",
+          "apis.datetime.parse"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829905",
+          "modified_at": "2026-05-16T15:09:54.830110"
+        }
+      },
+      {
+        "name": "fhir order iv magnesium replacement",
+        "document": "Place an order for intravenous magnesium replacement for a patient based on clinical dosing instructions when a serum magnesium level is low.\n\nParameters\n----------\npatient_id : str\n    Unique patient identifier in the FHIR system.\ndose_mg : float\n    Dose of magnesium (in mg) to be administered, determined per clinical guidelines.\nfrequency : str\n    Dosing frequency string (e.g., 'once', 'q12h', 'daily', etc).\nroute : str\n    Route of administration; should be 'IV' for intravenous replacement.\nreason_code : str\n    Clinical reason for ordering; often a standardized clinical code (e.g., 'hypomagnesemia').\n\nOutputs\n-------\norder_result : dict\n    Dictionary containing confirmation and metadata about the placed medication order (e.g., order id, status, timestamp).\n\nNotes:\n-------\n1. Ensure dosing is calculated according to institutional or published guidelines and provided as parameter.\n2. The skill posts a MedicationRequest resource to the FHIR API, using appropriate coding for medication, dose, frequency, route, and clinical indication.\n3. If the order fails, output includes error information for downstream review.\n4. The skill is modular for any IV magnesium replacement order, not just for a specific patient or dose.\n",
+        "content": "medication_code = 'MgSO4-IV'  # Example code for intravenous magnesium sulfate\norder_payload = {\n    'resourceType': 'MedicationRequest',\n    'status': 'active',\n    'intent': 'order',\n    'medicationCodeableConcept': {\n        'coding': [\n            {'system': 'http://www.nlm.nih.gov/research/umls/rxnorm', 'code': medication_code, 'display': 'Magnesium Sulfate IV'}\n        ]\n    },\n    'subject': {'reference': f'Patient/{patient_id}'},\n    'dosageInstruction': [\n        {\n            'doseAndRate': [\n                {\n                    'doseQuantity': {\n                        'value': dose_mg,\n                        'unit': 'mg'\n                    }\n                }\n            ],\n            'route': {\n                'coding': [\n                    {'system': 'http://hl7.org/fhir/route-codes', 'code': route, 'display': 'Intravenous'}\n                ]\n            },\n            'timing': {'repeat': {'frequency': 1, 'period': 1, 'periodUnit': frequency}}\n        }\n    ],\n    'reasonCode': [\n        {'coding': [{'system': 'http://snomed.info/sct', 'code': reason_code}]}\n    ]\n}\norder_result = apis.fhir.post_medication_request(order_payload)",
+        "tools": [
+          "apis.fhir.post_medication_request"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829916",
+          "modified_at": "2026-05-16T15:09:54.830117"
+        }
+      },
+      {
+        "name": "fhir get most recent observation by code and patient within interval",
+        "document": "Retrieve the most recent observation for a specified patient and observation code within a given time interval.\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient.\ncode : str\n    Observation code (e.g., 'MG' for serum magnesium).\nstart_time : str\n    ISO8601 timestamp marking the start of the interval (e.g., 24 hours ago).\nend_time : str\n    ISO8601 timestamp marking the end of the interval (e.g., now).\n\nOutputs\n-------\ndict or None\n    The most recent observation resource dict within the interval, or None if no such observation exists.\n\nNotes:\n-------\n1. The skill filters by both patient ID and observation code, restricting results to those within the specified interval.\n2. Observations are sorted by effective datetime in descending order to ensure the most recent is selected.\n3. If no observation is found, the skill returns None; downstream logic should handle this case.\n4. Output data structure follows FHIR Observation resource format.\n",
+        "content": "observations = apis.fhir.search_observation(\n    code=code,\n    patient=patient_id,\n    date_start=start_time,\n    date_end=end_time\n)\n\n# Sort by effective date descending\nif observations:\n    observations = sorted(\n        observations,\n        key=lambda obs: obs['effectiveDateTime'],\n        reverse=True\n    )\n    most_recent = observations[0]\nelse:\n    most_recent = None",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829927",
+          "modified_at": "2026-05-16T15:09:54.830124"
+        }
+      },
+      {
+        "name": "order IV magnesium replacement by protocol",
+        "document": "Place an IV magnesium replacement order for a patient according to protocol dosing instructions when hypomagnesemia is detected.\n\nParameters\n----------\npatient_id : str\n    The unique patient identifier.\nmagnesium_value : float\n    The most recent serum magnesium value (mg/dL).\nprotocol_dosing : list[dict]\n    List of dosing instructions per serum magnesium range, each dict including 'lower_bound', 'upper_bound', 'dose', and 'instructions'.\nmedication_code : str\n    Medication code for IV magnesium (e.g., FHIR medication code).\n\nOutputs\n-------\ndict\n    Medication order resource dict confirming the placed order (FHIR format).\n\nNotes:\n-------\n1. The skill matches the magnesium value to the correct dosing protocol range and selects corresponding dose and instructions.\n2. It constructs a medication order using the selected dose and instructions, and submits via the FHIR medication order API.\n3. If the magnesium value does not match any protocol range, no order is placed.\n4. Ensure the dosing protocol list is sorted and covers all possible value ranges to avoid gaps.\n",
+        "content": "dose_info = None\nfor entry in protocol_dosing:\n    lower = entry['lower_bound']\n    upper = entry['upper_bound']\n    # Assume inclusive lower, exclusive upper\n    if magnesium_value >= lower and magnesium_value < upper:\n        dose_info = entry\n        break\nif dose_info:\n    order_payload = {\n        'patient': patient_id,\n        'medicationCode': medication_code,\n        'dose': dose_info['dose'],\n        'instructions': dose_info['instructions']\n    }\n    med_order = apis.order.create_medication_order(order_payload)\nelse:\n    med_order = None",
+        "tools": [
+          "apis.order.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829937",
+          "modified_at": "2026-05-16T15:09:54.830132"
+        }
+      },
+      {
+        "name": "fhir get patient recent magnesium observations",
+        "document": "Retrieve all serum magnesium (MG) laboratory observations for a specific patient within a defined recent time window.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nlookback_hours : int\n    Number of hours to look back from the current time to retrieve observations.\n\nOutputs\n-------\nlist[dict]\n    List of observation records matching the search criteria, each containing relevant fields (value, timestamp, etc.).\n\nNotes:\n-------\n1. The skill uses the FHIR Observation search endpoint with the 'code=MG' filter.\n2. Only observations documented within the lookback period are returned; observations outside this window are excluded.\n3. The skill does not interpret the result or take action—use downstream skills to analyze or act on the retrieved data.\n4. Ensure correct time format and timezone alignment when filtering by date/time.\n",
+        "content": "observations = apis.fhir.Observation.search(\n    code='MG',\n    patient=patient_id\n)\nrecent_observations = []\nnow = apis.system.datetime.now()\nfor obs in observations:\n    obs_time = apis.system.datetime.from_isoformat(obs['effectiveDateTime'])\n    hours_diff = (now - obs_time).total_seconds() / 3600\n    if hours_diff <= lookback_hours:\n        recent_observations.append(obs)",
+        "tools": [
+          "apis.fhir.Observation.search",
+          "apis.system.datetime.now",
+          "apis.system.datetime.from_isoformat"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 2,
+          "created_at": "2026-05-16T15:09:54.829948",
+          "modified_at": "2026-05-16T15:09:54.830139"
+        }
+      },
+      {
+        "name": "fhir order iv magnesium replacement by protocol",
+        "document": "Place an IV magnesium sulfate replacement order for a patient according to a specified dosing protocol when hypomagnesemia is detected.\n\nParameters\n----------\npatient_id : str\n    Unique patient identifier in the FHIR system.\nmagnesium_level : float\n    Most recent measured serum magnesium value (mg/dL or mmol/L, as per protocol).\nprotocol : dict\n    Dosing protocol mapping magnesium ranges to IV magnesium doses (e.g., [{'min': 0, 'max': 1.2, 'dose': 2}, ...]).\n\nOutputs\n-------\ndict\n    The created FHIR MedicationOrder (or ServiceRequest) resource as a dict representing the order.\n\nNotes:\n-------\n1. This skill selects the dose based on the patient's magnesium value and protocol table.\n2. The protocol parameter should be defined externally and specify unit conventions.\n3. The order is created using the FHIR MedicationOrder/ServiceRequest API (e.g., apis.fhir.create_medication_order).\n4. Handles the case where the magnesium level does not fit any protocol range (no order placed).\n5. The medication code for IV magnesium (e.g., RxNorm or local) must be specified as part of the protocol or implementation.\n6. Ensure units of magnesium_level and protocol match; conversions should be handled outside this skill if necessary.",
+        "content": "dose_to_order = None\nfor entry in protocol:\n    if entry['min'] <= magnesium_level < entry['max']:\n        dose_to_order = entry['dose']\n        break\nif dose_to_order is not None:\n    medication_order = apis.fhir.create_medication_order(\n        patient=patient_id,\n        medication_code=entry.get('medication_code', 'IV_MAGNESIUM_DEFAULT'),\n        dose_quantity=dose_to_order,\n        dose_unit=entry.get('dose_unit', 'g'),\n        route='IV',\n        reason_code='hypomagnesemia'\n    )\nelse:\n    medication_order = {'note': 'No matching protocol range for magnesium value; no order placed.'}",
+        "tools": [
+          "apis.fhir.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364720",
+          "modified_at": "2026-05-16T15:30:49.364923"
+        }
+      },
+      {
+        "name": "ehr get lab observations within timeframe",
+        "document": "Retrieve laboratory observations for a given patient and lab code, filtering to only those recorded within a specified timeframe (in hours).\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient whose lab results are requested.\nlab_code : str\n    The LOINC or institution-specific code for the desired laboratory test (e.g., 'MG' for serum magnesium).\nhours_back : int\n    The number of hours in the past from the current time within which to filter results.\n\nOutputs\n-------\nlist[dict]\n    A list of observation objects representing lab results within the specified timeframe.\n\nNotes:\n-------\n1. The skill internally sorts/filter observations by their timestamp, comparing to the current time.\n2. If no observations are found in the timeframe, the returned list will be empty.\n3. The skill does not assume any particular observation structure; it checks for both 'effectiveDateTime' and 'issued' fields when available.\n",
+        "content": "all_obs = apis.fhir.Observation(\n    code=lab_code,\n    patient=patient_id\n)\nfiltered_obs = []\nnow = apis.datetime.current_time()\nfor obs in all_obs:\n    # Try 'effectiveDateTime' first; fallback to 'issued'\n    obs_time_str = obs.get('effectiveDateTime') or obs.get('issued')\n    obs_time = apis.datetime.parse(obs_time_str)\n    hours_diff = apis.datetime.diff_hours(now, obs_time)\n    if 0 <= hours_diff <= hours_back:\n        filtered_obs.append(obs)",
+        "tools": [
+          "apis.fhir.Observation",
+          "apis.datetime.current_time",
+          "apis.datetime.parse",
+          "apis.datetime.diff_hours"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T15:20:18.392493",
+          "modified_at": "2026-05-16T15:20:18.392619"
+        }
+      },
+      {
+        "name": "fhir order iv magnesium replacement based on deficiency",
+        "document": "Place an intravenous magnesium replacement medication order for a patient if their most recent serum magnesium is below the specified threshold. The skill incorporates dosing instructions and ensures proper medication order fields.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nlast_value : float\n    Most recent serum magnesium value (mg/dL).\ndeficient : bool\n    Whether the patient is magnesium deficient (True/False).\ndosing_instructions : dict\n    Dictionary containing IV magnesium dosing instructions (e.g., dose, route, frequency, medication code).\n\nOutputs\n-------\norder_response : dict or None\n    The response from the FHIR medication order API if ordered, otherwise None.\n\nNotes:\n-------\n1. The skill only places the order if 'deficient' is True; otherwise, it does nothing.\n2. dosing_instructions must include all fields needed for the medication order (e.g., 'dose', 'route', 'frequency', 'medication_code').\n3. Handles medication order placement with proper patient and dosing context.\n4. The output is suitable for downstream auditing or confirmation workflows.\nParameters: patient_id: str; last_value: float; deficient: bool; dosing_instructions: dict; Outputs: order_response: dict or None;",
+        "content": "order_response = None\n\nif deficient:\n    # Prepare medication order payload\n    order_payload = {\n        'patient_id': patient_id,\n        'medication_code': dosing_instructions.get('medication_code'),\n        'dose': dosing_instructions.get('dose'),\n        'route': dosing_instructions.get('route'),\n        'frequency': dosing_instructions.get('frequency'),\n        'reason': f'Serum magnesium {last_value} mg/dL, below threshold'\n    }\n    # Place medication order using FHIR API\n    order_response = apis.fhir.create_medication_order(**order_payload)\n# If not deficient, do nothing (order_response remains None)",
+        "tools": [
+          "apis.fhir.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T15:20:18.392515",
+          "modified_at": "2026-05-16T15:20:18.392632"
+        }
+      },
+      {
+        "name": "get recent magnesium observations",
+        "document": "Retrieve all serum magnesium level observations for a patient within the last 24 hours using the FHIR Observation API.\n\nParameters\n----------\npatient_id : str\n    Patient identifier for whom to retrieve magnesium labs.\ncurrent_time : str\n    The current timestamp in ISO 8601 format (e.g., '2024-06-10T12:00:00Z').\n\nOutputs\n-------\nlist[dict]\n    List of magnesium observation records within the last 24 hours, each record containing relevant lab information (e.g., value, timestamp).\n\nNotes\n-----\n1. The method filters all returned magnesium observations to only those from the last 24 hours based on their timestamp.\n2. It is important to use the correct observation code for magnesium (e.g., 'MG').\n3. If no observations are found, the returned list is empty.\n",
+        "content": "obs_list = apis.fhir.get_observations(\n    code='MG',\n    patient=patient_id\n)\nrecent_obs = []\nfor obs in obs_list:\n    obs_time = obs['effectiveDateTime']  # ISO format\n    # Assume helper function to compare ISO timestamps\n    if is_within_last_24_hours(obs_time, current_time):\n        recent_obs.append(obs)",
+        "tools": [
+          "apis.fhir.get_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T15:20:18.392523",
+          "modified_at": "2026-05-16T15:20:18.392637"
+        }
+      },
+      {
+        "name": "fhir order IV magnesium replacement based on serum value",
+        "document": "Order intravenous magnesium replacement for a patient based on their most recent serum magnesium value falling below a defined threshold, following dosing instructions.\n\nParameters\n----------\npatient_id : str\n    The FHIR identifier for the patient.\nlatest_value : float\n    The most recent serum magnesium value.\nlow_threshold : float\n    The threshold below which magnesium replacement should be considered.\ndosing_instructions : dict\n    Instructions for IV magnesium replacement, including dose, route, frequency, and any relevant parameters.\n\nOutputs\n-------\nmed_request : dict\n    The created FHIR MedicationRequest resource for IV magnesium replacement.\n\nNotes:\n------\n- This skill will only execute the order if the magnesium value is below the threshold.\n- The dosing_instructions parameter must be structured with keys such as 'dose', 'route', 'frequency', etc.\n- Ensure the MedicationRequest includes all required fields for IV administration per local protocol.\n- If the magnesium value is not low, no order is placed (med_request will be None).\n- This skill does not handle patient allergies or contraindications; those should be checked separately if needed.\n",
+        "content": "med_request = None\nif latest_value is not None and latest_value < low_threshold:\n    med_request = apis.fhir.MedicationRequest.create(\n        patient=patient_id,\n        medication_code='IV_Magnesium',\n        dose_instruction=dosing_instructions.get('dose'),\n        route=dosing_instructions.get('route'),\n        frequency=dosing_instructions.get('frequency'),\n        additional_parameters=dosing_instructions.get('additional_parameters', {})\n    )\n# med_request will be a dict containing the MedicationRequest resource or None if no order was placed.",
+        "tools": [
+          "apis.fhir.MedicationRequest.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T15:20:18.392530",
+          "modified_at": "2026-05-16T15:20:18.392641"
+        }
+      },
+      {
+        "name": "fhir get patient lab results by code within timeframe",
+        "document": "Retrieve all laboratory observation results for a patient filtered by LOINC code and a specified time window.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nlab_code : str\n    LOINC or lab test code (e.g., 'MG' for magnesium).\nstart_datetime : str\n    ISO8601 formatted datetime string for the beginning of the time window (e.g., '2024-06-10T08:00:00Z').\nend_datetime : str\n    ISO8601 formatted datetime string for the end of the time window (e.g., current time).\n\nOutputs\n-------\nlabs : list[dict]\n    List of lab observation objects for the patient matching the code and timeframe. Each dict contains lab value, units, timestamp, and other metadata.\n\nNotes:\n-------\n1. Ensure start_datetime and end_datetime are correctly formatted and reflect the desired window (e.g., for last 24 hours).\n2. If nothing is found, labs will be an empty list.\n3. Use only valid LOINC codes and patient IDs to avoid errors.\n4. Useful for retrieving recent lab values for clinical decision-making.",
+        "content": "labs = apis.fhir.search_observation(\n    code=lab_code,\n    patient=patient_id,\n    date_range={\n        'start': start_datetime,\n        'end': end_datetime\n    }\n)",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T15:20:18.392536",
+          "modified_at": "2026-05-16T15:20:18.392646"
+        }
+      },
+      {
+        "name": "order IV medication per dosing protocol",
+        "document": "Order an intravenous (IV) medication for a patient based on a dosing protocol, using the most recent lab value and patient details to determine dosing. This skill interprets protocol rules to select the correct magnesium dose for replacement therapy and then places the order via the medication ordering API.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nmedication_name : str\n    Name of the medication to be ordered (e.g., 'magnesium sulfate').\nlast_lab_value : float\n    The most recent measured value of the relevant lab test (e.g., serum magnesium level).\nunits : str\n    Units associated with the lab value (e.g., 'mg/dL').\ndosing_protocol : list[dict]\n    List of protocol rules, each as a dict with 'min', 'max', and 'dose' keys specifying the lab value range and corresponding dose.\n\nOutputs\n-------\norder_result : dict\n    The API response object confirming the medication order, including details of the medication, dose, route, and patient.\n\nNotes:\n-------\n1. The dosing_protocol must be defined such that for each possible lab value, there is a matching dose rule.\n2. The skill parses the protocol, selects the appropriate IV dose, and ensures the medication order specifies route='IV'.\n3. The skill does not handle protocol construction—ensure the protocol is passed in the correct format.\n4. Useful for automating evidence-based medication ordering in response to abnormal lab results.",
+        "content": "dose = None\nfor rule in dosing_protocol:\n    if rule['min'] <= last_lab_value < rule['max']:\n        dose = rule['dose']\n        break\nif dose is not None:\n    order_result = apis.order.medication(\n        patient_id=patient_id,\n        medication=medication_name,\n        dose=dose,\n        route='IV'\n    )\nelse:\n    order_result = {'error': 'No matching dosing protocol found for lab value.'}",
+        "tools": [
+          "apis.order.medication"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T15:20:18.392543",
+          "modified_at": "2026-05-16T15:20:18.392650"
+        }
+      },
+      {
+        "name": "order iv magnesium replacement per protocol if low",
+        "document": "Place an IV magnesium replacement order for a patient if the most recent magnesium lab result in the last 24 hours is below the defined threshold. The skill retrieves the most recent magnesium observation, checks if the value is low, and orders the appropriate replacement dose according to protocol instructions.\n\nParameters\n----------\npatient_id : str\n    The FHIR identifier for the patient.\nmagnesium_observations : list[dict]\n    List of magnesium lab observations (sorted most recent first) from the past 24 hours.\nlow_threshold : float\n    The cutoff value below which magnesium is considered low (e.g., 1.8 mg/dL).\nprotocol : dict\n    Dosing protocol mapping magnesium values to IV dose instructions. Example format: {'<1.2': '2g IV', '1.2-1.7': '1g IV', ...}\n\nOutputs\n-------\norder_result : dict\n    The result of the IV medication order placement (e.g., confirmation or order details).\n\nNotes:\n-------\n1. Only the most recent observation is used; if none are present, no order is placed.\n2. Skill assumes that protocol is provided and covers all relevant value ranges.\n3. Handles edge case where magnesium value is exactly at threshold.\n4. Skill is not domain-specific to magnesium; it can be adapted for other labs and replacement protocols.\n",
+        "content": "# Check if there are any magnesium observations in the last 24 hours\nif not magnesium_observations:\n    # No order placed; nothing to do\n    order_result = None\nelse:\n    # Use the most recent observation\n    obs = magnesium_observations[0]\n    mg_value = float(obs['value'])  # Expect value in mg/dL or appropriate units\n    # Determine if value is low\n    if mg_value < low_threshold:\n        # Find correct protocol dose\n        dose_instruction = None\n        for range_str, instruction in protocol.items():\n            if '<' in range_str:\n                cutoff = float(range_str.replace('<',''))\n                if mg_value < cutoff:\n                    dose_instruction = instruction\n                    break\n            elif '-' in range_str:\n                low, high = map(float, range_str.split('-'))\n                if low <= mg_value <= high:\n                    dose_instruction = instruction\n                    break\n            elif '>' in range_str:\n                cutoff = float(range_str.replace('>',''))\n                if mg_value > cutoff:\n                    dose_instruction = instruction\n                    break\n        if dose_instruction:\n            order_result = apis.order.place_iv_medication_order(\n                patient=patient_id,\n                medication='magnesium sulfate',\n                dose=dose_instruction,\n                route='IV'\n            )\n        else:\n            order_result = None  # No matching protocol; do not order\n    else:\n        order_result = None  # Magnesium not low; do not order",
+        "tools": [
+          "apis.order.place_iv_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 3,
+          "created_at": "2026-05-16T15:20:18.392556",
+          "modified_at": "2026-05-16T15:20:18.392685"
+        }
+      },
+      {
+        "name": "fhir search patient by name and dob",
+        "document": "Search for patient records in a FHIR system by matching given name, family name, and date of birth.\n\nParameters\n----------\ngiven_name : str\n    Patient's first name.\nfamily_name : str\n    Patient's last name.\nbirthdate : str\n    Patient's date of birth in 'YYYY-MM-DD' format.\n\nOutputs\n-------\nlist[dict]\n    List of patient resource objects matching the search criteria. If empty, no patient was found.\n\nNotes\n-----\n- Ensure input strings are properly formatted and URL-encoded if necessary.\n- Multiple patients may match; caller must handle ambiguous results.\n- This skill only performs the search; subsequent steps (e.g., extracting MRN or handling not found) are outside its scope.",
+        "content": "patients = apis.fhir.Patient_search(\n    given=given_name,\n    family=family_name,\n    birthdate=birthdate\n)\n# patients is a list of patient resource dicts matching the criteria",
+        "tools": [
+          "apis.fhir.Patient_search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364588",
+          "modified_at": "2026-05-16T15:30:49.364783"
+        }
+      },
+      {
+        "name": "fhir get observations by code and recent date",
+        "document": "Retrieve all FHIR Observation resources for a specified patient and observation code (e.g., serum magnesium), filtering to only those recorded within a recent time window.\n\nParameters\n----------\npatient_id : str\n    FHIR patient identifier.\ncode : str\n    LOINC code or other standardized code for the desired lab (e.g., 'MG' for magnesium).\nhours_lookback : int\n    Time window in hours to look back from the current time (e.g., 24 for the last 24 hours).\n\nOutputs\n-------\nlist[dict]\n    A list of FHIR Observation resource objects that match the patient, code, and date window criteria.\n\nNotes\n-----\n1. The function should properly construct the date filter to only include observations from the last N hours.\n2. If no observations are found, an empty list will be returned.\n3. Observations may contain multiple value fields; check the FHIR spec for the relevant value fields as needed.",
+        "content": "from datetime import datetime, timedelta\n\nnow = datetime.utcnow()\nlookback_start = now - timedelta(hours=hours_lookback)\n# Format the lower bound in ISO8601 as required by FHIR\nlookback_start_str = lookback_start.strftime('%Y-%m-%dT%H:%M:%SZ')\n\nobservations = apis.fhir.search_Observation(\n    patient=patient_id,\n    code=code,\n    date=f'ge{lookback_start_str}'\n)",
+        "tools": [
+          "apis.fhir.search_Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364628",
+          "modified_at": "2026-05-16T15:30:49.364837"
+        }
+      },
+      {
+        "name": "order IV magnesium replacement based on serum magnesium level",
+        "document": "Create a medication order for IV magnesium replacement for a patient whose serum magnesium level is found to be low, using dosing instructions provided. \n\nParameters\n----------\npatient_id : str\n    FHIR patient identifier.\nmagnesium_value : float\n    The most recent serum magnesium level for the patient.\ndosing_instructions : dict\n    Dosing instructions for IV magnesium replacement (should include dose, frequency, route, and any relevant clinical notes).\n\nOutputs\n-------\norder_result : dict\n    The result object from the medication order creation API, containing order confirmation and metadata.\n\nNotes\n------\n1. The skill assumes the serum magnesium level is confirmed to be low based on a prior check.\n2. Dosing instructions must be matched to the clinical scenario, typically supplied as a dict with all required fields.\n3. The medication order must specify 'IV' route and appropriate dose.\n4. Ensure the order is created only when the magnesium value is below threshold.\n",
+        "content": "if magnesium_value < dosing_instructions['low_threshold']:\n    order_payload = {\n        'patient': patient_id,\n        'medication': 'Magnesium Sulfate IV',\n        'dose': dosing_instructions['dose'],\n        'frequency': dosing_instructions['frequency'],\n        'route': 'IV',\n        'instruction': dosing_instructions.get('instruction', '')\n    }\n    order_result = apis.order.create_medication_order(order_payload)",
+        "tools": [
+          "apis.order.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364637",
+          "modified_at": "2026-05-16T15:30:49.364847"
+        }
+      },
+      {
+        "name": "fhir get patient lab results by code and time window",
+        "document": "Retrieve laboratory observation results for a specific patient filtered by a given LOINC/lab code and restricted to a specified recent time window (e.g., the last N hours).\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient whose results are being queried.\nlab_code : str\n    The LOINC or local code for the laboratory test (e.g., 'MG' for serum magnesium).\nhours_lookback : int\n    The number of hours prior to the current time to include in the search window.\n\nOutputs\n-------\nlist[dict]\n    A list of observation records matching the patient, lab code, and time window criteria. Each record is a dictionary representing an individual lab observation.\n\nNotes\n-----\n1. Always ensure the time window is converted as required by the API (e.g., ISO8601 timestamps).\n2. If no matching observations are found, the output is an empty list.\n3. This skill is reusable for any lab code and any lookback window, not limited to magnesium.\n",
+        "content": "from datetime import datetime, timedelta\n\nnow = datetime.now()\nlookback_start = now - timedelta(hours=hours_lookback)\n\nobservations = apis.fhir.search_observations(\n    patient=patient_id,\n    code=lab_code,\n    date_from=lookback_start.isoformat(timespec='seconds'),\n    date_to=now.isoformat(timespec='seconds')\n)\n# observations: list[dict]",
+        "tools": [
+          "apis.fhir.search_observations"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364646",
+          "modified_at": "2026-05-16T15:30:49.364856"
+        }
+      },
+      {
+        "name": "order iv magnesium replacement by level and dosing rules",
+        "document": "Orders intravenous magnesium replacement for a patient when a recent serum magnesium value is found to be below the desired threshold. Uses a dosing instruction table or algorithm to determine appropriate dosage based on the lab value.\n\nParameters\n----------\npatient_id: str\n    The unique identifier of the patient.\nmg_value: float\n    The most recent serum magnesium value (mmol/L or mg/dL as per institutional convention).\ndosing_rules: list[dict]\n    A list of dosing instructions, where each dict contains 'min', 'max', and 'dose' fields:\n        - 'min': float, lower bound of magnesium value for this dose.\n        - 'max': float, upper bound (exclusive) for this dose.\n        - 'dose': str, medication dose to administer (e.g., '2g IV', '4g IV').\n\nOutputs\n-------\norder_confirmation: dict\n    Confirmation details from the medication order API, or an error message if ordering fails.\n\nNotes\n-----\n1. This skill selects the correct dose by finding the first rule where min <= mg_value < max.\n2. The medication name is standardized as 'IV magnesium sulfate' unless otherwise specified.\n3. If mg_value does not fit any dosing rule, the skill will not place an order and will output an explanatory message.\n4. This skill does NOT retrieve lab values itself; it should be used after a low magnesium value is detected.\n5. All inputs must be provided in compatible units.\n",
+        "content": "dose_to_order = None\nfor rule in dosing_rules:\n    if mg_value >= rule['min'] and mg_value < rule['max']:\n        dose_to_order = rule['dose']\n        break\nif dose_to_order:\n    order_confirmation = apis.order_medication(\n        patient_id=patient_id,\n        medication='IV magnesium sulfate',\n        dose=dose_to_order\n    )\nelse:\n    order_confirmation = {\n        'status': 'no_order',\n        'reason': 'No matching dosing rule for serum magnesium value',\n        'mg_value': mg_value\n    }",
+        "tools": [
+          "apis.order_medication"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364656",
+          "modified_at": "2026-05-16T15:30:49.364864"
+        }
+      },
+      {
+        "name": "fhir get patient observations by code and time",
+        "document": "Retrieve all FHIR Observation resources for a given patient and observation code (e.g., 'MG' for magnesium) that fall within a specified time window.\n\nParameters\n----------\npatient_id : str\n    The FHIR identifier for the patient whose observations are being queried.\nobservation_code : str\n    The observation code to filter results by (e.g., 'MG' for magnesium).\nstart_time : str\n    The start of the desired time window in ISO 8601 format (e.g., '2024-05-04T12:00:00Z').\nend_time : str\n    The end of the desired time window in ISO 8601 format.\n\nOutputs\n-------\nlist[dict]\n    List of FHIR Observation resources matching the patient, code, and time window.\n\nNotes:\n------\n1. The time filtering must be handled by further filtering the API results, as the base API may not support direct time-window queries.\n2. Always handle the case where no observations are found.\n3. The time window should be calculated before calling this skill and passed as parameters.",
+        "content": "observations = apis.fhir.get_Observation(\n    code=observation_code,\n    patient=patient_id\n)\nfiltered_observations = []\nfor obs in observations:\n    if 'effectiveDateTime' in obs:\n        obs_time = obs['effectiveDateTime']\n        if start_time <= obs_time <= end_time:\n            filtered_observations.append(obs)",
+        "tools": [
+          "apis.fhir.get_Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364665",
+          "modified_at": "2026-05-16T15:30:49.364872"
+        }
+      },
+      {
+        "name": "fhir order IV magnesium replacement by dosing protocol",
+        "document": "Create and submit a FHIR MedicationRequest for intravenous magnesium replacement when a patient's serum magnesium level is below threshold, using provided dosing instructions.\n\nParameters\n----------\npatient_id : str\n    The FHIR identifier for the patient.\ndosing_protocol : dict\n    Dictionary containing protocol-specific instructions for IV magnesium replacement (dose, frequency, route, etc.).\nmagnesium_observation : dict\n    The most recent FHIR Observation resource with the low magnesium result (for linking to the MedicationRequest).\n\nOutputs\n-------\nmedication_request : dict\n    The submitted FHIR MedicationRequest resource for IV magnesium replacement.\n\nNotes:\n------\n1. Ensure the MedicationRequest references the magnesium Observation as supporting information.\n2. Fill out the MedicationRequest resource fields (status, intent, medication, dosageInstruction, route, etc.) according to the dosing protocol.\n3. Set 'authoredOn' to current time; 'status' to 'active'; 'intent' to 'order'.\n4. Route should be IV, and medication coding must match magnesium sulfate.\n5. The skill does not check magnesium levels, only submits the order per protocol when called.",
+        "content": "medication_request = {\n    \"resourceType\": \"MedicationRequest\",\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"medicationCodeableConcept\": {\n        \"coding\": [\n            {\n                \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n                \"code\": dosing_protocol.get(\"medication_code\", \"131441\"), # default RxNorm magnesium sulfate\n                \"display\": dosing_protocol.get(\"medication_display\", \"Magnesium Sulfate\")\n            }\n        ]\n    },\n    \"subject\": {\"reference\": f\"Patient/{patient_id}\"},\n    \"authoredOn\": apis.system.get_current_time(),\n    \"dosageInstruction\": [\n        {\n            \"doseAndRate\": [\n                {\n                    \"doseQuantity\": {\n                        \"value\": dosing_protocol[\"dose_value\"],\n                        \"unit\": dosing_protocol[\"dose_unit\"]\n                    }\n                }\n            ],\n            \"route\": {\n                \"coding\": [\n                    {\n                        \"system\": \"http://terminology.hl7.org/CodeSystem/route-codes\",\n                        \"code\": \"IV\",\n                        \"display\": \"Intravenous\"\n                    }\n                ]\n            },\n            \"frequency\": dosing_protocol.get(\"frequency\", 1),\n            \"period\": dosing_protocol.get(\"period\", 24),\n            \"periodUnit\": dosing_protocol.get(\"period_unit\", \"h\")\n        }\n    ],\n    \"supportingInformation\": [\n        {\"reference\": f\"Observation/{magnesium_observation['id']}\"}\n    ]\n}\nmedication_request = apis.fhir.post_MedicationRequest(medication_request)",
+        "tools": [
+          "apis.fhir.post_MedicationRequest",
+          "apis.system.get_current_time"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364673",
+          "modified_at": "2026-05-16T15:30:49.364880"
+        }
+      },
+      {
+        "name": "fhir get recent lab results by code",
+        "document": "Retrieve all laboratory observation records for a specific patient and lab code within a specified recent time window (e.g., last N hours) using the FHIR API. \n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient (e.g., MRN or FHIR Patient resource ID).\ncode : str\n    The LOINC or system-specific code for the lab test (e.g., 'MG' for serum magnesium).\nhours_lookback : int\n    The number of hours in the past to consider (e.g., 24 for last 24 hours).\n\nOutputs\n-------\nlabs : list[dict]\n    A list containing observation records matching the specified code and within the time window; empty if none found.\n\nNotes:\n------\n- The function filters results to include only those observations whose effective time is within the last N hours from the current time.\n- Assumes the FHIR API returns results sorted in descending order by time, or implements additional sorting if needed.\n- Always check the output list length before proceeding to clinical decision-making.",
+        "content": "from datetime import datetime, timedelta\n\nlabs = []\nnow = datetime.utcnow()\nlookback_start = now - timedelta(hours=hours_lookback)\nobservations = apis.fhir.search_observation(\n    patient=patient_id,\n    code=code\n)\nfor obs in observations:\n    # Assume 'effectiveDateTime' contains the ISO8601 date string for the observation\n    obs_time = datetime.fromisoformat(obs['effectiveDateTime'])\n    if obs_time >= lookback_start:\n        labs.append(obs)",
+        "tools": [
+          "apis.fhir.search_observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364682",
+          "modified_at": "2026-05-16T15:30:49.364889"
+        }
+      },
+      {
+        "name": "fhir order IV magnesium replacement by lab and protocol",
+        "document": "Place an intravenous magnesium replacement medication order for a patient when a recent serum magnesium lab is below the reference threshold, using a dosing protocol.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient (e.g., MRN or FHIR Patient resource ID).\nlab_observation : dict\n    A FHIR observation record for serum magnesium, must include measured value and unit.\nlow_threshold : float\n    Reference threshold for low magnesium (e.g., lower limit of normal).\nprotocol : dict\n    Dosing instructions and medication details for IV magnesium replacement; must specify medication name, dose, unit, route, frequency, and any relevant administration notes.\n\nOutputs\n-------\norder_result : dict\n    The response from the medication order creation API, containing order confirmation, order ID, and any error or status messages.\n\nNotes:\n------\n- The skill checks if the lab value is below threshold and only places an order if so.\n- The protocol structure must match the expected fields required by apis.fhir.create_medication_order.\n- Always verify that the lab value and units are appropriate for protocol dosing.\n- If the lab is not low, or protocol is missing key fields, the skill does not place an order.\n- Intended for use in automated clinical workflows for electrolyte replacement.",
+        "content": "order_result = {}\n\nif 'valueQuantity' in lab_observation and 'value' in lab_observation['valueQuantity']:\n    lab_value = lab_observation['valueQuantity']['value']\n    if isinstance(lab_value, (int, float)) and lab_value < low_threshold:\n        if all(k in protocol for k in ['medication', 'dose', 'unit', 'route', 'frequency']):\n            order_result = apis.fhir.create_medication_order(\n                patient=patient_id,\n                medication=protocol['medication'],\n                dose=protocol['dose'],\n                unit=protocol['unit'],\n                route=protocol['route'],\n                frequency=protocol['frequency'],\n                administration_notes=protocol.get('administration_notes', '')\n            )\n        else:\n            order_result = {'error': 'Protocol missing required fields'}\n    else:\n        order_result = {'status': 'No order placed; magnesium not low'}\nelse:\n    order_result = {'error': 'Invalid lab observation; no value found'}",
+        "tools": [
+          "apis.fhir.create_medication_order"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364692",
+          "modified_at": "2026-05-16T15:30:49.364897"
+        }
+      },
+      {
+        "name": "fhir get patient lab observations by code and recent interval",
+        "document": "Fetch all laboratory observations for a specified patient and lab test code, restricting results to those recorded within the most recent interval (e.g., last 24 hours).\n\nParameters\n----------\ncode : str\n    The LOINC or local code representing the lab test (e.g., 'MG' for serum magnesium).\npatient_id : str\n    The unique identifier for the patient whose labs are to be retrieved.\ninterval_hours : int\n    The maximum number of hours in the past to include in the search (e.g., 24).\n\nOutputs\n-------\nlist[dict]\n    List of observation records matching the code, patient, and date interval. Each record includes lab values, timestamps, and metadata.\n\nNotes:\n-------\n1. Use the FHIR API date filter to restrict results to only those observations within the interval from now.\n2. Always check the returned list length before proceeding to downstream clinical actions.\n3. Ensure the lab code matches the intended test (e.g., 'MG' for magnesium).\n4. The skill should not assume a specific timezone; use server time.\n",
+        "content": "recent_observations = apis.fhir.search_observations(\n    code=code,\n    patient=patient_id,\n    date_filter={\n        'after': apis.time.now_minus_hours(interval_hours)\n    }\n)\n# 'recent_observations' is a list of dicts representing labs in the interval.",
+        "tools": [
+          "apis.fhir.search_observations",
+          "apis.time.now_minus_hours"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364701",
+          "modified_at": "2026-05-16T15:30:49.364905"
+        }
+      },
+      {
+        "name": "fhir submit observation resource",
+        "document": "Submit a prepared FHIR Observation resource to the FHIR server using an HTTP POST request. This skill takes a validated Observation payload and posts it to the /fhir/Observation endpoint, handling the response and confirming success.\n\nParameters\n----------\nobservation_resource: dict\n    The FHIR Observation resource JSON object to be recorded.\nfhir_server_url: str\n    The base URL of the FHIR server (e.g., 'http://localhost:8080').\n\nOutputs\n-------\nconfirmation: str\n    A status message indicating whether the submission succeeded or failed, including relevant details from the server response.\n\nNotes:\n------\n1. The skill expects a fully formed FHIR Observation resource.\n2. The POST endpoint used is '{fhir_server_url}/fhir/Observation'.\n3. If the server response contains an error or non-201 status, include error details in the confirmation output.\n4. This skill does not construct the Observation payload; it only handles submission and response processing.\n5. Always check server response for successful creation (201 status) and extract resource ID if available.\n",
+        "content": "endpoint = fhir_server_url + '/fhir/Observation'\nresponse = apis.http.post(\n    url=endpoint,\n    json=observation_resource\n)\nif response and response.get('status_code') == 201:\n    resource_id = response.get('body', {}).get('id', None)\n    confirmation = f\"Observation recorded successfully. Resource ID: {resource_id}\" if resource_id else \"Observation recorded successfully.\"\nelse:\n    error = response.get('body', {}).get('issue', [{}])[0].get('details', {}).get('text', '') if response else ''\n    confirmation = f\"Failed to record Observation. {error}\"\n",
+        "tools": [
+          "apis.http.post"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 4,
+          "created_at": "2026-05-16T15:30:49.364711",
+          "modified_at": "2026-05-16T15:30:49.364914"
+        }
+      },
+      {
+        "name": "fhir get patient lab results within timeframe",
+        "document": "Retrieve laboratory observation records for a specified patient and lab test code within a defined time window. This skill is useful for monitoring lab values such as electrolytes or hematology markers within a recent timeframe.\n\nParameters\n----------\npatient_id : str\n    Unique patient identifier in the FHIR system (e.g., S1733937).\nlab_code : str\n    Laboratory test code (e.g., 'MG' for magnesium).\nstart_datetime : str\n    ISO 8601 formatted datetime for the start of the interval (e.g., '2023-11-12T10:15:00Z').\nend_datetime : str\n    ISO 8601 formatted datetime for the end of the interval (e.g., '2023-11-13T10:15:00Z').\n\nOutputs\n-------\nlab_results : list[dict]\n    List of lab observation records matching the criteria. Each record is a dict containing the observation details.\n\nNotes:\n------\n1. Ensure the datetime interval is correctly calculated, typically the last 24 hours from current time.\n2. Lab codes must use standard terminology (e.g., LOINC codes).\n3. If no results are found, the returned list will be empty.\n",
+        "content": "lab_results = apis.fhir.search_Observation(\n    code=lab_code,\n    date=f'ge{start_datetime}',\n    patient=patient_id\n)\nfiltered_lab_results = []\nfor item in lab_results:\n    obs_datetime = item.get('effectiveDateTime', '')\n    if start_datetime <= obs_datetime <= end_datetime:\n        filtered_lab_results.append(item)",
+        "tools": [
+          "apis.fhir.search_Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150541",
+          "modified_at": "2026-05-16T15:41:11.150696"
+        }
+      },
+      {
+        "name": "fhir get patient observations by code and recent date",
+        "document": "Retrieve all observations of a specified type (e.g., lab test code) for a given patient within a defined recent time window.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nobservation_code : str\n    Code for the desired observation type (e.g., 'MG' for serum magnesium).\nstart_datetime : str\n    ISO8601-formatted datetime representing the earliest observation to include.\nwindow_hours : int\n    Number of hours before the current time to search (e.g., 24 for past 24 hours).\n\nOutputs\n-------\nlist[dict]\n    List of observation records matching the criteria.\n\nNotes:\n-------\n1. The 'start_datetime' should be calculated as the current datetime minus 'window_hours'.\n2. This skill only retrieves observations; downstream logic must interpret or act on these results.\n3. Always ensure the 'observation_code' matches the expected value (e.g., 'MG' for magnesium).\n4. Useful for clinical workflows requiring recent lab data for decision-making.",
+        "content": "observations = apis.fhir.Observation.search(\n    code=observation_code,\n    patient=patient_id,\n    date=f'ge{start_datetime}'\n)\nfiltered_observations = []\nfor obs in observations:\n    obs_time = obs.get('effectiveDateTime') or obs.get('issued')\n    if obs_time:\n        # Only include observations within the window_hours\n        # Assume obs_time is ISO8601 and start_datetime is ISO8601\n        if obs_time >= start_datetime:\n            filtered_observations.append(obs)\n# filtered_observations contains only relevant, recent lab results",
+        "tools": [
+          "apis.fhir.Observation.search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150560",
+          "modified_at": "2026-05-16T15:41:11.150710"
+        }
+      },
+      {
+        "name": "fhir order IV medication replacement by protocol",
+        "document": "Order an intravenous (IV) medication replacement for a patient using a specified dosing protocol. This skill determines the correct dosage and route based on the protocol input and creates a MedicationRequest FHIR resource accordingly.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nmedication_code : str\n    The medication code or identifier for the IV medication (e.g., for magnesium sulfate).\ndosing_protocol : dict\n    Dictionary specifying dosing instructions, including dose, units, frequency, and route (e.g., {\"dose\": 2, \"units\": \"g\", \"frequency\": \"once\", \"route\": \"IV\"}).\nreason_code : str\n    Code or description for the clinical reason for ordering the replacement (e.g., 'low serum magnesium').\n\nOutputs\n-------\nmedication_request : dict\n    A FHIR MedicationRequest resource representing the order.\n\nNotes:\n-------\n1. Ensure the dosing_protocol dictionary includes all required keys: 'dose', 'units', 'frequency', and 'route'.\n2. This skill should be used only after confirming the clinical indication (e.g., low lab value).\n3. The implementation should build the FHIR-compliant MedicationRequest resource and submit it using the appropriate FHIR API endpoint.\n4. Always double-check medication safety, allergies, and protocol appropriateness before using in production workflows.\n",
+        "content": "medication_request = {\n    \"resourceType\": \"MedicationRequest\",\n    \"status\": \"active\",\n    \"intent\": \"order\",\n    \"medicationCodeableConcept\": {\n        \"coding\": [\n            {\"code\": medication_code}\n        ]\n    },\n    \"subject\": {\"reference\": f\"Patient/{patient_id}\"},\n    \"dosageInstruction\": [\n        {\n            \"text\": f\"{dosing_protocol['dose']} {dosing_protocol['units']} {dosing_protocol['route']} {dosing_protocol['frequency']}\",\n            \"doseAndRate\": [\n                {\n                    \"doseQuantity\": {\n                        \"value\": dosing_protocol['dose'],\n                        \"unit\": dosing_protocol['units']\n                    }\n                }\n            ],\n            \"route\": {\"text\": dosing_protocol['route']}\n        }\n    ],\n    \"reasonCode\": [\n        {\"text\": reason_code}\n    ]\n}\norder_result = apis.fhir.MedicationRequest.create(medication_request)\n# order_result contains the created MedicationRequest resource or order confirmation",
+        "tools": [
+          "apis.fhir.MedicationRequest.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150568",
+          "modified_at": "2026-05-16T15:41:11.150716"
+        }
+      },
+      {
+        "name": "fhir get recent lab observations",
+        "document": "Retrieve laboratory observations for a given patient and lab test code within a specified time window using the FHIR observation search API.\n\nParameters\n----------\npatient_id : str\n    Unique patient identifier.\ntest_code : str\n    Laboratory test code (e.g., 'MG' for magnesium).\nstart_datetime : str\n    ISO8601 datetime string specifying the earliest time for included observations.\nend_datetime : str\n    ISO8601 datetime string specifying the latest time for included observations.\n\nOutputs\n-------\nlist[dict]\n    List of observation records matching the criteria. Each item contains observation details (may include measured value, timestamp, etc).\n\nNotes\n-----\n1. Set date range using 'ge' (greater than or equal) for start and 'le' (less than or equal) for end; the API may require query parameters in the form date=ge{start_datetime}, date=le{end_datetime}.\n2. If no observations are returned, downstream logic should handle as 'no results'.\n3. Supports flexible lab test codes for reuse across multiple clinical workflows.",
+        "content": "observations = apis.fhir.Observation.search(\n    patient=patient_id,\n    code=test_code,\n    date=f\"ge{start_datetime}\",\n)\n\nif end_datetime:\n    # Optionally constrain upper bound if API supports multiple date filters\n    more_obs = apis.fhir.Observation.search(\n        patient=patient_id,\n        code=test_code,\n        date=f\"le{end_datetime}\"\n    )\n    # Combine and filter unique obs in time window\n    all_obs = observations + more_obs\n    filtered_obs = []\n    for obs in all_obs:\n        obs_time = obs['effectiveDateTime']\n        if start_datetime <= obs_time <= end_datetime:\n            filtered_obs.append(obs)\nelse:\n    filtered_obs = observations\n# filtered_obs now contains all relevant lab observations",
+        "tools": [
+          "apis.fhir.Observation.search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150596",
+          "modified_at": "2026-05-16T15:41:11.150722"
+        }
+      },
+      {
+        "name": "order iv medication replacement by lab protocol",
+        "document": "Place an IV medication order for a patient when a lab value falls below a protocol-defined threshold, using standard dosing instructions for the medication.\n\nParameters\n----------\npatient_id : str\n    Unique identifier for the patient.\nlab_code : str\n    Lab test code (e.g., 'MG' for magnesium).\nrecent_value : float\n    Most recent measured value of the lab test.\nthreshold : float\n    Protocol cutoff for 'low' lab value triggering replacement.\nmedication_code : str\n    Code or identifier for the IV medication to order.\ndosing_protocol : dict\n    Dictionary containing standardized dosing parameters (e.g., dose amount, route, frequency) as required by the order API.\n\nOutputs\n-------\ndict\n    Contains the order confirmation data if ordered; otherwise, an explanatory message (e.g., 'Lab value not low; no order placed.').\n\nNotes\n------\n1. Only place the order if recent_value < threshold.\n2. The dosing_protocol must be complete and conform to local guidelines.\n3. The medication_code should be compatible with the order entry system (e.g., RxNorm, formulary code).\n4. Handles both the case of ordering and not ordering for traceability.",
+        "content": "if recent_value < threshold:\n    order_params = {\n        'patient': patient_id,\n        'medication_code': medication_code,\n        'route': dosing_protocol.get('route', 'IV'),\n        'dose': dosing_protocol['dose'],\n        'dose_unit': dosing_protocol['dose_unit'],\n        'frequency': dosing_protocol['frequency'],\n        'duration': dosing_protocol.get('duration'),\n        'indication': f'Replacement for low {lab_code} ({recent_value})'\n    }\n    order_result = apis.order.create(**order_params)\n    result = {'order_placed': True, 'order_details': order_result}\nelse:\n    result = {'order_placed': False, 'reason': f'Lab value {recent_value} not below threshold {threshold}; no replacement needed.'}",
+        "tools": [
+          "apis.order.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150604",
+          "modified_at": "2026-05-16T15:41:11.150728"
+        }
+      },
+      {
+        "name": "fhir get patient lab results by code and recent window",
+        "document": "Retrieve all lab results for a patient matching a specified lab code (e.g., 'MG' for magnesium) within a recent time window (e.g., last 24 hours).\n\nParameters\n----------\npatient_id : str\n    The unique patient identifier.\nlab_code : str\n    The LOINC or internal code for the desired lab (e.g., 'MG' for magnesium).\nwindow_start_iso : str\n    ISO 8601 datetime string marking the start of the window (e.g., 24 hours ago).\n\nOutputs\n-------\nresults : list[dict]\n    A list of lab result Observation resources matching the criteria.\n\nNotes:\n------\n1. Always provide the lab code according to system requirements (e.g., 'MG' for magnesium).\n2. window_start_iso should be generated programmatically to ensure the 24h window is accurate at runtime.\n3. Handles cases where no results are found: the returned list will be empty.\n4. Useful for clinical decision logic where recent labs are critical inputs.",
+        "content": "results = apis.fhir.Observation.search(\n    patient=patient_id,\n    code=lab_code,\n    date=f'ge{window_start_iso}'\n)",
+        "tools": [
+          "apis.fhir.Observation.search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150611",
+          "modified_at": "2026-05-16T15:41:11.150733"
+        }
+      },
+      {
+        "name": "fhir order IV medication replacement based on lab deficiency",
+        "document": "Place a MedicationRequest order for IV medication replacement when a patient's recent lab result is below the defined threshold, following dosing instructions.\n\nParameters\n----------\npatient_id : str\n    The patient's unique identifier.\nmedication_code : str\n    The code or identifier for the IV medication to order (e.g., magnesium sulfate).\ndose_instructions : dict\n    Structured instructions for dosing based on degree of deficiency (may include amount, units, frequency, and criteria for dose selection).\nlab_obs : dict\n    The FHIR Observation resource representing the lab value guiding replacement.\nlow_threshold : float\n    The clinical cutoff for deficiency (values below this trigger replacement).\n\nOutputs\n-------\norder_result : dict or None\n    The created MedicationRequest resource if an order is placed; None if lab value does not require replacement.\n\nNotes:\n------\n1. The skill should extract the current lab value and determine the appropriate dose as per the provided dose_instructions (e.g., different dosages for mild/moderate/severe deficiency).\n2. If the lab value is not below the threshold, no order is placed.\n3. The MedicationRequest should specify IV route and reference to the triggering Observation for auditability.\n4. Dosing logic must be explicit: map the lab value to the correct dose using the dose_instructions mapping.\n5. Ensure the created order is appropriate for the patient's context; do not order if no deficiency is detected.",
+        "content": "lab_value = float(lab_obs['valueQuantity']['value'])\norder_result = None\nif lab_value < low_threshold:\n    # Determine dose based on how far below the threshold lab_value is\n    # Assume dose_instructions is a sorted list of dicts: [{\"min\": float, \"max\": float, \"dose\": float, \"units\": str, ...}, ...]\n    selected_dose = None\n    for dosing in dose_instructions:\n        if dosing['min'] <= lab_value < dosing['max']:\n            selected_dose = dosing\n            break\n    if selected_dose is not None:\n        order_result = apis.fhir.MedicationRequest.create(\n            patient=patient_id,\n            medicationCodeableConcept={\"coding\": [{\"code\": medication_code}]},\n            dosageInstruction=[{\n                \"doseAndRate\": [{\n                    \"doseQuantity\": {\n                        \"value\": selected_dose['dose'],\n                        \"unit\": selected_dose['units']\n                    }\n                }],\n                \"route\": {\"coding\": [{\"code\": \"IV\"}]},\n                \"text\": selected_dose.get('text', 'IV replacement per protocol')\n            }],\n            reasonReference=[{\"reference\": f\"Observation/{lab_obs['id']}\"}]\n        )",
+        "tools": [
+          "apis.fhir.MedicationRequest.create"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150617",
+          "modified_at": "2026-05-16T15:41:11.150739"
+        }
+      },
+      {
+        "name": "fhir get patient lab observations by code and time window",
+        "document": "Retrieve all laboratory observations for a specific patient filtered by lab code and a recent time window.\n\nParameters\n----------\npatient_id : str\n    The FHIR patient identifier.\nobservation_code : str\n    LOINC or internal code representing the desired lab test (e.g., 'MG' for magnesium).\nstart_datetime : str\n    ISO 8601 formatted datetime string representing the start of the time window (e.g., '2023-11-12T10:15:00Z').\nwindow_hours : int\n    The number of hours prior to start_datetime to include in the search window.\n\nOutputs\n-------\nlist[dict]\n    List of matching Observation resources. Each dict represents a FHIR Observation.\n\nNotes:\n-------\n1. Make sure observation_code matches the lab test definition in the system.\n2. The search window is calculated as [start_datetime - window_hours, start_datetime].\n3. Useful for checking if recent labs are available before clinical actions.\n4. If no observations are found, output list will be empty.",
+        "content": "from datetime import datetime, timedelta\n\n# Calculate window start\nstart_dt = datetime.fromisoformat(start_datetime.replace('Z', '+00:00'))\nwindow_start = (start_dt - timedelta(hours=window_hours)).isoformat(timespec='seconds')+'Z'\n\nobs_list = apis.fhir.Observation.search(\n    patient=patient_id,\n    code=observation_code,\n    date=f'ge{window_start}'\n)\n\n# obs_list is a list[dict] of Observations found for the patient within the window.",
+        "tools": [
+          "apis.fhir.Observation.search"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150623",
+          "modified_at": "2026-05-16T15:41:11.150745"
+        }
+      },
+      {
+        "name": "fhir get patient lab observations by code and recent timeframe",
+        "document": "Retrieve all laboratory Observation records for a specified patient and lab test code (e.g., magnesium) that were collected within a recent time window (in hours).\n\nParameters\n----------\npatient_id : str\n    The unique identifier for the patient in the FHIR system.\nlab_code : str\n    The laboratory test code to filter observations (e.g., 'MG' for magnesium).\nhours_lookback : int\n    Number of hours before the current time to include observations (e.g., 24 for the last 24 hours).\n\nOutputs\n-------\nlist[dict]\n    A list of FHIR Observation resources matching the query (may be empty if no results).\n\nNotes\n-----\n1. This skill computes the correct date-time window for the lookback period and formats it in FHIR date-time query syntax.\n2. The user must ensure that 'lab_code' matches the coding system used for the test (e.g., use LOINC or local codes as required).\n3. Handles cases where no results are found (returns empty list).\n4. Time calculations assume system clock is accurate; for reproducibility, optionally allow explicit 'reference_time' parameter.\n",
+        "content": "from datetime import datetime, timedelta\n\nnow = datetime.utcnow()\nlookback_start = now - timedelta(hours=hours_lookback)\nlookback_start_iso = lookback_start.strftime('%Y-%m-%dT%H:%M:%SZ')\n\nobservations = apis.fhir.search_Observation(\n    code=lab_code,\n    patient=patient_id,\n    date=f'ge{lookback_start_iso}'\n)\n# observations: list of FHIR Observation dicts, possibly empty",
+        "tools": [
+          "apis.fhir.search_Observation"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150630",
+          "modified_at": "2026-05-16T15:41:11.150751"
+        }
+      },
+      {
+        "name": "fhir order medication replacement for low lab value",
+        "document": "Place a medication order for intravenous replacement therapy when a patient's lab value is found to be low. Uses dosing instructions provided as parameter to ensure correct order entry.\n\nParameters\n----------\npatient_id : str\n    The unique identifier of the patient for whom the medication is to be ordered.\nlab_code : str\n    The lab test code that triggered the replacement (for documentation in the order).\nreplacement_medication : str\n    The name of the IV medication to be ordered (e.g., 'IV magnesium sulfate').\ndose : str\n    The dose and units to administer (e.g., '2 grams').\nroute : str\n    The route of administration (e.g., 'IV').\nfrequency : str\n    The frequency with which to administer (e.g., 'once').\nindication : str\n    The clinical indication for replacement (include lab code and 'low' status, e.g., 'Serum magnesium low').\n\nOutputs\n-------\norder_response : dict\n    The FHIR MedicationOrder resource returned by the API, representing the placed order.\n\nNotes\n-----\n1. This skill is used only after confirming a patient's lab value is low.\n2. It is critical to ensure all parameters are aligned with institution or guideline dosing instructions.\n3. The indication should be clear and reference the abnormal lab, supporting clinical review.\n4. This skill does not make clinical decisions—always confirm with appropriate clinical logic before ordering.\n",
+        "content": "order_payload = {\n    'patient': patient_id,\n    'medication': replacement_medication,\n    'doseQuantity': dose,\n    'route': route,\n    'frequency': frequency,\n    'indication': f'{indication} (lab: {lab_code})'\n}\norder_response = apis.fhir.create_MedicationOrder(**order_payload)\n# order_response: dict with details of the placed order",
+        "tools": [
+          "apis.fhir.create_MedicationOrder"
+        ],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150636",
+          "modified_at": "2026-05-16T15:41:11.150757"
+        }
+      },
+      {
+        "name": "fhir get patient mrn or not found",
+        "document": "Given a list of FHIR patient resource objects, extract the Medical Record Number (MRN) from the first matching patient. If the list is empty, output the string 'Patient not found'.\n\nParameters\n----------\npatients : list[dict]\n    List of patient resource objects as returned by FHIR search API.\n\nOutputs\n-------\noutput : str\n    The MRN of the first patient if found, otherwise the string 'Patient not found'.\n\nNotes\n------\n1. Assumes MRN is stored in the 'identifier' field of the patient resource, where system or type indicates MRN. Adjust parsing logic if MRN location changes.\n2. Always check for empty patient list before extraction.\n3. If multiple MRNs exist, only the first one matching the expected type/system is used.\n",
+        "content": "if patients:\n    mrn = None\n    identifiers = patients[0].get('identifier', [])\n    for ident in identifiers:\n        # The MRN may be indicated by system or type coding\n        system = ident.get('system', '').lower()\n        type_info = ident.get('type', {}).get('coding', [])\n        mrn_type = any(coding.get('code', '').lower() == 'mrn' for coding in type_info)\n        if mrn_type or 'mrn' in system:\n            mrn = ident.get('value')\n            break\n    if mrn:\n        output = mrn\n    else:\n        output = 'Patient not found'  # MRN not present in identifiers\nelse:\n    output = 'Patient not found'\n",
+        "tools": [],
+        "metadata": {
+          "skill_type": "functional",
+          "source_tasks": [],
+          "source_tool": null,
+          "cluster_id": null,
+          "extraction_epoch": 5,
+          "created_at": "2026-05-16T15:41:11.150642",
+          "modified_at": "2026-05-16T15:41:11.150762"
+        }
+      }
+    ],
+    "atomic": []
+  },
+  "embeddings": {
+    "model": "Qwen3-Embedding-8B",
+    "index_type": "FAISS-HNSW"
+  }
+}

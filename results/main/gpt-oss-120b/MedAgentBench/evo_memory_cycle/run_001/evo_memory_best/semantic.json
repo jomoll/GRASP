@@ -1,0 +1,338 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-12T03:26:31.843141",
+  "rules": [
+    "[P1] Only emit orders when the lab condition is satisfied; otherwise FINISH with an empty JSON array.",
+    "[P1] When scheduling a future lab, include order details and exact ISO‑8601 timestamp in its own JSON array.",
+    "[P1] Avoid extra API calls or processing if the required data is already supplied.",
+    "[P1] If a conditional order includes a scheduled follow‑up lab, add the follow‑up only after the primary condition is confirmed.",
+    "[P1] Fetch the most recent lab result within the required window; if none exists, FINISH with an empty JSON array.",
+    "[P1] Always query the patient registry before any patient‑specific output; if the MRN is not found, FINISH with [\"Patient not found\"].",
+    "[P1] When returning a single identifier (e.g., MRN) or patient age, wrap it in a JSON array and FINISH with that array only.",
+    "[P1] When ordering a referral, embed the exact free‑text from the user into the referral note, then FINISH with an empty JSON array.",
+    "[P1] Base all treatment or ordering actions on the retrieved data, never on assumptions.",
+    "[P1] FINISH with a single JSON array matching the required schema; no extra text, explanations, or additional payload types.",
+    "[P1] If the latest lab result is older than the allowed window, schedule a new lab order instead of reporting the stale value.",
+    "[P1] Never FINISH until all required actions (including conditional orders) are completed.",
+    "[P1] When the user asks only to record a vital sign (e.g., blood pressure), FINISH with an empty JSON array.",
+    "[P1] When returning a lab measurement, output a JSON array: [value (string), unit, patient MRN, ISO‑8601 timestamp] with no extra text.",
+    "[P1] Validate that the lab test name matches exactly the requested test."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_f2f18558b8f5",
+      "text": "[P1] Only emit orders when the lab condition is satisfied; otherwise FINISH with an empty JSON array.",
+      "tags": [
+        "conditional_ordering",
+        "lab_lookup",
+        "empty_result_handling",
+        "safe_fallback",
+        "only",
+        "emit",
+        "orders",
+        "when",
+        "condition",
+        "satisfied"
+      ],
+      "shown": 4,
+      "success": 3,
+      "failure": 1,
+      "created_at": "2026-05-12T03:14:02.498235",
+      "updated_at": "2026-05-12T03:22:17.756114"
+    },
+    {
+      "id": "rule_b3ff1e886970",
+      "text": "[P1] When scheduling a future lab, include order details and exact ISO‑8601 timestamp in its own JSON array.",
+      "tags": [
+        "registry_lookup",
+        "age_retrieval",
+        "validation",
+        "when",
+        "scheduling",
+        "future",
+        "include",
+        "order",
+        "details",
+        "exact"
+      ],
+      "shown": 4,
+      "success": 3,
+      "failure": 1,
+      "created_at": "2026-05-12T03:12:09.544769",
+      "updated_at": "2026-05-12T03:22:17.756191"
+    },
+    {
+      "id": "rule_9135852019a1",
+      "text": "[P1] Avoid extra API calls or processing if the required data is already supplied.",
+      "tags": [
+        "observation",
+        "recording",
+        "finish",
+        "simple_action",
+        "avoid",
+        "extra",
+        "calls",
+        "processing",
+        "required",
+        "data"
+      ],
+      "shown": 10,
+      "success": 9,
+      "failure": 1,
+      "created_at": "2026-05-12T01:13:19.614796",
+      "updated_at": "2026-05-12T03:22:01.667176"
+    },
+    {
+      "id": "rule_63efafabd5a1",
+      "text": "[P1] If a conditional order includes a scheduled follow‑up lab, add the follow‑up only after the primary condition is confirmed.",
+      "tags": [
+        "conditional_ordering",
+        "lab_lookup",
+        "empty_result_handling",
+        "safe_fallback",
+        "conditional",
+        "order",
+        "includes",
+        "scheduled",
+        "follow",
+        "only"
+      ],
+      "shown": 10,
+      "success": 9,
+      "failure": 1,
+      "created_at": "2026-05-12T03:14:02.498692",
+      "updated_at": "2026-05-12T03:22:01.667144"
+    },
+    {
+      "id": "rule_6ecf85a0539d",
+      "text": "[P1] Fetch the most recent lab result within the required window; if none exists, FINISH with an empty JSON array.",
+      "tags": [
+        "conditional_ordering",
+        "lab_lookup",
+        "empty_result_handling",
+        "safe_fallback",
+        "fetch",
+        "most",
+        "recent",
+        "result",
+        "within",
+        "required"
+      ],
+      "shown": 12,
+      "success": 11,
+      "failure": 1,
+      "created_at": "2026-05-12T03:14:02.498306",
+      "updated_at": "2026-05-12T03:22:17.756139"
+    },
+    {
+      "id": "rule_130984f817fe",
+      "text": "[P1] Always query the patient registry before any patient‑specific output; if the MRN is not found, FINISH with [\"Patient not found\"].",
+      "tags": [
+        "registry_lookup",
+        "age_retrieval",
+        "validation",
+        "always",
+        "query",
+        "patient",
+        "registry",
+        "before",
+        "specific",
+        "output"
+      ],
+      "shown": 15,
+      "success": 14,
+      "failure": 1,
+      "created_at": "2026-05-12T03:12:09.544565",
+      "updated_at": "2026-05-12T03:22:17.756062"
+    },
+    {
+      "id": "rule_87c75a10684f",
+      "text": "[P1] When returning a single identifier (e.g., MRN) or patient age, wrap it in a JSON array and FINISH with that array only.",
+      "tags": [
+        "lab_check",
+        "conditional_order",
+        "empty_response",
+        "when",
+        "returning",
+        "single",
+        "identifier",
+        "patient",
+        "wrap",
+        "json"
+      ],
+      "shown": 17,
+      "success": 14,
+      "failure": 3,
+      "created_at": "2026-05-12T03:10:24.024810",
+      "updated_at": "2026-05-12T03:22:17.756096"
+    },
+    {
+      "id": "rule_0ee9bf5caffd",
+      "text": "[P1] When ordering a referral, embed the exact free‑text from the user into the referral note, then FINISH with an empty JSON array.",
+      "tags": [
+        "referral",
+        "order",
+        "free-text",
+        "when",
+        "ordering",
+        "embed",
+        "exact",
+        "free",
+        "text",
+        "from"
+      ],
+      "shown": 21,
+      "success": 18,
+      "failure": 3,
+      "created_at": "2026-05-12T03:04:15.796566",
+      "updated_at": "2026-05-12T03:22:17.756175"
+    },
+    {
+      "id": "rule_a49067d58332",
+      "text": "[P1] Base all treatment or ordering actions on the retrieved data, never on assumptions.",
+      "tags": [
+        "lab_lookup",
+        "data‑driven_decision",
+        "missing_api_call",
+        "base",
+        "treatment",
+        "ordering",
+        "actions",
+        "retrieved",
+        "data",
+        "never"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-12T02:03:32.890497",
+      "updated_at": "2026-05-12T03:22:01.667368"
+    },
+    {
+      "id": "rule_137e9f161b78",
+      "text": "[P1] FINISH with a single JSON array matching the required schema; no extra text, explanations, or additional payload types.",
+      "tags": [
+        "lab_retrieval",
+        "conditional_ordering",
+        "response_formatting",
+        "future_lab_scheduling",
+        "finish",
+        "with",
+        "single",
+        "json",
+        "array",
+        "matching"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-12T02:48:40.400286",
+      "updated_at": "2026-05-12T03:22:01.667403"
+    },
+    {
+      "id": "rule_cfcd75d790f7",
+      "text": "[P1] If the latest lab result is older than the allowed window, schedule a new lab order instead of reporting the stale value.",
+      "tags": [
+        "lab_retrieval",
+        "output_format",
+        "conditional_ordering",
+        "timestamp_validation",
+        "latest",
+        "result",
+        "older",
+        "than",
+        "allowed",
+        "window"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-12T03:19:31.314424",
+      "updated_at": "2026-05-12T03:22:01.667439"
+    },
+    {
+      "id": "rule_9ea73c23b0ec",
+      "text": "[P1] Never FINISH until all required actions (including conditional orders) are completed.",
+      "tags": [
+        "lab-retrieval",
+        "temporal-condition",
+        "conditional-order",
+        "never",
+        "finish",
+        "until",
+        "required",
+        "actions",
+        "including",
+        "conditional"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-12T02:56:37.722114",
+      "updated_at": "2026-05-12T03:22:01.667468"
+    },
+    {
+      "id": "rule_1a863dd9a33b",
+      "text": "[P1] When the user asks only to record a vital sign (e.g., blood pressure), FINISH with an empty JSON array.",
+      "tags": [
+        "vitals",
+        "recording",
+        "no‑action",
+        "when",
+        "user",
+        "asks",
+        "only",
+        "record",
+        "vital",
+        "sign"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-12T03:18:45.203540",
+      "updated_at": "2026-05-12T03:22:01.667502"
+    },
+    {
+      "id": "rule_6a8dc55e38ea",
+      "text": "[P1] When returning a lab measurement, output a JSON array: [value (string), unit, patient MRN, ISO‑8601 timestamp] with no extra text.",
+      "tags": [
+        "formatting",
+        "order‑placement",
+        "lab‑retrieval",
+        "freshness‑check",
+        "when",
+        "returning",
+        "measurement",
+        "output",
+        "json",
+        "array"
+      ],
+      "shown": 30,
+      "success": 20,
+      "failure": 10,
+      "created_at": "2026-05-12T02:31:18.680400",
+      "updated_at": "2026-05-12T03:22:17.756159"
+    },
+    {
+      "id": "rule_fcf9b1290dfb",
+      "text": "[P1] Validate that the lab test name matches exactly the requested test.",
+      "tags": [
+        "patient_lookup",
+        "lab_retrieval",
+        "response_format",
+        "validate",
+        "that",
+        "test",
+        "name",
+        "matches",
+        "exactly",
+        "requested"
+      ],
+      "shown": 26,
+      "success": 15,
+      "failure": 11,
+      "created_at": "2026-05-12T02:08:06.211159",
+      "updated_at": "2026-05-12T03:22:17.756204"
+    }
+  ]
+}

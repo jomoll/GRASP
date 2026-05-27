@@ -1,0 +1,1174 @@
+[
+  {
+    "id": 142,
+    "description": "The baseball game results were inserted into the database with the following values: Date='Jun 2', Opponent='@ Angels', Score='5–3', Loss='Montefusco (4–2)', Record='17–33' using the query: INSERT INTO baseball_game_results (Date, Opponent, Score, Loss, Record) VALUES",
+    "type": "INSERT",
+    "answer": "[('44b975ce3592c31481d6214b04b779bc',)]"
+  },
+  {
+    "id": 141,
+    "description": "The movie 'Despicable Me 3' released in 2017 featured Frieda (voice) and had no additional notes, and this data was inserted into the 'Movie Roles' table.",
+    "type": "INSERT",
+    "answer": "[('991c10f663f594f4aa4af79fae998906',)]"
+  },
+  {
+    "id": 191,
+    "description": "On 28 March 2021, 41,000 crowd witnessed Sydney Swans score 15.10 (100) against GWS Giants who scored 10.12 (72) at Sydney Cricket Ground venue.",
+    "type": "INSERT",
+    "answer": "[('fa90ca5d9272cc3dd64cc4d0bfbce999',)]"
+  },
+  {
+    "id": 109,
+    "description": "The music catalog for the performance 'Live at the Opera House' in 2012 was added to the database with the label 'Warner Music' and format 'DVD' using the SQL command INSERT INTO music_catalog (Year, Title, Label, Format) VALUES ('2012', 'Live at the Opera House', 'Warner Music', 'DVD')",
+    "type": "INSERT",
+    "answer": "[('d76adbd72e07b819b72020e35682b88b',)]"
+  },
+  {
+    "id": 165,
+    "description": "In 2010, the athlete achieved the 3rd position in 110 m hurdles event at Continental Cup held in Split, Croatia with a timing of 13.22, as recorded in the Athlete Results table.",
+    "type": "INSERT",
+    "answer": "[('6d968c84a4c7e57af3e67e7556cbf2e0',)]"
+  },
+  {
+    "id": 150,
+    "description": "Data for a recent football match against Australia was inserted into the database with information on the date, venue, opponents, score, and competition.",
+    "type": "INSERT",
+    "answer": "[('aaa99bf2f6cd4efd03a8afe3c00f6154',)]"
+  },
+  {
+    "id": 101,
+    "description": "25 schools exist in total, with 15 being male-only and 10 being female-only.",
+    "type": "INSERT",
+    "answer": "[('bd817e36aace6a7ae81bcd83f24fa5cc',)]"
+  },
+  {
+    "id": 170,
+    "description": "Insert 'Enfield' into `Location Table` with '30' kilometers, '18.6' miles, and 'Hwy 102 Halifax, Truro To Hwy 104 (TCH) / Hwy 102' as destinations and '-' as notes.",
+    "type": "INSERT",
+    "answer": "[('ec12a4a976644c7174503482ff5010ef',)]"
+  },
+  {
+    "id": 115,
+    "description": "On June 2, the team played against the Red Sox, with a final score of 3-2. The team suffered a loss, with Cotton having a record of 3-3. The game had an attendance of 30,000, bringing the team's overall record to 30-27. The game results were inserted into the database using the following values: Date='June 2', Opponent='Red Sox', Score='3 - 2', Loss='Cotton (3-3)', Attendance='30,000', and Record='30-27'.",
+    "type": "INSERT",
+    "answer": "[('ea5c8d48e9e3507e6cedf678bdf9ba32',)]"
+  },
+  {
+    "id": 178,
+    "description": "The year 1999 saw the athlete complete in the World Championships held in Seville, Spain, where they placed second in the 400m event with a time of 49.67 and made notes in their performance log.",
+    "type": "INSERT",
+    "answer": "[('99d3db6995935090585f74f0bfe18e18',)]"
+  },
+  {
+    "id": 173,
+    "description": "Insert the information of the lead actress of a TV movie based on a true story into the table 'Actress Filmography', including the year, title, role, and notes.",
+    "type": "INSERT",
+    "answer": "[('2e67780fd63db4e5276f9f4e9c8b77a4',)]"
+  },
+  {
+    "id": 110,
+    "description": "The Financial Performance table should have a new row inserted with 'Net profit before tax' recorded for the years 2005-2009 at amounts of (33), 28, 194, 26, and 267 million CZK respectively.",
+    "type": "INSERT",
+    "answer": "[('e17ff23a6f2542188cba3e96e7a2e578',)]"
+  },
+  {
+    "id": 155,
+    "description": "The Movie_Credits table is being inserted with the value of Year, Title, Role, and Notes, with values of '2019', 'Joker', 'Arthur Fleck/Joker', and 'Academy Award winning performance for Best Actor', respectively.",
+    "type": "INSERT",
+    "answer": "[('5d674e899a7691e39b2f0781acc65be9',)]"
+  },
+  {
+    "id": 156,
+    "description": "Insert a new record into the Senators table with values for Senator as Mitt Romney, Party as Republican, State as Utah, and Religion as Mormon.",
+    "type": "INSERT",
+    "answer": "[('c130d30f91061d80326a10121fe72430',)]"
+  },
+  {
+    "id": 172,
+    "description": "The `Winners By Country` table is being updated by adding the values '3' for `Winner`, 'Spain' for `Country`, and '2005' for `Most Recent Win`.",
+    "type": "INSERT",
+    "answer": "[('93d17a3d946c3fa612e3e949e7a725ee',)]"
+  },
+  {
+    "id": 145,
+    "description": "The movie 'The Aviator' released in 2004 features Sen. Ralph Owen Brewster played by the actor, with no additional notes.",
+    "type": "INSERT",
+    "answer": "[('770c2818b477aec0428a995255ea6916',)]"
+  },
+  {
+    "id": 148,
+    "description": "The film_awards table is being updated with the result of Emma Stone winning the BAFTA Award for Best Actress in a Leading Role in 2017.",
+    "type": "INSERT",
+    "answer": "[('5dd8cc271ba54daf5b758e65ff95098b',)]"
+  },
+  {
+    "id": 192,
+    "description": "The song 'Porto Sentido' by Rui Veloso won 1st place with 145 points in Draw 10 of the music contest, and was inserted into the database.",
+    "type": "INSERT",
+    "answer": "[('8d2fd111c7e1c52a3c23cbf5257971b2',)]"
+  },
+  {
+    "id": 176,
+    "description": "To add information about Osage Hills State Park to the State Parks Table, insert values for Park Name, County or Counties, Area in acres, Year Established, and Water Body(s) as 'Osage Hills State Park', 'Osage', '1, 100', '1936', ''.",
+    "type": "INSERT",
+    "answer": "[('68966f5f9021d49a11853cda07a3effa',)]"
+  },
+  {
+    "id": 137,
+    "description": "Insert 'Lambeau Field' into sports_venues for American Football with a capacity of 81,441.",
+    "type": "INSERT",
+    "answer": "[('3cb2f88d957e2569ea5cda1fcdedcd48',)]"
+  },
+  {
+    "id": 130,
+    "description": "Insert a record into the HMAS_ships table with the following values- Name: HMAS Newcastle, Type: Frigate, Class: Adelaide, Dates: 2000-2021, and Notes: null.",
+    "type": "INSERT",
+    "answer": "[('e967f773fa72df3f0b30c01b75ca41f3',)]"
+  },
+  {
+    "id": 121,
+    "description": "LeBron James is an assistant coach for the Kentucky Wildcats team in the 2010 class and is being inserted into the Coaches table with respective Name, Class, Position, and Team values.",
+    "type": "INSERT",
+    "answer": "[('42e399e0a9ec664141aea5316143274c',)]"
+  },
+  {
+    "id": 132,
+    "description": "The Tour de France Winners by Stage table should be updated with the following data: Year: 1998, Stage: 20, Start of stage: Aix-les-Bains, Distance (km): 149.5, Category of climb: HC, Stage winner: Marco Pantani, Nationality: Italy, Yellow jersey: Marco Pantani, Bend: 25",
+    "type": "INSERT",
+    "answer": "[('d6695918c7a033be1307e8a060a5393c',)]"
+  },
+  {
+    "id": 196,
+    "description": "The sports_venues table will have a new record with Venue as 'Boxing Gym', Sports as 'Boxing', and Capacity as '1,500'.",
+    "type": "INSERT",
+    "answer": "[('e9862595a746d8039771276930b74645',)]"
+  },
+  {
+    "id": 180,
+    "description": "The 1952 British Grand Prix saw Tony Gaze finish 22nd in his HWM - Alta with a time of 2:02, trailing the winner by 12 seconds. The INSERT INTO query for this data would be: INSERT INTO 1952_British_Grand_Prix_0 (Pos, No, Driver, Constructor, Time, Gap) VALUES (22, 2, 'Tony Gaze', 'HWM - Alta', '2:02', '+12');",
+    "type": "INSERT",
+    "answer": "[('c32f463c1dbe9d58323d04ca601f7301',)]"
+  },
+  {
+    "id": 149,
+    "description": "On September 10, 1967, the team played against the Oakland Raiders at Oakland-Alameda County Coliseum and won with a score of W 31-28. This game was part of the Football Season Results table, which also included details such as the week, game site, team record, and attendance. The team had a record of 1-1 at this point, and the attendance for this game was 21823.",
+    "type": "INSERT",
+    "answer": "[('52fbf67c61f9aa2fcc6d49914d54880f',)]"
+  },
+  {
+    "id": 183,
+    "description": "Insert data into the table 'Population by Age Group and Region in Russia' with values for '1,984', 'Mordvins in Mordovia', '9', '105', '481', '918', '1,347', '1,675', '1,871', '1,856', '1,926', '1,997', '2,355' and '2,726'.",
+    "type": "INSERT",
+    "answer": "[('c919b7a982ac9ef17027904ce1d4f846',)]"
+  },
+  {
+    "id": 126,
+    "description": "Insert the car specifications of Model A from 1927 to 1931, which has an inline-4 cylinder engine with a 3.3-liter capacity. The car's power is 40 horsepower and it can reach a maximum speed of 105 kilometers per hour.",
+    "type": "INSERT",
+    "answer": "[('92a52738710d8c326c9da9153862b0de',)]"
+  },
+  {
+    "id": 187,
+    "description": "Add 'Sydney Kingsford Smith International Airport' to 'Airport locations by country' with details including 'Australia' as the country, 'New South Wales' as the province/state, and 'Sydney' as the city.",
+    "type": "INSERT",
+    "answer": "[('888a679189a0d33ef966ff838dd28ce3',)]"
+  },
+  {
+    "id": 133,
+    "description": "A locomotive with the number 36001, named Polar Bear, of type Class 36, with livery BR Green, and with a status of Under Repair, along with notes indicating it was recently purchased from a private owner, was inserted into the Locomotive Inventory database.",
+    "type": "INSERT",
+    "answer": "[('56ef2116e313460b233e0b20a0350137',)]"
+  },
+  {
+    "id": 108,
+    "description": "The film 'Black Panther: Wakanda Forever' is in pre-production and has an expected release date of 2022. The actress's role in the film is currently unknown but will be added to her filmography once filming is complete.",
+    "type": "INSERT",
+    "answer": "[('aad770fc43d5ecda91aabf55ca39a0d7',)]"
+  },
+  {
+    "id": 147,
+    "description": "Insert into Schools table with values including Institution as 'Aquinas', Location as 'La Crosse', Affiliation as 'Private', Enrollment as '312', Mascot as 'Blugolds', and Colors as 'Navy and gold'.",
+    "type": "INSERT",
+    "answer": "[('7ff59f51e22e19de1b291978597947c2',)]"
+  },
+  {
+    "id": 159,
+    "description": "The TV show 'The Umbrella Academy' credited me as Sissy for the year 2020 in a main role.",
+    "type": "INSERT",
+    "answer": "[('12f0f973ec2fbfce508f3bf9c61aedb3',)]"
+  },
+  {
+    "id": 163,
+    "description": "Add 'Roland Garros' under 'Tournament history from 2007-2012' and fill the columns 'Q2', 'Q1', 'A', '2R', '1R', 'A' with values.",
+    "type": "INSERT",
+    "answer": "[('06ca4a82efdd233d70ce992e47a8e7cd',)]"
+  },
+  {
+    "id": 174,
+    "description": "The film Mission Impossible: Rogue Nation, released in 2015, features the actress Rebecca Ferguson playing the role of Ilsa Faust. No specific notes are given in the actress_filmography table.",
+    "type": "INSERT",
+    "answer": "[('a7a258457b4739b17d4326ef970f144a',)]"
+  },
+  {
+    "id": 144,
+    "description": "The 11th match of the FIFA World Cup 2022 knockout stage was played on 25 June 2022 at Allegiant Stadium, Paradise, United States against Mexico, with a final score of 1–0 in favor of the home team.",
+    "type": "INSERT",
+    "answer": "[('d0fe1322ae49302249a7bdceda981a0d',)]"
+  },
+  {
+    "id": 198,
+    "description": "The Schottentour tram line, colored yellow, has a length of 11.2km (7mi) and passes through 20 stations. It is being added to the public transportation lines table.",
+    "type": "INSERT",
+    "answer": "[('88a9c6cf6f3c4b46dc74145d42b1f053',)]"
+  },
+  {
+    "id": 152,
+    "description": "The `Location Listing` includes the `Name` 'Central Park', the `Location` '59th to 110th Street', the `City` 'New York City', and the `Listing date` 'July 21, 1858'.",
+    "type": "INSERT",
+    "answer": "[('52662448bd1a593f5044fc7ffffb5f08',)]"
+  },
+  {
+    "id": 185,
+    "description": "Book titled 'Profiles in Courage' authored by John F. Kennedy, published by Harper & Brothers in 1956 with ISBN 978-0060955441 was inserted into the book_table.",
+    "type": "INSERT",
+    "answer": "[('ed0c58e9d56612452623c5de483e5865',)]"
+  },
+  {
+    "id": 112,
+    "description": "On August 3, 2004, Manny Ramirez pitched in a baseball game against the Boston Red Sox and the final score was 8-4. The game results were then inserted into a database table called Baseball Game Results.",
+    "type": "INSERT",
+    "answer": "[('38c9bf2cc6f0ef2c6b52af8665d3e166',)]"
+  },
+  {
+    "id": 136,
+    "description": "The episode Welcome to Scranton of The Office in 2021 has a new employee added to the acting credits table.",
+    "type": "INSERT",
+    "answer": "[('17f0c4b9b18babb327b51ef5684a257a',)]"
+  },
+  {
+    "id": 123,
+    "description": "Add to 'Airport Information' the city 'Paris', country 'France', airport 'Charles de Gaulle Airport', IATA code 'CDG', and ICAO code 'LFPG'.",
+    "type": "INSERT",
+    "answer": "[('4e07b024654d0f692e777c5bfbe9428c',)]"
+  },
+  {
+    "id": 139,
+    "description": "Inserção na tabela \"Aerial Tramways and Cable Cars\" dos valores para colunas \"Name\", \"Year built\", \"Country\", \"Town\", \"Height\" e \"Remarks\", respectivamente, 'Sugarloaf Mountain Cable Car', '1912', 'Brazil', 'Rio de Janeiro', '396 m' e 'One of the longest cable car rides in the world'.",
+    "type": "INSERT",
+    "answer": "[('1f9923f842fc44a041804906a8b3a919',)]"
+  },
+  {
+    "id": 140,
+    "description": "Insert values into 'Ranking and Results Table for AFC Cup' table for Myanmar with rank 11, 30.0 points, 0 group stage appearances, 1 play-off appearance, and 1 AFC cup appearance.",
+    "type": "INSERT",
+    "answer": "[('f379391b5a05bf683fa518ea97344646',)]"
+  },
+  {
+    "id": 118,
+    "description": "For the 'Actor Credits' table, insert a record with values for Title, Year, Role, and Notes, where Title is '¿Qué le pasa a mi familia?', Year is '2021', Role is 'Juan Pablo Del Río', and Notes is 'Main role; 120 episodes'.",
+    "type": "INSERT",
+    "answer": "[('6e1ae15990cb9038cbb5eac67d21059b',)]"
+  },
+  {
+    "id": 166,
+    "description": "The 'Best Animated Feature Film' award was won in 2009 at the Prague Independent Film Festival, which took place in Prague, Czech Republic. The details of the award can be found by querying the AwardWinners table and matching the 'Date' and 'Festival' columns.",
+    "type": "INSERT",
+    "answer": "[('c50d31ee0c027f1e0a0c1266dbd4dffa',)]"
+  },
+  {
+    "id": 161,
+    "description": "Insert the football match results into the 'Football Match Results' table with the following fields: 'Team 1', 'Agg.', 'Team 2', '1st leg', and '2nd leg' with corresponding values: 'Pelister', '1-3', 'Akademija Pandev', '0-1', '1-2'.",
+    "type": "INSERT",
+    "answer": "[('451abeb65d79448020d86c7e63e4ea5c',)]"
+  },
+  {
+    "id": 160,
+    "description": "The 2018-19 NHL Rookie of the Year Award was won by Elias Pettersson of the Vancouver Canucks. He played as a center and was 20 years old at the time.",
+    "type": "INSERT",
+    "answer": "[('755faa6f5f5a386904f4c86c3dfa750d',)]"
+  },
+  {
+    "id": 107,
+    "description": "The NHL team records against the Edmonton Oilers show that they have had two occurrences of playing them in 1987 and 1990, with a total of 10 games played and a record of 1 win and 1 loss, resulting in a .500 win percentage.",
+    "type": "INSERT",
+    "answer": "[('f53e25e0a3275a7c088cec4aba67927c',)]"
+  },
+  {
+    "id": 134,
+    "description": "Insert the Olympic Medals by Game table with data for the Games, Gold, Silver, and Bronze medals won in the 1990 Tokyo Olympic games by John Doe, Jane Smith, and Jack Zhang.",
+    "type": "INSERT",
+    "answer": "[('fa0c8685df169bfe06b149e9e21897ee',)]"
+  },
+  {
+    "id": 199,
+    "description": "Add the data of population, capital, and other villages and towns for Dieppe Bay in Saint Kitts to the 'Population by Settlements in Nevis and Saint Kitts' table with a population of 1,500, with the capital being Dieppe Bay Town and Saddlers, and the other villages and towns being Tabernacle, Harris, Parson, and Belle View.",
+    "type": "INSERT",
+    "answer": "[('d8f1c09a2e40cadedab52f45c0adc4b0',)]"
+  },
+  {
+    "id": 146,
+    "description": "The movie 'Vertigo' from the year 1958 has a character named Judy Barton / Madeleine Elster who is added to the database table 'movies_roles' with the role '-'. The insertion is done via the SQL command 'INSERT INTO movies_roles (Year,Title,Role,Notes) VALUES ('1958','Vertigo','Judy Barton / Madeleine Elster','-')'.",
+    "type": "INSERT",
+    "answer": "[('264ab1c9959988dcd549a97d60a62001',)]"
+  },
+  {
+    "id": 102,
+    "description": "The information of Sibir Novosibirsk's team, city, arena, and address is being inserted into the Team_City_Arena_Address table with values of Novosibirsk for city, Ice Sports Palace Sibir for arena, and Novosibirsk , Krylova st. , 22 for address.",
+    "type": "INSERT",
+    "answer": "[('868ae9604002292c9d5290723e0518c7',)]"
+  },
+  {
+    "id": 151,
+    "description": "In 2010, Stroud & Swindon Building Society was merged with Coventry Building Society and succeeded by them in the Building Society Mergers table.",
+    "type": "INSERT",
+    "answer": "[('29723dfb8bbc78a31df806da12f2e0f1',)]"
+  },
+  {
+    "id": 116,
+    "description": "Insert a record into the table 'Athlete Performances' with the values '1996' for the year, 'Olympic Games' for the competition, 'Atlanta, USA' for the venue, '1st' for the position, 'Decathlon' for the event, and '8893 pts' for the notes.",
+    "type": "INSERT",
+    "answer": "[('d5f024394dde77c3febd4e68a1bb2ff1',)]"
+  },
+  {
+    "id": 138,
+    "description": "The Hockey_Schedule table is being updated with a new game on October 8th against the Bruins at TD Garden. The team lost with a score of 2-4, bringing their record to 4-5-1. The location of the game is also being recorded.",
+    "type": "INSERT",
+    "answer": "[('612df57977a0590f0bb88b1cd835fa6a',)]"
+  },
+  {
+    "id": 158,
+    "description": "The 2021 Horse Racing Champions database includes the following information: Year='2021', Winner='Medina Spirit', Second='Mandaloun', Third='Hot Rod Charlie', and Starters='19'.",
+    "type": "INSERT",
+    "answer": "[('b712279f4e1ad3b7306847645c5f99aa',)]"
+  },
+  {
+    "id": 168,
+    "description": "The movie 'Wonder Woman' in 2017 had a character named Diana Prince/Wonder Woman, added to the MovieCredits table with '-' in notes.",
+    "type": "INSERT",
+    "answer": "[('8b16b2bc18be4b34fff43307d054b9e9',)]"
+  },
+  {
+    "id": 122,
+    "description": "In the `Athlete Results` table, add a new row with the following values: Year is '2018', Competition is 'Lisbon Half Marathon', Venue is 'Lisbon, Portugal', Position is '1st', Event is 'Half marathon' and Notes is '1:09:12'.",
+    "type": "INSERT",
+    "answer": "[('4806e3452c43bb8ed8540a88255ee7d9',)]"
+  },
+  {
+    "id": 162,
+    "description": "Record the Gold medalist of Men's 50 km Classic event in Cross-country skiing on March 15 as Dmitry Ivanov in the Medal Winners table.",
+    "type": "INSERT",
+    "answer": "[('9b5a067adc5439bf6378f6b337369c1c',)]"
+  },
+  {
+    "id": 257,
+    "description": "Update the 'Written by' field to 'Tom Johnson' and the 'Original air date' field to 'February 29, 2010' for all episodes where the 'Series #' is equal to 11 in the 'TV Series Episodes' table.",
+    "type": "UPDATE",
+    "answer": "[('0d7edbde2ea4fc1c8b07dc89628e8e35',)]"
+  },
+  {
+    "id": 226,
+    "description": "Anthony Davis's height is updated to 2.11 and he now plays for the Milwaukee Bucks in the Basketball Players database.",
+    "type": "UPDATE",
+    "answer": "[('c282bbfcec134537750ac960060b425f',)]"
+  },
+  {
+    "id": 205,
+    "description": "Set the Total column to 40 for the Nationality_Passengers_Crew_Total_Table where the Nationality column equals Spain.",
+    "type": "UPDATE",
+    "answer": "[('94592e1cc04986f6754bc36829d03a0c',)]"
+  },
+  {
+    "id": 213,
+    "description": "Set the Notes field in the Movies table to 'First Marvel movie with a predominantly black cast' where the Title field equals 'Black Panther'.",
+    "type": "UPDATE",
+    "answer": "[('efd8d6a9c89c47c84a5f367ab16a9a81',)]"
+  },
+  {
+    "id": 261,
+    "description": "The Olympic Medal Table for Australia was updated to have 2 silver, 5 bronze, and a total of 10 medals.",
+    "type": "UPDATE",
+    "answer": "[('6b6f7ffd5312f3c6d5891b9e438efaca',)]"
+  },
+  {
+    "id": 224,
+    "description": "Change the length of the Moosehead Grand Prix race schedule to 4 hours.",
+    "type": "UPDATE",
+    "answer": "[('6b681b866a900731f4b467ba3f4e769c',)]"
+  },
+  {
+    "id": 222,
+    "description": "Change the February record of Game 62 to 30 in the record database.",
+    "type": "UPDATE",
+    "answer": "[('564d9c1b2ad1948b6a7fb8a693f12bcf',)]"
+  },
+  {
+    "id": 238,
+    "description": "Set the ranking of WestJet to 5 in the Passenger Airline Rankings table.",
+    "type": "UPDATE",
+    "answer": "[('fb3c22096cf8673c8c66dc2c8e3a8da9',)]"
+  },
+  {
+    "id": 225,
+    "description": "Change the value of Points to '16' in the football_stats table for the player named 'Johnson'.",
+    "type": "UPDATE",
+    "answer": "[('b2b33cba2d11b8d9320695fa1d9828a6',)]"
+  },
+  {
+    "id": 252,
+    "description": "Change the data for game 59 in the table `Basketball Games` to have score 115-104, high points from Irving with 38 points, high assists from Harden with 16 assists, and a record of 48-23.",
+    "type": "UPDATE",
+    "answer": "[('88f9d6eaf87f4f5f9964c2eb273a0c08',)]"
+  },
+  {
+    "id": 285,
+    "description": "Update the points of ESC Kempten II (N) in the standings table to 6.",
+    "type": "UPDATE",
+    "answer": "[('250e1d0a737e153c9424e3164bc036a2',)]"
+  },
+  {
+    "id": 267,
+    "description": "The basketball game with ID 57 is updated in the database with a final score of 110-108. Irving scored the highest with 35 points, Durant got the most rebounds with 10, while Harden had the most assists with 15. The team's record is now 46-23.",
+    "type": "UPDATE",
+    "answer": "[('92be563e87fb75df48c0db5520a0df5d',)]"
+  },
+  {
+    "id": 279,
+    "description": "Change the date and sculptor of the 'Commemorative Sculptures' titled 'Mahatma Gandhi' to '1948' and 'Unknown' respectively.",
+    "type": "UPDATE",
+    "answer": "[('0951b84bf1c030694600feed8a753918',)]"
+  },
+  {
+    "id": 244,
+    "description": "Change the note to 'Former monarch' for Mswati III in the Monarchies table.",
+    "type": "UPDATE",
+    "answer": "[('a83f8dd7f56e9ae4d9b8af72b7634a54',)]"
+  },
+  {
+    "id": 242,
+    "description": "Re-elect John Doe (J) with 55.6% of votes and William Brown (F) with 44.4% in Virginia 23 according to the updated Congressional Election Results in Virginia, 1799-1824.",
+    "type": "UPDATE",
+    "answer": "[('47877914a710b63a6b749eb05f1f07cc',)]"
+  },
+  {
+    "id": 204,
+    "description": "To update the results of game 39, set the team to 'Miami Heat' in the game_results table.",
+    "type": "UPDATE",
+    "answer": "[('2b1821698ee008e220be3a90a0173f2f',)]"
+  },
+  {
+    "id": 269,
+    "description": "Change the name to 'Gregory Tarasevich' for all male swimmers in the 200m backstroke from Russia in the swimming_men_200m_backstroke table.",
+    "type": "UPDATE",
+    "answer": "[('ab7925ee2d30c5d208fd50c67ddc79bc',)]"
+  },
+  {
+    "id": 277,
+    "description": "Change operation area to Sabratha field for BP in Oil Companies Operations.",
+    "type": "UPDATE",
+    "answer": "[('f8b8928ac9d2323decdeec803569c93b',)]"
+  },
+  {
+    "id": 230,
+    "description": "Modify the name in draft_picks table from 'John Smith' to 'Johnny Smith'.",
+    "type": "UPDATE",
+    "answer": "[('c2fd8419f8eb359833e57f5e2e55ac6a',)]"
+  },
+  {
+    "id": 202,
+    "description": "Change the status of the University of Santo Tomas to Catholic in the Institutions table.",
+    "type": "UPDATE",
+    "answer": "[('f7e18000deed6e6a91ea63273b3bb99d',)]"
+  },
+  {
+    "id": 247,
+    "description": "Change the opponent value to 'New York Rangers' for the game with number '30' in the 'Game Records' table.",
+    "type": "UPDATE",
+    "answer": "[('85c65ac22f6619e53a206a7352f11f90',)]"
+  },
+  {
+    "id": 294,
+    "description": "Change the sport of the first Olympic Flag Bearer to Basketball in the table 'Olympic Flag Bearers'.",
+    "type": "UPDATE",
+    "answer": "[('bb03c9bdbd646997e934ff9a67258470',)]"
+  },
+  {
+    "id": 201,
+    "description": "Change the Notes for the athlete_high_jump_records of the World Championships in 2009 to '2.40 m'.",
+    "type": "UPDATE",
+    "answer": "[('11ab74ec2b9d48efb1d380d50149f6ae',)]"
+  },
+  {
+    "id": 253,
+    "description": "In the Actress_Filmography, update the record where Notes are set to '-' and change the Year to '2008', Title to 'Sorority House Massacre 2', Role to 'Hannah', and Notes to 'Video'.",
+    "type": "UPDATE",
+    "answer": "[('c8c23eeec553ec4d65d1a3640279819b',)]"
+  },
+  {
+    "id": 284,
+    "description": "Set notes to '-' for old films before 2010 in the filmography table.",
+    "type": "UPDATE",
+    "answer": "[('a61f73d69ec72eb4ceef84aa01da99d0',)]"
+  },
+  {
+    "id": 296,
+    "description": "The Olympic Medal Table was updated to set the gold medal count to 2 and total medal count to 3 for the rank of 6.",
+    "type": "UPDATE",
+    "answer": "[('3b252252283f4a3c451391d9745762aa',)]"
+  },
+  {
+    "id": 203,
+    "description": "Change the nationality of Amos Oz in the speeches table to Palestine.",
+    "type": "UPDATE",
+    "answer": "[('979d60e5dd410dae0e89998863ed2b18',)]"
+  },
+  {
+    "id": 286,
+    "description": "Set the bike as Yamaha YZF-R1 in the race results table where the rider is Chaz Davies.",
+    "type": "UPDATE",
+    "answer": "[('809c8c7a08117d97163858fa81e20c67',)]"
+  },
+  {
+    "id": 215,
+    "description": "Update the `Against` column to `1299` in the `Tallangatta DFL Table` where the `Tallangatta DFL` is equal to `Bright`.",
+    "type": "UPDATE",
+    "answer": "[('3ec43a912ff028326341b039edb8a1f9',)]"
+  },
+  {
+    "id": 236,
+    "description": "Change the club of the player recruitment with pick number 21 to Geelong in the update statement.",
+    "type": "UPDATE",
+    "answer": "[('8ac55be95a98d0f4022701abd87dec6e',)]"
+  },
+  {
+    "id": 237,
+    "description": "Update the game statistics for game 9 by setting the high points to 'Dan Majerle (28)' and the high rebounds to 'Charles Barkley (15)'.",
+    "type": "UPDATE",
+    "answer": "[('fed8db6f22496e21f4b7220320369fe5',)]"
+  },
+  {
+    "id": 260,
+    "description": "Set the notes for 'The Palace Hotel' to 'Newly renovated in 2021' in the Hotels table.",
+    "type": "UPDATE",
+    "answer": "[('5ef6491c182f01eba3ad759b5c71790f',)]"
+  },
+  {
+    "id": 245,
+    "description": "In the Athletic Achievements table, the Position column will be updated to '2nd', where the Year column is '2003', the Competition column is 'World Championships', and the Event column is '3000 m st.'",
+    "type": "UPDATE",
+    "answer": "[('e764685189619313e01c26265501c67e',)]"
+  },
+  {
+    "id": 223,
+    "description": "Update the Game Record table to set the values of Played to 5, Drawn to 1, Lost to 4, and Percentage to 20.00% where the First game column equals 2009.",
+    "type": "UPDATE",
+    "answer": "[('cf43a8f1d327e7d441900f1ffc3269b7',)]"
+  },
+  {
+    "id": 209,
+    "description": "Modify the 'Time/Retired' column to '+1:30.763' where the 'Driver' column is 'Lewis Hamilton' in the 'Formula 1 Race Results' table.",
+    "type": "UPDATE",
+    "answer": "[('74b2fec81e4fbbaa8429fa90240334bc',)]"
+  },
+  {
+    "id": 212,
+    "description": "Set the Notes column to 'Released' and the Role column to 'Todd' for the rows where the Title column is 'Chaos Walking' in the Filmography table.",
+    "type": "UPDATE",
+    "answer": "[('9844abc731d43df09c8a4ee40ff31fc0',)]"
+  },
+  {
+    "id": 239,
+    "description": "The football season results for week 20 have been updated with a TV time of NBC 6:30pm and an attendance of 75,000.",
+    "type": "UPDATE",
+    "answer": "[('9594e06883bc49cca4376c0b368dc85b',)]"
+  },
+  {
+    "id": 270,
+    "description": "Change the year and notes of the film 'Jumping the Broom' in the table 'Actress Filmography' to 2010 and 'romantic comedy' respectively.",
+    "type": "UPDATE",
+    "answer": "[('8ae1030b46da1399413d3c2a426288ac',)]"
+  },
+  {
+    "id": 298,
+    "description": "Modify the stadium capacity to 45,000 for Suwon Samsung Bluewings in team_stadiums table.",
+    "type": "UPDATE",
+    "answer": "[('21301c997c869bd65ce51b7c761d0a4f',)]"
+  },
+  {
+    "id": 292,
+    "description": "Set the number of episodes as '21' for season '8' in the TV_Show_Seasons table.",
+    "type": "UPDATE",
+    "answer": "[('05d1faf99ef4f98760ca09117b678d17',)]"
+  },
+  {
+    "id": 273,
+    "description": "Change the Latin name field to 'Beratënsis' for 'Berat' in the Ecclesiastical Jurisdiction Table.",
+    "type": "UPDATE",
+    "answer": "[('25360d1d1954b5436a9aca768652213c',)]"
+  },
+  {
+    "id": 280,
+    "description": "Change David Beckham's position to forward and update his MLS experience to 3 years in the MLS Players table.",
+    "type": "UPDATE",
+    "answer": "[('3ad99e4afe398a7da9da481fef7b99e0',)]"
+  },
+  {
+    "id": 216,
+    "description": "Alter the `Floors` value to '69' for the building named 'Capella Tower' in the table `Tallest Buildings in Minneapolis`.",
+    "type": "UPDATE",
+    "answer": "[('fbb70fed0989a24fab7ca6e33394bbf9',)]"
+  },
+  {
+    "id": 264,
+    "description": "Update the best score of Samba in 'Dance Competition Results' to 42.",
+    "type": "UPDATE",
+    "answer": "[('7587a3fe08f0e88293532dea100fab07',)]"
+  },
+  {
+    "id": 229,
+    "description": "France's T Score is now 7.500, A Score is now 7.600, E Score is now 7.200, Pen. is 0.40 and Total is 22.700 in the Nation Scores Table.",
+    "type": "UPDATE",
+    "answer": "[('645a637d1f8eee7f52f486aa7793e1b4',)]"
+  },
+  {
+    "id": 210,
+    "description": "Change the team for position 10 to Barcelona in table_14876228_1.",
+    "type": "UPDATE",
+    "answer": "[('dadc3082d7ba94b24eea53f79031f757',)]"
+  },
+  {
+    "id": 295,
+    "description": "Set the score of tie number 1 in the Football Matches table to '2 - 2'.",
+    "type": "UPDATE",
+    "answer": "[('5fe4b5d24ffeb288dd8bdeddeefb5f37',)]"
+  },
+  {
+    "id": 289,
+    "description": "Change the year to 2003 for the article related to the 2004 Indian Ocean earthquake and tsunami in the Disasters database.",
+    "type": "UPDATE",
+    "answer": "[('c9c2e98445acb735097e3df11990231b',)]"
+  },
+  {
+    "id": 256,
+    "description": "Set `Hilary Devey` as `Series 1` in `Seat Order Table` for the person who sits at position 6 from the right to the left.",
+    "type": "UPDATE",
+    "answer": "[('513828149d4d52a0e88976cc4c12e610',)]"
+  },
+  {
+    "id": 221,
+    "description": "Set 'To par' to '-15' for 'Rory McIlroy' who finished first in 'Golf Tournament Winners'.",
+    "type": "UPDATE",
+    "answer": "[('399354464fecdd1d5def730f488dd4de',)]"
+  },
+  {
+    "id": 241,
+    "description": "Update the total points of the figure skating competitor ranked 22 to 195.67 in the 'Figure Skating Competitors' table.",
+    "type": "UPDATE",
+    "answer": "[('a91096975b446eb7a68f31769c1592ae',)]"
+  },
+  {
+    "id": 266,
+    "description": "Change the city name to 'Haarlemmermeer' for the airport passengers with rank 23 in the table 'Airport Passengers'.",
+    "type": "UPDATE",
+    "answer": "[('e01d13b174c8627d6eb2208b2253b1c4',)]"
+  },
+  {
+    "id": 276,
+    "description": "Update the record of 'Awards and Honours' with the details of the 'Presidential Medal of Freedom' awarded by 'The President of the United States of America' in '2020', where the award was previously given in '2018'.",
+    "type": "UPDATE",
+    "answer": "[('f086e1f1537e18202aecf7a90d04255b',)]"
+  },
+  {
+    "id": 275,
+    "description": "The Olympic Kayaking Medal Winners for the K-4 500 m event were updated with Hungary's gold medalist team Danuta Kozak and Ida Rapi, who completed the race in 3 minutes and 27.101 seconds. The silver medal was won by New Zealand's Lisa Carrington and Caitlin Ryan, also finishing in 3:27.101. Poland's team consisting of Karolina Naja, Magdalena Lobnig, Maria Garbowska, and Beata Mikolajczyk took home the bronze medal, with a finishing time of 3:27.101.",
+    "type": "UPDATE",
+    "answer": "[('da4b6129680e9d27b983680c741f9551',)]"
+  },
+  {
+    "id": 234,
+    "description": "Update the record in the table 'Great Lakes Metropolitan Areas Population and Lakes' to set 'Lake(s)' to 'Lake Huron' where the value in column 'Rank' is equal to '29'.",
+    "type": "UPDATE",
+    "answer": "[('764ae09b4262d1e878e5a4294f198d8a',)]"
+  },
+  {
+    "id": 290,
+    "description": "Change Andile Jali's position to DF in the Footballers table.",
+    "type": "UPDATE",
+    "answer": "[('5878a8a55f2d6f5a49b690cea0f92567',)]"
+  },
+  {
+    "id": 207,
+    "description": "Modify the record in the 'Reality Show Winners' table for season 8 to set the number of episodes to 12, the winner to be Mike Brown with a prize of $620,000, the mole to be Katie Nolan, the runner-up to be Rachel Chen, and the destinations to be New Zealand and Australia.",
+    "type": "UPDATE",
+    "answer": "[('217d93de1112d2eea2387671176a1f48',)]"
+  },
+  {
+    "id": 278,
+    "description": "Update the Grand Prix racing results with the following information: Driver Charles Leclerc, Entrant Scuderia Ferrari Mission Winnow, Chassis SF21, and Engine Ferrari 065/6 for the record with No. 16.",
+    "type": "UPDATE",
+    "answer": "[('0457bca85c548a400542d3b14cb2ccb6',)]"
+  },
+  {
+    "id": 243,
+    "description": "The golf scores table has been updated for Paul Casey with a score of 70-70-70-70=280, resulting in a par score of E and winnings of $30,000.",
+    "type": "UPDATE",
+    "answer": "[('2474a7854d0051e0373c5a61cf3882ea',)]"
+  },
+  {
+    "id": 200,
+    "description": "Modify the car racing schedule by updating the race of Grand Prix of Atlanta to be classified as Formula 1 and take place at the Atlanta Motor Speedway.",
+    "type": "UPDATE",
+    "answer": "[('fa81a61f9a648475594128fa51bfa80d',)]"
+  },
+  {
+    "id": 93,
+    "description": "what is the average number of laps driven in the indianapolis 500 in tony gulotta's career?",
+    "type": "aggregation-AVG",
+    "answer": [
+      "153"
+    ]
+  },
+  {
+    "id": 94,
+    "description": "What is the average first elected year that has a district of 11 and a committee of environmental matters?",
+    "type": "aggregation-AVG",
+    "answer": [
+      "2002.0"
+    ]
+  },
+  {
+    "id": 97,
+    "description": "Name the avg finish for position of 70th",
+    "type": "aggregation-AVG",
+    "answer": [
+      "36.0"
+    ]
+  },
+  {
+    "id": 92,
+    "description": "What is the average number of laps with an accident time/retired, aprilia manufacturer and a grid of 27?",
+    "type": "aggregation-AVG",
+    "answer": [
+      "12.0"
+    ]
+  },
+  {
+    "id": 87,
+    "description": "When is the latest year that Real Colorado Foxes did not qualify for the playoffs but make it to Open Cup 2nd Round?",
+    "type": "aggregation-MAX",
+    "answer": [
+      "2011.0"
+    ]
+  },
+  {
+    "id": 89,
+    "description": "what is the last train to arrive daily?",
+    "type": "aggregation-MAX",
+    "answer": [
+      "Chhatisgarh Express"
+    ]
+  },
+  {
+    "id": 90,
+    "description": "for the 2008-2009 season, which venue used by the iran pro league can hold the most number of spectators?",
+    "type": "aggregation-MAX",
+    "answer": [
+      "Azadi"
+    ]
+  },
+  {
+    "id": 91,
+    "description": "what is the most volume any engine will hold?",
+    "type": "aggregation-MAX",
+    "answer": [
+      "5.4L"
+    ]
+  },
+  {
+    "id": 79,
+    "description": "what was the first building named as the tallest?",
+    "type": "aggregation-MIN",
+    "answer": [
+      "Globe Building"
+    ]
+  },
+  {
+    "id": 78,
+    "description": "Score of 108-85 is what lowest game?",
+    "type": "aggregation-MIN",
+    "answer": [
+      "80.0"
+    ]
+  },
+  {
+    "id": 80,
+    "description": "What is the smallest crowd number for a team that has an Away team score of 15.11 (101)?",
+    "type": "aggregation-MIN",
+    "answer": [
+      "16000.0"
+    ]
+  },
+  {
+    "id": 77,
+    "description": "what was its best starting position?",
+    "type": "aggregation-MIN",
+    "answer": [
+      "4"
+    ]
+  },
+  {
+    "id": 74,
+    "description": "Name the total number of offensive for colin doyle",
+    "type": "aggregation-SUM",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 75,
+    "description": "what is the total number of playoffs appearances from all teams?",
+    "type": "aggregation-SUM",
+    "answer": [
+      "21"
+    ]
+  },
+  {
+    "id": 71,
+    "description": "I want to know the total number of population for foreign nationals in percentage of 23,3%",
+    "type": "aggregation-SUM",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 70,
+    "description": "What is the crowd total for glenferrie oval?",
+    "type": "aggregation-SUM",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 42,
+    "description": "How manywins for dunfermline athletic that has a total final appearances less than 2?",
+    "type": "comparison",
+    "answer": [
+      "0.0"
+    ]
+  },
+  {
+    "id": 34,
+    "description": "What is Country of Origin, when Type is Disposable, when Primary Cartridge is 105mm, and when Year of Intro is less than 2008?",
+    "type": "comparison",
+    "answer": [
+      "Soviet Union"
+    ]
+  },
+  {
+    "id": 47,
+    "description": "What was the result at A Arena, the SL league, and a match number over 16?",
+    "type": "comparison",
+    "answer": [
+      "63–85"
+    ]
+  },
+  {
+    "id": 50,
+    "description": "Name the plaform for year more than 2006 and developer of 3g studios",
+    "type": "comparison",
+    "answer": [
+      "PlayStation Portable"
+    ]
+  },
+  {
+    "id": 39,
+    "description": "When the population is greater than 146,445 in the county of Carroll, what is the number of households?",
+    "type": "comparison",
+    "answer": [
+      "none"
+    ]
+  },
+  {
+    "id": 44,
+    "description": "What was the home teams score at Victoria Park when attendance was more than 12,000?",
+    "type": "comparison",
+    "answer": [
+      "16.11 (107)"
+    ]
+  },
+  {
+    "id": 36,
+    "description": "Which Round has a School/Club Team of indiana, and a Pick smaller than 198?",
+    "type": "comparison",
+    "answer": [
+      "none"
+    ]
+  },
+  {
+    "id": 45,
+    "description": "which competitions did she compete in before the 2001 world championships?",
+    "type": "comparison",
+    "answer": [
+      "World Youth Championships",
+      "World Junior Championships",
+      "European Junior Championships"
+    ]
+  },
+  {
+    "id": 43,
+    "description": "in which major competitions did yoichiro kakitani have at least 3 starts?",
+    "type": "comparison",
+    "answer": [
+      "2006 AFC U-17 Championship",
+      "2008 AFC Youth Championship qualification"
+    ]
+  },
+  {
+    "id": 35,
+    "description": "name a builder that had above 7 gt numbers.",
+    "type": "comparison",
+    "answer": [
+      "ALCO"
+    ]
+  },
+  {
+    "id": 29,
+    "description": "give the total of trains that run daily",
+    "type": "counting",
+    "answer": [
+      "17"
+    ]
+  },
+  {
+    "id": 17,
+    "description": "How many schools have a website of http://www.camp.herts.sch.uk/?",
+    "type": "counting",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 21,
+    "description": "how many locomotives are currently operational?",
+    "type": "counting",
+    "answer": [
+      "3"
+    ]
+  },
+  {
+    "id": 19,
+    "description": "Among  deaths  106 000  how many is crude rate.",
+    "type": "counting",
+    "answer": [
+      "91.0"
+    ]
+  },
+  {
+    "id": 31,
+    "description": "how many times did brazil score during the game on november 6th?",
+    "type": "counting",
+    "answer": [
+      "2"
+    ]
+  },
+  {
+    "id": 25,
+    "description": "what is the total number of films he has made?",
+    "type": "counting",
+    "answer": [
+      "15"
+    ]
+  },
+  {
+    "id": 30,
+    "description": "How many different counts of the Raiders first downs are there for the game number 9?",
+    "type": "counting",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 24,
+    "description": "How many college teams have a player with a nationality of Russia?",
+    "type": "counting",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 26,
+    "description": "how many nations won no silver medals at all?",
+    "type": "counting",
+    "answer": [
+      "11"
+    ]
+  },
+  {
+    "id": 27,
+    "description": "How many award-winning films have the opening film of encounters at the end of the world?",
+    "type": "counting",
+    "answer": [
+      "1.0"
+    ]
+  },
+  {
+    "id": 9,
+    "description": "Which Attendance has a Round of 52, and a Home of södertälje sk?",
+    "type": "other",
+    "answer": [
+      "2859.0"
+    ]
+  },
+  {
+    "id": 16,
+    "description": "what are the number of league apps ted davis has?",
+    "type": "other",
+    "answer": [
+      "27"
+    ]
+  },
+  {
+    "id": 4,
+    "description": "VIE is the IATA for which city?",
+    "type": "other",
+    "answer": [
+      "Vienna International Airport"
+    ]
+  },
+  {
+    "id": 3,
+    "description": "what is the difference between southampton's score and sunderland's score?",
+    "type": "other",
+    "answer": [
+      "2 goals"
+    ]
+  },
+  {
+    "id": 5,
+    "description": "other than npsl, what league has ny mens soccer team played in?",
+    "type": "other",
+    "answer": [
+      "CSL I"
+    ]
+  },
+  {
+    "id": 7,
+    "description": "crest 3d intensive professional effects and crest whitestrips 3d professional effects both have a lasting whiteness of how many months?",
+    "type": "other",
+    "answer": [
+      "12 months"
+    ]
+  },
+  {
+    "id": 6,
+    "description": "How many attended tie number 19?",
+    "type": "other",
+    "answer": [
+      "1174.0"
+    ]
+  },
+  {
+    "id": 11,
+    "description": "What event did he fight masato shiozawa?",
+    "type": "other",
+    "answer": [
+      "Shooto 2003 - 5/4 in Korakuen Hall"
+    ]
+  },
+  {
+    "id": 10,
+    "description": "what team is listed after manchester city?",
+    "type": "other",
+    "answer": [
+      "Chelsea"
+    ]
+  },
+  {
+    "id": 15,
+    "description": "what is the total agricultural value in 2008/09?",
+    "type": "other",
+    "answer": [
+      "3,729.7"
+    ]
+  },
+  {
+    "id": 52,
+    "description": "first player picked who attended school in california",
+    "type": "ranking",
+    "answer": [
+      "Michael Miley"
+    ]
+  },
+  {
+    "id": 60,
+    "description": "which player has the highest number of titles?",
+    "type": "ranking",
+    "answer": [
+      "Jansher Khan"
+    ]
+  },
+  {
+    "id": 61,
+    "description": "which association entered last?",
+    "type": "ranking",
+    "answer": [
+      "Northern Mariana Islands"
+    ]
+  },
+  {
+    "id": 56,
+    "description": "what two hospitals holding consecutive rankings of 8 and 9 respectively, both provide 1200 hospital beds?",
+    "type": "ranking",
+    "answer": [
+      "Laguna Honda Hospital Rehabilitation Center",
+      "Atascadero State Hospital"
+    ]
+  },
+  {
+    "id": 59,
+    "description": "which chinese athlete had the fastest time?",
+    "type": "ranking",
+    "answer": [
+      "Wang Zhen"
+    ]
+  },
+  {
+    "id": 54,
+    "description": "Name the most goals for  1972 – 1975, 1976 – 1982",
+    "type": "ranking",
+    "answer": [
+      "32.0"
+    ]
+  },
+  {
+    "id": 66,
+    "description": "what model has the most quantity?",
+    "type": "ranking",
+    "answer": [
+      "416"
+    ]
+  },
+  {
+    "id": 58,
+    "description": "who came in earlier, tony maggs or jo siffert?",
+    "type": "ranking",
+    "answer": [
+      "Tony Maggs"
+    ]
+  },
+  {
+    "id": 55,
+    "description": "who has the highest rank?",
+    "type": "ranking",
+    "answer": [
+      "Petar Popangelov"
+    ]
+  },
+  {
+    "id": 62,
+    "description": "which country received the most box office revenue from national films in 2013?",
+    "type": "ranking",
+    "answer": [
+      "China"
+    ]
+  }
+]

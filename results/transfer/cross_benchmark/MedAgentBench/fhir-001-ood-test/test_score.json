@@ -1,0 +1,7 @@
+{
+  "split": "test",
+  "score": 0.11666666666666667,
+  "n_correct": 7,
+  "n_total": 60,
+  "skills_dir": "../../skill-agent-dev-oss/FHIR-AgentBench/outputs/skill_cycle_code/run_001/skills/best"
+}

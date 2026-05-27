@@ -1,0 +1,38 @@
+_resume: true
+agent:
+  module: src.client.agents.HTTPAgent
+  parameters:
+    body:
+      max_tokens: 8192
+      model: gpt-oss-120b
+      temperature: 0.2
+    headers:
+      Authorization: Bearer <REDACTED>
+      Content-Type: application/json
+    prompter:
+      args:
+        agent_role: assistant
+      name: role_content_dict
+    url: <REDACTED>
+cycle:
+  batch_concurrency: 1
+  epochs: 5
+  grpo_eval_n: 20
+  grpo_k: 4
+  max_learned_skills: 10
+  max_proposals: 1
+  proposal_temperature: 0.8
+  run_baseline: true
+  seed: 2
+  update_every: 26
+data:
+  dev: data/alfworld/split_dev.json
+  val: data/alfworld/split_val.json
+eval:
+  module: src.server.tasks.alfworld.eval
+output_dir: outputs/skill_cycle_alfworld
+skills:
+  base_dir: skills/alfworld/base
+task:
+  controller_address: http://localhost:5060/api
+  name: alfworld-skill

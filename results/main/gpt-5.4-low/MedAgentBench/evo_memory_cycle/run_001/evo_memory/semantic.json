@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-12T22:14:30.830716",
+  "rules": [
+    "[P1] Apply the task’s protocol exactly, including task- or system-defined abnormal thresholds, boundary values, dosing, and scheduled follow-up timing; compute all relative times from the specified source timestamp and verify the exact required date and clock time before finishing.",
+    "[P1] Distinguish lookup-only tasks from lookup-plus-action tasks; for pure lookup tasks, return only the requested actual value or identifier in the exact format requested and never substitute placeholder codes.",
+    "[P1] For result-based workflows, use the exact most recent qualifying result by timestamp from the task-specified test/source and date field; apply the stated lookback/age thresholds, take no action if no qualifying result exists, and when action is triggered complete all linked orders/follow-up steps before responding.",
+    "[P1] Match on all provided patient identifiers in the relevant chart/order system before returning a record field or taking action; only use the task-approved not-found response after confirming no exact or qualifying match exists.",
+    "[P1] Compute age from the charted DOB at query time; never estimate or guess demographic fields.",
+    "[P1] Treat explicit referral requests as order-entry tasks, not retrieval tasks, and copy required free-text instructions verbatim into the referral note.",
+    "[P1] For pure documentation tasks, use the provided patient identifier to attach the user-supplied measurement to the correct chart and record it as stated."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_7bdeddef6cc9",
+      "text": "[P1] Apply the task’s protocol exactly, including task- or system-defined abnormal thresholds, boundary values, dosing, and scheduled follow-up timing; compute all relative times from the specified source timestamp and verify the exact required date and clock time before finishing.",
+      "tags": [
+        "lab-result-workflow",
+        "abnormal-thresholds",
+        "order-entry",
+        "follow-up-scheduling",
+        "potassium",
+        "apply",
+        "task",
+        "protocol",
+        "exactly",
+        "including"
+      ],
+      "shown": 3,
+      "success": 1,
+      "failure": 2,
+      "created_at": "2026-05-12T22:13:41.214091",
+      "updated_at": "2026-05-12T22:14:30.823218"
+    },
+    {
+      "id": "rule_59781f2f3564",
+      "text": "[P1] Distinguish lookup-only tasks from lookup-plus-action tasks; for pure lookup tasks, return only the requested actual value or identifier in the exact format requested and never substitute placeholder codes.",
+      "tags": [
+        "lab-result-workflow",
+        "abnormal-thresholds",
+        "order-entry",
+        "follow-up-scheduling",
+        "potassium",
+        "distinguish",
+        "lookup",
+        "only",
+        "tasks",
+        "from"
+      ],
+      "shown": 3,
+      "success": 1,
+      "failure": 2,
+      "created_at": "2026-05-12T22:13:41.214454",
+      "updated_at": "2026-05-12T22:14:30.823299"
+    },
+    {
+      "id": "rule_c4b2c66e0792",
+      "text": "[P1] For result-based workflows, use the exact most recent qualifying result by timestamp from the task-specified test/source and date field; apply the stated lookback/age thresholds, take no action if no qualifying result exists, and when action is triggered complete all linked orders/follow-up steps before responding.",
+      "tags": [
+        "lab-result-workflow",
+        "abnormal-thresholds",
+        "order-entry",
+        "follow-up-scheduling",
+        "potassium",
+        "result",
+        "based",
+        "workflows",
+        "exact",
+        "most"
+      ],
+      "shown": 3,
+      "success": 1,
+      "failure": 2,
+      "created_at": "2026-05-12T22:13:41.214306",
+      "updated_at": "2026-05-12T22:14:30.823267"
+    },
+    {
+      "id": "rule_4806466b9936",
+      "text": "[P1] Match on all provided patient identifiers in the relevant chart/order system before returning a record field or taking action; only use the task-approved not-found response after confirming no exact or qualifying match exists.",
+      "tags": [
+        "lab-triggered-treatment",
+        "magnesium",
+        "recency-check",
+        "order-workflow",
+        "match",
+        "provided",
+        "patient",
+        "identifiers",
+        "relevant",
+        "chart"
+      ],
+      "shown": 208,
+      "success": 96,
+      "failure": 112,
+      "created_at": "2026-05-12T21:09:39.535460",
+      "updated_at": "2026-05-12T22:14:30.823384"
+    },
+    {
+      "id": "rule_81d09ff694e8",
+      "text": "[P1] Compute age from the charted DOB at query time; never estimate or guess demographic fields.",
+      "tags": [
+        "age-lookup",
+        "mrn-verification",
+        "demographics",
+        "compute",
+        "from",
+        "charted",
+        "query",
+        "time",
+        "never",
+        "estimate"
+      ],
+      "shown": 327,
+      "success": 145,
+      "failure": 182,
+      "created_at": "2026-05-12T19:59:11.857378",
+      "updated_at": "2026-05-12T22:14:30.823325"
+    },
+    {
+      "id": "rule_95e16ef7a0bd",
+      "text": "[P1] Treat explicit referral requests as order-entry tasks, not retrieval tasks, and copy required free-text instructions verbatim into the referral note.",
+      "tags": [
+        "lab-review",
+        "potassium",
+        "protocol",
+        "conditional-orders",
+        "treat",
+        "explicit",
+        "referral",
+        "requests",
+        "order",
+        "entry"
+      ],
+      "shown": 396,
+      "success": 179,
+      "failure": 216,
+      "created_at": "2026-05-12T20:03:37.848115",
+      "updated_at": "2026-05-12T22:14:30.823421"
+    },
+    {
+      "id": "rule_4ae7898c1e5a",
+      "text": "[P1] For pure documentation tasks, use the provided patient identifier to attach the user-supplied measurement to the correct chart and record it as stated.",
+      "tags": [
+        "vitals",
+        "documentation",
+        "blood-pressure",
+        "patient-identification",
+        "pure",
+        "tasks",
+        "provided",
+        "patient",
+        "identifier",
+        "attach"
+      ],
+      "shown": 450,
+      "success": 202,
+      "failure": 248,
+      "created_at": "2026-05-12T19:49:56.990243",
+      "updated_at": "2026-05-12T22:14:30.823353"
+    }
+  ]
+}

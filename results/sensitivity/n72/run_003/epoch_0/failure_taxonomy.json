@@ -1,0 +1,17 @@
+{
+  "answer_format_wrong_type": "answer format wrong type",
+  "date_filter_misformatted": "Used an incorrect date filter syntax or format in the FHIR query, leading to wrong or missing results.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "observation_value_missing_placeholder": "Returned a placeholder like -1 instead of the actual observation value.",
+  "order_action_omitted": "Required ordering action (e.g., medication or test) was not performed despite condition being met or instruction demanding it.",
+  "observation_creation_not_initiated": "Failed to create the required Observation resource (e.g., recording a vital sign) after being asked to record it.",
+  "mrn_lookup_incorrect_result": "Returned \"Patient not found\" or an incorrect MRN when the patient actually exists (or vice‑versa).",
+  "no_action_executed": "Agent provided reasoning or stopped without performing any FHIR request or producing a final answer.",
+  "date_filter_omitted": "date filter omitted",
+  "age_value_mismatch": "Computed age value does not match the expected correct age for the patient.",
+  "order_created_without_condition_check": "Issued an order (e.g., ServiceRequest) without first verifying the condition (e.g., date threshold) required by the instruction.",
+  "duplicate_service_request_created": "Created multiple identical ServiceRequest resources for the same purpose.",
+  "observation_value_missing_units": "Observation value string missing required units (e.g., mmHg) as specified.",
+  "date_format_mismatch": "Returned date string does not match required ISO datetime format.",
+  "observation_subject_reference_missing_prefix": "Subject reference lacks required 'Patient/' prefix in Observation resource."
+}

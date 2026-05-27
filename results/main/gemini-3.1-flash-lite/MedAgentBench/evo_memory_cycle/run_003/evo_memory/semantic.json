@@ -1,0 +1,360 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-17T00:50:24.981988",
+  "rules": [
+    "[P1] Strictly evaluate conditional triggers and boolean constraints before initiating state-changing actions.",
+    "[P1] Validate tool output and state-change persistence (transaction ID) before generating final responses.",
+    "[P1] Reject records outside specified temporal windows and document record age in the thought trace.",
+    "[P1] Verify existence of patient records and identity via tool call before extracting attributes or performing state-changing operations.",
+    "[P1] Prioritize structured key-value extraction over narrative prose.",
+    "[P1] Exhaustively verify data absence (query synonyms, broader windows) before concluding a null result.",
+    "[P1] Explicitly retrieve and cite tool-provided reference ranges and threshold values; avoid internal knowledge for interpretation.",
+    "[P1] Perform explicit date arithmetic (time delta) between retrieved records and current system time; document the evaluation in the thought trace.",
+    "[P1] Separate the decision to act from the execution; confirm actions only after tool logs verify completion.",
+    "[P1] Treat missing tool output as a blocking error; do not fabricate values or guess when retrieval fails.",
+    "[P1] Use a 'plan-and-execute' structure: decompose workflows into distinct phases and checklist sub-tasks.",
+    "[P1] Validate clinical payloads against tool schema requirements before execution.",
+    "[P1] Mandate tool usage for all data-dependent queries; never substitute internal knowledge for external execution.",
+    "[P1] Prioritize data retrieval and conditional assessment in early turns to preserve task budget.",
+    "[P1] Map unstructured clinical requests into standardized SBAR frameworks prior to tool submission.",
+    "[P1] Standardize clinical entries with ISO 8601 timestamps and dual patient identifiers."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_f7d493399a7d",
+      "text": "[P1] Strictly evaluate conditional triggers and boolean constraints before initiating state-changing actions.",
+      "tags": [
+        "hallucination",
+        "tool-use-failure",
+        "data-retrieval",
+        "strictly",
+        "evaluate",
+        "conditional",
+        "triggers",
+        "boolean",
+        "constraints",
+        "before"
+      ],
+      "shown": 13,
+      "success": 9,
+      "failure": 4,
+      "created_at": "2026-05-17T00:49:06.647180",
+      "updated_at": "2026-05-17T00:50:24.961966"
+    },
+    {
+      "id": "rule_ad5c473b9392",
+      "text": "[P1] Validate tool output and state-change persistence (transaction ID) before generating final responses.",
+      "tags": [
+        "hallucination",
+        "tool-use-failure",
+        "data-retrieval",
+        "validate",
+        "tool",
+        "output",
+        "state",
+        "change",
+        "persistence",
+        "transaction"
+      ],
+      "shown": 12,
+      "success": 8,
+      "failure": 3,
+      "created_at": "2026-05-17T00:49:06.646982",
+      "updated_at": "2026-05-17T00:50:24.962080"
+    },
+    {
+      "id": "rule_a6f8621289b8",
+      "text": "[P1] Reject records outside specified temporal windows and document record age in the thought trace.",
+      "tags": [
+        "hallucination",
+        "tool-use-failure",
+        "data-retrieval",
+        "reject",
+        "records",
+        "outside",
+        "specified",
+        "temporal",
+        "windows",
+        "document"
+      ],
+      "shown": 14,
+      "success": 9,
+      "failure": 5,
+      "created_at": "2026-05-17T00:49:06.646633",
+      "updated_at": "2026-05-17T00:50:24.961849"
+    },
+    {
+      "id": "rule_f20b59449b83",
+      "text": "[P1] Verify existence of patient records and identity via tool call before extracting attributes or performing state-changing operations.",
+      "tags": [
+        "hallucination",
+        "tool-use-failure",
+        "data-retrieval",
+        "verify",
+        "existence",
+        "patient",
+        "records",
+        "identity",
+        "tool",
+        "call"
+      ],
+      "shown": 14,
+      "success": 9,
+      "failure": 5,
+      "created_at": "2026-05-17T00:49:06.646249",
+      "updated_at": "2026-05-17T00:50:24.962217"
+    },
+    {
+      "id": "rule_a07ef466838b",
+      "text": "[P1] Prioritize structured key-value extraction over narrative prose.",
+      "tags": [
+        "workflow-management",
+        "clinical-ordering",
+        "task-chaining",
+        "prioritize",
+        "structured",
+        "value",
+        "extraction",
+        "over",
+        "narrative",
+        "prose"
+      ],
+      "shown": 8,
+      "success": 3,
+      "failure": 4,
+      "created_at": "2026-05-17T00:31:51.126529",
+      "updated_at": "2026-05-17T00:50:24.962475"
+    },
+    {
+      "id": "rule_402675dd5407",
+      "text": "[P1] Exhaustively verify data absence (query synonyms, broader windows) before concluding a null result.",
+      "tags": [
+        "hallucination",
+        "tool-use-avoidance",
+        "data-grounding",
+        "exhaustively",
+        "verify",
+        "data",
+        "absence",
+        "query",
+        "synonyms",
+        "broader"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:50:24.962605",
+      "updated_at": "2026-05-17T00:50:24.962612"
+    },
+    {
+      "id": "rule_080fade01e4b",
+      "text": "[P1] Explicitly retrieve and cite tool-provided reference ranges and threshold values; avoid internal knowledge for interpretation.",
+      "tags": [
+        "hallucination",
+        "tool-use-avoidance",
+        "data-grounding",
+        "explicitly",
+        "retrieve",
+        "cite",
+        "tool",
+        "provided",
+        "reference",
+        "ranges"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:50:24.962752",
+      "updated_at": "2026-05-17T00:50:24.962758"
+    },
+    {
+      "id": "rule_b7f0c1a755f1",
+      "text": "[P1] Perform explicit date arithmetic (time delta) between retrieved records and current system time; document the evaluation in the thought trace.",
+      "tags": [
+        "hallucination",
+        "tool-use-avoidance",
+        "data-grounding",
+        "perform",
+        "explicit",
+        "date",
+        "arithmetic",
+        "time",
+        "delta",
+        "between"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:50:24.962371",
+      "updated_at": "2026-05-17T00:50:24.962378"
+    },
+    {
+      "id": "rule_b70443bb38f9",
+      "text": "[P1] Separate the decision to act from the execution; confirm actions only after tool logs verify completion.",
+      "tags": [
+        "hallucination",
+        "tool-use-avoidance",
+        "data-grounding",
+        "separate",
+        "decision",
+        "from",
+        "execution",
+        "confirm",
+        "actions",
+        "only"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:50:24.962894",
+      "updated_at": "2026-05-17T00:50:24.962900"
+    },
+    {
+      "id": "rule_126eafa814a3",
+      "text": "[P1] Treat missing tool output as a blocking error; do not fabricate values or guess when retrieval fails.",
+      "tags": [
+        "hallucination",
+        "tool-use-avoidance",
+        "data-grounding",
+        "treat",
+        "missing",
+        "tool",
+        "output",
+        "blocking",
+        "error",
+        "fabricate"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:50:24.961683",
+      "updated_at": "2026-05-17T00:50:24.961692"
+    },
+    {
+      "id": "rule_4fa99e739483",
+      "text": "[P1] Use a 'plan-and-execute' structure: decompose workflows into distinct phases and checklist sub-tasks.",
+      "tags": [
+        "hallucination",
+        "tool-use-avoidance",
+        "data-grounding",
+        "plan",
+        "execute",
+        "structure",
+        "decompose",
+        "workflows",
+        "into",
+        "distinct"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:50:24.963034",
+      "updated_at": "2026-05-17T00:50:24.963040"
+    },
+    {
+      "id": "rule_44b37f1e2667",
+      "text": "[P1] Validate clinical payloads against tool schema requirements before execution.",
+      "tags": [
+        "hallucination",
+        "tool-use-failure",
+        "data-retrieval",
+        "validate",
+        "clinical",
+        "payloads",
+        "against",
+        "tool",
+        "schema",
+        "requirements"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-17T00:49:06.646862",
+      "updated_at": "2026-05-17T00:50:24.963144"
+    },
+    {
+      "id": "rule_b6f65666a3cd",
+      "text": "[P1] Mandate tool usage for all data-dependent queries; never substitute internal knowledge for external execution.",
+      "tags": [
+        "hallucination",
+        "tool-use-avoidance",
+        "data-retrieval",
+        "mandate",
+        "tool",
+        "usage",
+        "data",
+        "dependent",
+        "queries",
+        "never"
+      ],
+      "shown": 18,
+      "success": 10,
+      "failure": 7,
+      "created_at": "2026-05-17T00:43:05.762524",
+      "updated_at": "2026-05-17T00:50:24.961442"
+    },
+    {
+      "id": "rule_2ea781c7b371",
+      "text": "[P1] Prioritize data retrieval and conditional assessment in early turns to preserve task budget.",
+      "tags": [
+        "clinical-workflow",
+        "conditional-logic",
+        "task-planning",
+        "prioritize",
+        "data",
+        "retrieval",
+        "conditional",
+        "assessment",
+        "early",
+        "turns"
+      ],
+      "shown": 10,
+      "success": 4,
+      "failure": 6,
+      "created_at": "2026-05-17T00:48:05.286078",
+      "updated_at": "2026-05-17T00:50:24.963272"
+    },
+    {
+      "id": "rule_02472813ddca",
+      "text": "[P1] Map unstructured clinical requests into standardized SBAR frameworks prior to tool submission.",
+      "tags": [
+        "temporal-reasoning",
+        "conditional-logic",
+        "safety-constraints",
+        "unstructured",
+        "clinical",
+        "requests",
+        "into",
+        "standardized",
+        "sbar",
+        "frameworks"
+      ],
+      "shown": 13,
+      "success": 6,
+      "failure": 7,
+      "created_at": "2026-05-17T00:39:02.274624",
+      "updated_at": "2026-05-17T00:50:24.963386"
+    },
+    {
+      "id": "rule_748f914987df",
+      "text": "[P1] Standardize clinical entries with ISO 8601 timestamps and dual patient identifiers.",
+      "tags": [
+        "temporal-filtering",
+        "null-result",
+        "workflow-termination",
+        "standardize",
+        "clinical",
+        "entries",
+        "with",
+        "8601",
+        "timestamps",
+        "dual"
+      ],
+      "shown": 56,
+      "success": 28,
+      "failure": 25,
+      "created_at": "2026-05-17T00:39:25.027356",
+      "updated_at": "2026-05-17T00:50:24.963512"
+    }
+  ]
+}

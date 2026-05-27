@@ -1,0 +1,82 @@
+[
+  {
+    "text": "To determine a patient’s last hospital departure, retrieve all Encounter resources for the patient, filter for hospital encounters (e.g., identifier.system containing “encounter‑hosp” or class.code indicating inpatient), and then select the encounter with the most recent period.end value.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple encounters exist, compare their period.end timestamps in a timezone‑naïve way, ignoring any encounter that lacks an end date, to identify the latest discharge.",
+    "counter": 2
+  },
+  {
+    "text": "Verify that the chosen encounter’s status is “finished” and, if present, that it includes a dischargeDisposition; if the disposition is missing, still use the period.end but note possible uncertainty.",
+    "counter": 2
+  },
+  {
+    "text": "Always conclude the response with the exact phrase “The final answer is:” followed by the answer, preserving the original datetime string format from the FHIR data.",
+    "counter": 2
+  },
+  {
+    "text": "Always retrieve all relevant FHIR resource types for the query (e.g., MedicationRequest and MedicationAdministration for medication‑related questions) before forming an answer.",
+    "counter": 2
+  },
+  {
+    "text": "Filter the retrieved resources by the required date range using execute_python_code and only answer “Yes” or “No” after confirming that at least one record meets the criteria.",
+    "counter": 2
+  },
+  {
+    "text": "Verify that the final response follows the exact required format: “The final answer is: …” and include the concise answer without additional commentary.",
+    "counter": 2
+  },
+  {
+    "text": "If no records satisfy the query after proper filtering, explicitly state that no such data were found rather than assuming a positive answer.",
+    "counter": 2
+  },
+  {
+    "text": "When a question asks for the admission type of a patient’s last hospital visit, first retrieve all Encounter resources, identify hospital encounters (e.g., by an identifier system containing “encounter‑hosp” or by class code indicating inpatient), sort them by the period.start timestamp, and select the encounter with the most recent start time.",
+    "counter": 2
+  },
+  {
+    "text": "Extract the admission type from the selected Encounter’s hospitalization.admitSource.coding.display (if present) or hospitalization.admitSource.coding.code as a fallback. If the hospitalization or admitSource field is missing, explicitly state that the admission type is not available rather than inferring from other fields.",
+    "counter": 2
+  },
+  {
+    "text": "Present the answer exactly in the required format: “The final answer is: <value>”. The value must match the wording/casing from the FHIR data without alteration or additional interpretation.",
+    "counter": 2
+  },
+  {
+    "text": "Verify that the chosen encounter is truly the last visit by comparing period.start dates, and do not rely on the order of returned resources or on identifier values alone when determining recency.",
+    "counter": 2
+  },
+  {
+    "text": "Before executing Python code, ensure all variables referenced in the script are defined and populated (e.g., retrieve and assign the list of resources to a variable such as `med_reqs` before using it).",
+    "counter": 2
+  },
+  {
+    "text": "When filtering or matching textual fields (e.g., medication routes, codes, or identifiers), normalize both the source data and the target string by stripping surrounding whitespace and converting to a common case (usually lower‑case) to make the comparison case‑insensitive and robust to formatting variations.",
+    "counter": 2
+  },
+  {
+    "text": "To identify the “first” prescription or encounter, sort the relevant resources by their timestamp fields (e.g., `authoredOn` for MedicationRequest) in ascending order and select the earliest entry; never assume the first item in the retrieved list is the earliest.",
+    "counter": 2
+  },
+  {
+    "text": "After extracting the medication name, prefer the `display` value from the referenced Medication resource; if `display` is missing, fall back to a suitable identifier (e.g., `medicationCodeableConcept.coding[0].code` or a known drug name field). Ensure the final response follows the exact required format: “The final answer is: <answer>”.",
+    "counter": 2
+  },
+  {
+    "text": "Verify that each Observation used in a calculation belongs to the intended encounter (e.g., the first ICU visit) by filtering on the Observation’s encounter reference and on identifiers or codes that denote the ICU stay.",
+    "counter": 2
+  },
+  {
+    "text": "Determine the order of multiple measurements (first, second, etc.) by sorting the relevant Observations by their effectiveDateTime or issued timestamp in ascending order before selecting the required values.",
+    "counter": 2
+  },
+  {
+    "text": "Confirm that the Observation’s code (or category) matches the exact clinical parameter being asked (e.g., respiratory rate) using case‑insensitive comparison of code.coding.display or code.coding.code to avoid mixing different vital signs.",
+    "counter": 2
+  },
+  {
+    "text": "If any required data (such as a second measurement or the specific encounter) cannot be found, explicitly state that the information is unavailable rather than proceeding with incomplete or guessed values.",
+    "counter": 2
+  }
+]

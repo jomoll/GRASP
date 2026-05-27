@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When searching for a vaccine administration record, use both Procedure (with CPT code) and MedicationRequest (with text or code filters) to ensure comprehensive coverage, as vaccines may be documented in either resource.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify the date of the last vaccine administration using a date range that goes back far enough (e.g., at least 3 years) to capture all relevant records, rather than limiting the search to only recent dates.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that no vaccine record exists, perform multiple searches with different parameters (e.g., different date ranges, codes, or resource types) to avoid missing data due to incomplete queries.",
+    "counter": 2
+  },
+  {
+    "text": "When the task involves determining if an action is needed based on a time threshold (e.g., more than 365 days), first retrieve the actual date of the last event from the data, then compare it to the current time, rather than immediately concluding the condition is met based on an empty search result.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires verification of an exact number of active orders (e.g., zero, one, or multiple), first retrieve all active orders for the patient without filtering by category or status to ensure no orders are missed, then filter the results by the specific medication or order criteria in your analysis.",
+    "counter": 2
+  },
+  {
+    "text": "When a search returns zero results, do not immediately conclude the absence of all relevant orders; consider that the search parameters (e.g., category) may be too restrictive, and repeat the search with broader or no category filters to confirm.",
+    "counter": 2
+  },
+  {
+    "text": "If the task involves modifying orders (e.g., creating or discontinuing), after identifying the situation (zero, one, or multiple orders), perform the necessary action (create or discontinue) via the appropriate API call, and then verify the outcome by re-searching before finishing.",
+    "counter": 2
+  },
+  {
+    "text": "When verifying opioid orders, filter MedicationRequest results to only active orders and check each medication's display name against the specified opioid list (e.g., hydromorphone, oxycodone, fentanyl, hydrocodone, morphine) before concluding no opioids exist.",
+    "counter": 2
+  },
+  {
+    "text": "After identifying active opioid orders, always search for a matching naloxone prescription by querying MedicationRequest for naloxone specifically, and only create a new naloxone order if no matching active naloxone prescription exists.",
+    "counter": 2
+  },
+  {
+    "text": "Do not assume all returned medications are non-opioid; explicitly parse each medication's name for opioid keywords to avoid missing opioid orders among a large list of medications.",
+    "counter": 2
+  },
+  {
+    "text": "If the initial MedicationRequest query returns many entries, use pagination (follow \"next\" links) to retrieve all results before making a final determination about the presence or absence of opioid orders.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a vaccine or procedure, try multiple relevant FHIR resources (e.g., Procedure, MedicationRequest, Immunization if available) and use multiple code or text search strategies (CPT code, display name, text contains) to avoid missing records due to data storage variations.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that no vaccine record exists and ordering a new one, ensure the date range used in the search query covers a sufficiently long period (e.g., at least 2-3 years) to account for possible last administration, and consider using \"date=lt\" or no date filter if the record might be older than the current date range.",
+    "counter": 2
+  },
+  {
+    "text": "When the task context provides a \"current time\" that differs from the task description date, use the description date for determining time-based conditions (e.g., \"more than 365 days ago\") and for ordering, but ensure API queries use appropriate date parameters based on the actual data available.",
+    "counter": 2
+  },
+  {
+    "text": "When using FHIR APIs, always include the full base URL (e.g., http://localhost:8080/fhir/) in the GET request, not just the resource path, to avoid \"No scheme supplied\" errors.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for specific medication types (e.g., opioids), filter the results by checking the medicationCodeableConcept text field against the provided list of target medications, rather than relying solely on the API's status or category parameters.",
+    "counter": 2
+  },
+  {
+    "text": "If no matching medications are found after filtering, verify that the search query was correctly constructed and returned results before concluding that no action is needed; double-check that the full response was parsed and no relevant entries were missed.",
+    "counter": 2
+  },
+  {
+    "text": "Always include the full FHIR server base URL (e.g., `http://localhost:8080/fhir/`) when constructing API calls, not just the resource path, to avoid invalid URL errors.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for medication orders, use a broad search without a category filter initially to capture all relevant orders, then filter programmatically based on the task's specific medication criteria.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving a search result with zero total, do not immediately conclude absence of orders; consider that the search parameters (e.g., category) may have been too restrictive and retry with adjusted parameters.",
+    "counter": 2
+  }
+]

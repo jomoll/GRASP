@@ -1,0 +1,21 @@
+{
+  "patient_id_not_resolved_before_query": "patient id not resolved before query",
+  "paired_order_missing": "The required follow‑up (paired) order, such as a repeat test, was not created when the clinical decision required it.",
+  "potassium_dose_incorrect": "The potassium replacement medication was ordered with an incorrect dose or unit relative to the dosing instructions.",
+  "missing_hba1c_order": "The agent failed to create a follow‑up HbA1c ServiceRequest when the result date met the condition for ordering a new test.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "duplicate_service_request_post": "The agent sent multiple POST requests for the same ServiceRequest, creating duplicate resources.",
+  "service_request_note_not_array": "The ServiceRequest's note field was supplied as a single object instead of an array of Annotation objects.",
+  "unnecessary_hba1c_order": "A new HbA1c ServiceRequest was created even though the clinical rule did not require a follow‑up test.",
+  "observation_query_patient_reference_mismatch": "Used a patient reference string in Observation query instead of patient identifier, causing an incorrect or empty result set.",
+  "unnecessary_service_request_post": "unnecessary service request post",
+  "date_filter_omitted": "date filter omitted",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "medication_order_without_low_potassium_check": "Placed a potassium replacement MedicationRequest without first verifying that the potassium level was low.",
+  "service_request_wrong_code": "Created ServiceRequest with an incorrect or inappropriate code for the requested service",
+  "patient_query_not_executed": "The agent never performed a GET request to look up the patient before attempting to answer.",
+  "empty_answer_returned": "The agent returned an empty answer list when a response was required.",
+  "service_request_note_extra_content": "The ServiceRequest note includes additional text beyond the required free‑text phrase.",
+  "answer_text_not_matching_expected": "The final answer string does not match the exact expected phrasing.",
+  "observation_query_not_executed": "Agent did not perform the required Observation GET request before answering"
+}

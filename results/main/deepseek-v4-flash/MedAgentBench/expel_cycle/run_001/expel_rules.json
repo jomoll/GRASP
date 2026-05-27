@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When retrieving lab results to find the most recent value, always include a `date` parameter sorted in descending order (e.g., `date=gt1900` or `_sort=-date`) to ensure the latest record is identified, especially when multiple results exist.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving a search result with multiple entries, always parse and compare the `effectiveDateTime` values to determine the most recent lab result before making any decisions or calling FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "When a task requires checking if a lab result is older than a specified threshold (e.g., 1 year), compute the time difference between the current time and the most recent lab's `effectiveDateTime`, and only proceed to order a new test if the result is indeed outdated.",
+    "counter": 2
+  },
+  {
+    "text": "For tasks that involve both retrieving data and conditionally performing an action (like ordering a test), always complete the retrieval and analysis of all relevant data before deciding whether to execute the action, and include the action result in the FINISH response.",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving lab results, always include the `date` parameter with a descending sort (e.g., `_sort=-date`) to get the most recent result first, ensuring you identify the last recorded value accurately.",
+    "counter": 2
+  },
+  {
+    "text": "After obtaining the last lab result, always compare its date to the current time using a clear threshold (e.g., >1 year) to determine if a new order is needed, and execute the order via the appropriate POST endpoint (e.g., ServiceRequest) if the condition is met.",
+    "counter": 2
+  },
+  {
+    "text": "If no lab result is found for the given code, return the default answer (e.g., -1) and do not proceed with ordering, as per the task instructions.",
+    "counter": 2
+  },
+  {
+    "text": "When the task requires both retrieving a value and conditionally ordering a lab, ensure you check the date of the retrieved result against the current time before finalizing the response, and include the order action in the same sequence of API calls.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for a patient by name using the Patient.Search API, use separate parameters for `given` (first name) and `family` (last name) instead of the combined `name` parameter to ensure accurate matching.",
+    "counter": 2
+  },
+  {
+    "text": "After receiving a search result with zero matches, verify that the query parameters used are correct and complete before concluding the patient does not exist; check if alternative parameter combinations (e.g., using `given` and `family` separately) could yield results.",
+    "counter": 2
+  },
+  {
+    "text": "For patient lookup tasks, always use the most specific search parameters available (e.g., `given`, `family`, `birthdate`) to avoid ambiguous or failed searches, especially when the patient name may be common.",
+    "counter": 2
+  },
+  {
+    "text": "When a lab search returns no results (total=0), verify the code parameter matches the expected identifier (e.g., LOINC or local code) before concluding the measurement is unavailable; check the API description for the correct code usage.",
+    "counter": 2
+  },
+  {
+    "text": "For tasks with conditional actions (e.g., \"if > 1 year old, order new test\"), always compute the date difference from the most recent result to the current time, and execute the conditional action when the condition is met.",
+    "counter": 2
+  },
+  {
+    "text": "for ordering a lab test, use ServiceRequest.Create with appropriate LOINC codes and required fields, not Observation.Create or FINISH.",
+    "counter": 2
+  },
+  {
+    "text": "When a search returns no results, consider alternative search parameters (e.g., different code systems or date ranges) before concluding data is absent, as missing results may indicate incorrect query formulation.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for lab results within a time window, always use the most recent observation by comparing effectiveDateTime values to determine the last result, not the order of entries in the response bundle.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving lab results, always interpret the numeric value against the provided clinical thresholds (e.g., low, normal, high) before deciding whether to order a medication, and include that reasoning in the final answer.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple observations are returned for the same code, select the one with the latest effectiveDateTime as the \"last\" result for the specified time period, and base decisions solely on that value.",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving lab results, always use the `date` parameter with a descending sort order (e.g., `_sort=-date`) to ensure the most recent result is first, avoiding reliance on arbitrary server ordering.",
+    "counter": 2
+  },
+  {
+    "text": "After retrieving observation data, explicitly check the `effectiveDateTime` of the most recent result against the current time to determine if it is older than 1 year; if so, use `ServiceRequest.Create` with the provided LOINC code to order a new lab test, ensuring the `authoredOn` and `occurrenceDateTime` are set to the current time.",
+    "counter": 2
+  }
+]

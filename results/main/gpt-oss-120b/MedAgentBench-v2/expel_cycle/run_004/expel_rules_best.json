@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Always use the full FHIR reference format (\"Patient/{patient_id}\") for the `subject.reference` field when creating resources such as ServiceRequest or MedicationRequest.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that no prior record exists, verify that the search query includes all required parameters (e.g., correct `code`, `patient`, and any necessary date filters) and that the chosen resource type (Procedure, Immunization, etc.) is appropriate for the data being retrieved.",
+    "counter": 2
+  },
+  {
+    "text": "Include both the CPT code and a clear human‑readable `display` or `text` in the `code` element of ServiceRequest (or MedicationRequest) to ensure the order is unambiguous and interoperable.",
+    "counter": 2
+  },
+  {
+    "text": "In the FINISH response, explicitly state both the identified last vaccination date (or “none found”) and the action taken, using consistent phrasing and avoiding assumptions about data that were not verified.",
+    "counter": 2
+  },
+  {
+    "text": "Retrieve all active MedicationRequest resources for the patient first, then filter them by the specified opioid medication names (e.g., hydromorphone, oxycodone, fentanyl, hydrocodone, morphine) before deciding whether a naloxone order is needed.",
+    "counter": 2
+  },
+  {
+    "text": "After identifying any active opioid orders, explicitly search for an existing naloxone order (matching the required formulation) and only create a naloxone MedicationRequest if none is found.",
+    "counter": 2
+  },
+  {
+    "text": "Do not issue FINISH until you have confirmed both (a) whether any active opioid orders exist and (b) whether a matching naloxone order exists for each opioid order.",
+    "counter": 2
+  },
+  {
+    "text": "Perform case‑insensitive substring or coded matching against medicationCodeableConcept.text (and coding) to detect target medications, rather than assuming the medication list is empty.",
+    "counter": 2
+  },
+  {
+    "text": "Verify that the time window used in API queries is calculated from the “current time” provided in the task context, ensuring start and end timestamps correctly reflect the required past‑hours interval.",
+    "counter": 2
+  },
+  {
+    "text": "Construct FHIR date filters using the proper syntax (e.g., `date=ge2023-11-07T10:47:00Z` and `date=le2023-11-07T22:47:00Z`) and include both lower‑bound (`ge`) and upper‑bound (`le`) parameters in the same request.",
+    "counter": 2
+  },
+  {
+    "text": "If a search returns a Bundle with `total: 0`, explicitly report that no observations were found for the specified period and refrain from providing calculated results; optionally consider widening the time range or indicating that the average cannot be computed.",
+    "counter": 2
+  },
+  {
+    "text": "Confirm that the observation code supplied (e.g., `HEARTRATE`) is valid for the target resource and that the `category` parameter is set appropriately (e.g., `\"vital-signs\"` for vital sign observations) before issuing the request.",
+    "counter": 2
+  },
+  {
+    "text": "When assessing if a device has been in place longer than a required duration, compute the cutoff datetime (current time minus the duration) and query for placement procedures with performedDateTime ≤ cutoff to ensure accurate eligibility determination.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating a new removal ServiceRequest, always search for existing removal orders or ServiceRequests (e.g., using removal codes) to avoid duplicate orders.",
+    "counter": 2
+  },
+  {
+    "text": "Choose coding systems that match the intended action (e.g., use SNOMED CT for “catheter removal” rather than CPT) and include both the code and a clear display text in the ServiceRequest payload.",
+    "counter": 2
+  },
+  {
+    "text": "If multiple placement procedures are returned, base the eligibility check on the earliest performedDateTime for that device and ensure only one removal request is generated per patient for the same catheter episode.",
+    "counter": 2
+  },
+  {
+    "text": "Retrieve all required lab observations, sort them by effectiveDateTime (most recent first), and use the latest values for clinical decision‑making.",
+    "counter": 2
+  },
+  {
+    "text": "Only apply the clinical protocol after all necessary lab results have been obtained; if the protocol criteria are met, generate the appropriate medication order or service request with correct dosage, priority, and timing.",
+    "counter": 2
+  },
+  {
+    "text": "Explicitly check protocol thresholds: TSH > 10 uIU/mL on two separate dates ≥ 1 month apart → start levothyroxine and schedule repeat labs in 6 weeks; TSH 4.5‑10 uIU/mL with normal FT4 (0.8‑1.8 ng/dL) → order repeat TSH/FT4 in 3 months, no medication.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the FINISH response is a JSON‑loadable list of concise answer strings and contains no additional text or formatting.",
+    "counter": 2
+  }
+]

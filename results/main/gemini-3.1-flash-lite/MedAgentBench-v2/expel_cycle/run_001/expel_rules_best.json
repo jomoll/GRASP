@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When referencing a patient in a POST request, ensure the subject reference follows the required format (e.g., \"Patient/ID\") rather than just the ID string to maintain resource linkage.",
+    "counter": 2
+  },
+  {
+    "text": "Before assuming a procedure has not occurred within a specific timeframe, verify the search results by performing a broader search (e.g., without the date filter) to confirm if the procedure exists but is older than the threshold, rather than just returning zero results.",
+    "counter": 2
+  },
+  {
+    "text": "Always confirm the patient's identity and FHIR resource identifier using the Patient search API before performing clinical actions to ensure the correct patient record is being referenced.",
+    "counter": 2
+  },
+  {
+    "text": "When reviewing medical history for a specific event or vaccination, query both MedicationRequest and Procedure resources, as clinical documentation of such events may be stored in either.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for historical data, use iterative date-based filtering to ensure all relevant records are captured, rather than assuming a single search will return all entries.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that a clinical event (like a vaccination) did not occur, perform a exhaustive search across multiple relevant resource types and review the full breadth of retrieved data, rather than stopping after a single API call.",
+    "counter": 2
+  },
+  {
+    "text": "If the instruction specifies a timeframe for an action (e.g., \"more than 12 months ago\"), calculate the cutoff date precisely relative to the current context time provided in the task description before evaluating the search results.",
+    "counter": 2
+  },
+  {
+    "text": "When referencing a patient in a FHIR resource (e.g., ServiceRequest.subject.reference), use the format \"Patient/{id}\" rather than just the raw ID string.",
+    "counter": 2
+  },
+  {
+    "text": "Before assuming a procedure has not occurred within a specific timeframe, verify the patient's identity and record existence using the Patient resource search if the initial procedure query returns zero results.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for procedures, if a specific time window is required, ensure the date parameter is calculated correctly against the current date before executing the query.",
+    "counter": 2
+  },
+  {
+    "text": "Always validate that the POST request payload conforms exactly to the required structure defined in the API schema, particularly for nested references and required fields.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for historical clinical events like vaccinations, if an initial search for a specific code returns no results, consider searching for broader categories or related resources (e.g., Immunization resources) before concluding that no record exists.",
+    "counter": 2
+  },
+  {
+    "text": "When creating a resource (like a ServiceRequest), ensure that all required fields, including the subject reference, strictly follow the expected format (e.g., \"Patient/ID\" instead of just \"ID\").",
+    "counter": 2
+  },
+  {
+    "text": "Before assuming a lack of data implies a condition for action, double-check if the search parameters (such as date ranges) were overly restrictive or if alternative FHIR resources might contain the relevant information.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify the exact schema and required format of the reference fields for POST requests to ensure successful execution of clinical orders.",
+    "counter": 2
+  },
+  {
+    "text": "When tasked with calculating averages or summaries over a specific time range, first identify the current reference time provided in the context, then explicitly filter or manually select all relevant data points that fall within the requested window before performing the calculation.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical observations like vitals, check both the 'Observation.Search (Vitals)' category and the 'Observation.Search (Labs)' category if the initial search does not return expected results, as data may be categorized differently across systems.",
+    "counter": 2
+  },
+  {
+    "text": "Before finalizing a calculation, ensure all retrieved data points are examined to verify they are within the specified time frame; do not rely on a single data point if multiple records exist within the requested window.",
+    "counter": 2
+  },
+  {
+    "text": "When performing date-based filtering in FHIR API calls, verify the syntax for date ranges (e.g., 'ge', 'le') and ensure the ISO format matches the system's expected precision to avoid missing relevant records.",
+    "counter": 2
+  },
+  {
+    "text": "When referencing a patient in a POST request, ensure the subject reference follows the required format 'Patient/{patient_id}' rather than just the raw ID to maintain FHIR resource compliance.",
+    "counter": 2
+  }
+]

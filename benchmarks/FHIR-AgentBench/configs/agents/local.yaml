@@ -1,0 +1,4 @@
+# Generic OpenAI-compatible endpoint.
+# Required env: LOCAL_API_BASE, LOCAL_MODEL.
+model: "openai/${LOCAL_MODEL}"
+base_url: "${LOCAL_API_BASE}"

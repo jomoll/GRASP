@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When searching for clinical observations by code (like heart rate), first retrieve all relevant observations for the patient within the target category (e.g., 'vital-signs') and then filter the results locally by code or description, rather than relying on a specific code search parameter if it returns no results.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that a specific data point is missing, perform a broad search of the relevant resource category (e.g., all 'vital-signs' for a patient) and inspect the returned entries to manually identify the desired information, as terminology codes may vary or be stored in descriptive text fields.",
+    "counter": 2
+  },
+  {
+    "text": "When calculating time-based averages, ensure the date-time filtering is applied strictly to the relevant resources; if the API does not support precise time-range filtering, retrieve a sufficient window of data and perform the temporal filtering in the reasoning phase.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify the structure of the returned FHIR bundle and nested resources to ensure that data is not hidden within fields that were not initially queried or expected, such as checking for 'valueQuantity' vs 'valueString' or inspecting the 'code.text' field for matching terminology.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for medications to fulfill a safety verification task, ensure the full list of relevant medications is retrieved by carefully examining all pages of the API bundle response, as paginated results may hide critical active orders.",
+    "counter": 2
+  },
+  {
+    "text": "When verifying medication orders, always perform an exhaustive search for all specified drug classes (e.g., opioids like hydromorphone, oxycodone, fentanyl, hydrocodone, morphine) and their synonyms or brand names, rather than assuming a partial list or a single result indicates the absence of an order.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that no intervention is required, explicitly document the criteria used for the search and confirm that all relevant medication records returned by the API have been cross-referenced against the required safety medication.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for clinical data, if a specific search filter (like 'code') yields no results, perform a broader search (e.g., by 'category' or 'patient') to manually inspect the available resources, as the expected terminology might differ from the query.",
+    "counter": 2
+  },
+  {
+    "text": "When calculating a value (like an average) from time-series data, always verify the presence of the data using multiple search strategies if the initial search is unsuccessful before concluding that the data is missing.",
+    "counter": 2
+  },
+  {
+    "text": "When performing data retrieval for specific metrics, if the search parameters are unclear or restricted, use the broadest possible search for that resource type to ensure all relevant records are captured for filtering at the processing stage.",
+    "counter": 2
+  },
+  {
+    "text": "When tasked with verifying the count of active orders (e.g., DVT prophylaxis), first retrieve all active medication orders for the patient and audit them to identify any existing orders that match or are equivalent to the target medication or category.",
+    "counter": 2
+  },
+  {
+    "text": "If a duplicate or conflicting order is identified during the verification process, perform the required remediation (discontinuation) before or alongside creating a new order to ensure the final state strictly adheres to the requested constraints.",
+    "counter": 2
+  },
+  {
+    "text": "When an instruction requires managing the number of active orders (e.g., \"ensure exactly one active order\"), explicitly check for the presence of any relevant existing medications before creating new ones to avoid creating unintentional duplicates.",
+    "counter": 2
+  },
+  {
+    "text": "Always confirm that the final state of the patient's record matches the requested criteria (e.g., exactly one active order) by reviewing the retrieved list or performing a follow-up check if necessary.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for historical clinical events (like vaccines or procedures) to determine if a threshold has been met, always retrieve data without restrictive date filters initially to ensure a comprehensive search, especially if the patient's history is unknown.",
+    "counter": 2
+  },
+  {
+    "text": "If an initial search for clinical history returns zero results, perform a broader search (e.g., removing the date parameter) to confirm the total absence of records before assuming the patient has never received the intervention.",
+    "counter": 2
+  },
+  {
+    "text": "When ordering a new procedure or medication based on a clinical decision rule, ensure the resource reference in the POST request uses the full path (e.g., \"Patient/ID\") rather than just the ID string to maintain FHIR compatibility.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify the exact format requirements for resource references in API calls by reviewing the specific parameters of the POST function before execution.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for procedures or observations, ensure the query includes the specific relevant code or category to narrow down results, rather than relying on broad date-based searches which may return irrelevant data.",
+    "counter": 2
+  },
+  {
+    "text": "Before concluding that a medical device or procedure is not present, perform targeted searches using the specific identifier or code provided in the instructions, as general searches may miss specific records buried in large bundles.",
+    "counter": 2
+  }
+]

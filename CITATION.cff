@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use GRASP, please cite the paper and/or this repository."
+title: "GRASP: self-improvement via a regression-gated skill library"
+authors:
+  - family-names: Moll
+    given-names: Johannes
+  - family-names: Corbeil
+    given-names: Jean-Philippe
+  - family-names: Pan
+    given-names: Jiazhen
+  - family-names: Hadamitzky
+    given-names: Martin
+  - family-names: Rueckert
+    given-names: Daniel
+  - family-names: Adams
+    given-names: Lisa
+  - family-names: Bressem
+    given-names: Keno
+repository-code: "https://github.com/jomoll/GRASP"
+license: MIT
+# TODO: replace with the published paper reference once available.
+preferred-citation:
+  type: article
+  title: "GRASP: self-improvement via a regression-gated skill library"
+  authors:
+    - family-names: Moll
+      given-names: Johannes
+    - family-names: Corbeil
+      given-names: Jean-Philippe
+    - family-names: Pan
+      given-names: Jiazhen
+    - family-names: Hadamitzky
+      given-names: Martin
+    - family-names: Rueckert
+      given-names: Daniel
+    - family-names: Adams
+      given-names: Lisa
+    - family-names: Bressem
+      given-names: Keno
+  year: 2026

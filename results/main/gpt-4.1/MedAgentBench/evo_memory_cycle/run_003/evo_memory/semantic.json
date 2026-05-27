@@ -1,0 +1,338 @@
+{
+  "version": 1,
+  "updated_at": "2026-05-16T10:49:19.304541",
+  "rules": [
+    "[P1] Align follow-up lab timing with explicit instruction dates, not just 'next day'.",
+    "[P1] Calculate and confirm target dates for follow-up actions precisely.",
+    "[P1] Verify that values fall within the specified timeframe before responding.",
+    "[P1] Always search for relevant data (including identifiers) before responding.",
+    "[P1] Check all conditional requirements before finalizing response.",
+    "[P1] Include all specified structured information in free text as instructed.",
+    "[P1] Record measurements and values exactly as provided.",
+    "[P1] Match all identifying criteria before selecting data.",
+    "[P1] Take all required follow-up actions based on instruction criteria.",
+    "[P1] Ensure procedural instructions are followed exactly.",
+    "[P1] Use SBAR format when requested for clinical communication.",
+    "[P1] Retrieve answers only from provided context or sources; do not infer values not found.",
+    "[P1] Associate data entries and measurements with precise patient identifiers (e.g., MRN).",
+    "[P1] Verify prerequisite data availability before acting.",
+    "[P1] Return the specified fallback response if search criteria are unmet."
+  ],
+  "rule_entries": [
+    {
+      "id": "rule_ab5b4c588662",
+      "text": "[P1] Align follow-up lab timing with explicit instruction dates, not just 'next day'.",
+      "tags": [
+        "date-calculation",
+        "lab-order",
+        "medication-order",
+        "align",
+        "follow",
+        "timing",
+        "with",
+        "explicit",
+        "instruction",
+        "dates"
+      ],
+      "shown": 3,
+      "success": 1,
+      "failure": 2,
+      "created_at": "2026-05-16T10:48:57.858454",
+      "updated_at": "2026-05-16T10:49:19.295030"
+    },
+    {
+      "id": "rule_6f48d0d2c9e9",
+      "text": "[P1] Calculate and confirm target dates for follow-up actions precisely.",
+      "tags": [
+        "date-calculation",
+        "lab-order",
+        "medication-order",
+        "calculate",
+        "confirm",
+        "target",
+        "dates",
+        "follow",
+        "actions",
+        "precisely"
+      ],
+      "shown": 3,
+      "success": 1,
+      "failure": 2,
+      "created_at": "2026-05-16T10:48:57.858346",
+      "updated_at": "2026-05-16T10:49:19.295087"
+    },
+    {
+      "id": "rule_4b5d71f96267",
+      "text": "[P1] Verify that values fall within the specified timeframe before responding.",
+      "tags": [
+        "lab_results",
+        "patient_context",
+        "timeframe",
+        "verify",
+        "that",
+        "values",
+        "fall",
+        "within",
+        "specified",
+        "before"
+      ],
+      "shown": 4,
+      "success": 1,
+      "failure": 3,
+      "created_at": "2026-05-16T10:48:43.420771",
+      "updated_at": "2026-05-16T10:49:19.295138"
+    },
+    {
+      "id": "rule_6feabf7265f5",
+      "text": "[P1] Always search for relevant data (including identifiers) before responding.",
+      "tags": [
+        "identifier-matching",
+        "data-verification",
+        "always",
+        "search",
+        "relevant",
+        "data",
+        "including",
+        "identifiers",
+        "before",
+        "responding"
+      ],
+      "shown": 17,
+      "success": 10,
+      "failure": 3,
+      "created_at": "2026-05-16T10:47:00.345650",
+      "updated_at": "2026-05-16T10:49:19.295188"
+    },
+    {
+      "id": "rule_e943d2fb6eb0",
+      "text": "[P1] Check all conditional requirements before finalizing response.",
+      "tags": [
+        "lab_result",
+        "conditional_logic",
+        "date_check",
+        "check",
+        "conditional",
+        "requirements",
+        "before",
+        "finalizing",
+        "response",
+        "lab_results"
+      ],
+      "shown": 5,
+      "success": 1,
+      "failure": 4,
+      "created_at": "2026-05-16T10:48:28.179408",
+      "updated_at": "2026-05-16T10:49:19.295429"
+    },
+    {
+      "id": "rule_98e6086d6e92",
+      "text": "[P1] Include all specified structured information in free text as instructed.",
+      "tags": [
+        "referral",
+        "sbar",
+        "workflow",
+        "include",
+        "specified",
+        "structured",
+        "information",
+        "free",
+        "text",
+        "instructed"
+      ],
+      "shown": 8,
+      "success": 3,
+      "failure": 2,
+      "created_at": "2026-05-16T10:47:28.026499",
+      "updated_at": "2026-05-16T10:49:19.295323"
+    },
+    {
+      "id": "rule_1ce80371e667",
+      "text": "[P1] Record measurements and values exactly as provided.",
+      "tags": [
+        "identifiers",
+        "measurement",
+        "record",
+        "measurements",
+        "values",
+        "exactly",
+        "provided",
+        "structured-information",
+        "procedural-adherence",
+        "sbar"
+      ],
+      "shown": 8,
+      "success": 3,
+      "failure": 2,
+      "created_at": "2026-05-16T10:48:00.054459",
+      "updated_at": "2026-05-16T10:49:19.295366"
+    },
+    {
+      "id": "rule_8d525198b3a9",
+      "text": "[P1] Match all identifying criteria before selecting data.",
+      "tags": [
+        "identifier-matching",
+        "fallback-response",
+        "match",
+        "identifying",
+        "criteria",
+        "before",
+        "selecting",
+        "data",
+        "identifier_lookup",
+        "conditional"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-16T10:47:41.887741",
+      "updated_at": "2026-05-16T10:49:19.295474"
+    },
+    {
+      "id": "rule_40c8a85b1967",
+      "text": "[P1] Take all required follow-up actions based on instruction criteria.",
+      "tags": [
+        "conditional",
+        "lab",
+        "workflow",
+        "take",
+        "required",
+        "follow",
+        "actions",
+        "based",
+        "instruction",
+        "criteria"
+      ],
+      "shown": 0,
+      "success": 0,
+      "failure": 0,
+      "created_at": "2026-05-16T10:48:19.147197",
+      "updated_at": "2026-05-16T10:49:19.295521"
+    },
+    {
+      "id": "rule_1105d1ee4ca8",
+      "text": "[P1] Ensure procedural instructions are followed exactly.",
+      "tags": [
+        "referral",
+        "sbar",
+        "workflow",
+        "ensure",
+        "procedural",
+        "instructions",
+        "followed",
+        "exactly",
+        "data-entry",
+        "measurement"
+      ],
+      "shown": 13,
+      "success": 6,
+      "failure": 4,
+      "created_at": "2026-05-16T10:47:28.026701",
+      "updated_at": "2026-05-16T10:49:19.295231"
+    },
+    {
+      "id": "rule_ae9d18a90f38",
+      "text": "[P1] Use SBAR format when requested for clinical communication.",
+      "tags": [
+        "referral",
+        "sbar",
+        "workflow",
+        "format",
+        "when",
+        "requested",
+        "clinical",
+        "communication",
+        "data-entry",
+        "measurement"
+      ],
+      "shown": 13,
+      "success": 6,
+      "failure": 3,
+      "created_at": "2026-05-16T10:47:28.026609",
+      "updated_at": "2026-05-16T10:49:19.295275"
+    },
+    {
+      "id": "rule_68ac5ad8365d",
+      "text": "[P1] Retrieve answers only from provided context or sources; do not infer values not found.",
+      "tags": [
+        "data-retrieval",
+        "lab-orders",
+        "procedural",
+        "retrieve",
+        "answers",
+        "only",
+        "from",
+        "provided",
+        "context",
+        "sources"
+      ],
+      "shown": 31,
+      "success": 18,
+      "failure": 13,
+      "created_at": "2026-05-16T10:42:16.541704",
+      "updated_at": "2026-05-16T10:49:19.295593"
+    },
+    {
+      "id": "rule_7d5bbba865f1",
+      "text": "[P1] Associate data entries and measurements with precise patient identifiers (e.g., MRN).",
+      "tags": [
+        "identifiers",
+        "measurement",
+        "associate",
+        "data",
+        "entries",
+        "measurements",
+        "with",
+        "precise",
+        "patient",
+        "structured-information"
+      ],
+      "shown": 11,
+      "success": 3,
+      "failure": 5,
+      "created_at": "2026-05-16T10:48:00.054105",
+      "updated_at": "2026-05-16T10:49:19.295653"
+    },
+    {
+      "id": "rule_a1e2bb255ae2",
+      "text": "[P1] Verify prerequisite data availability before acting.",
+      "tags": [
+        "workflow",
+        "prerequisite-check",
+        "medication-order",
+        "verify",
+        "prerequisite",
+        "data",
+        "availability",
+        "before",
+        "acting",
+        "referral"
+      ],
+      "shown": 36,
+      "success": 16,
+      "failure": 18,
+      "created_at": "2026-05-16T10:42:03.957555",
+      "updated_at": "2026-05-16T10:49:19.295696"
+    },
+    {
+      "id": "rule_790815a26b12",
+      "text": "[P1] Return the specified fallback response if search criteria are unmet.",
+      "tags": [
+        "identifiers",
+        "fallback-handling",
+        "search",
+        "return",
+        "specified",
+        "fallback",
+        "response",
+        "criteria",
+        "unmet",
+        "patient-lookup"
+      ],
+      "shown": 83,
+      "success": 33,
+      "failure": 40,
+      "created_at": "2026-05-16T10:37:49.323858",
+      "updated_at": "2026-05-16T10:49:19.295746"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When retrieving multiple Observation resources, always select the most recent result by comparing the `effectiveDateTime` (or `issued` if `effectiveDateTime` is absent) timestamps rather than assuming the API returns them in chronological order.",
+    "counter": 2
+  },
+  {
+    "text": "Compute date comparisons using the current time supplied in the task context, handling ISO‑8601 formats and time‑zone offsets correctly to determine whether a result is older than the required interval (e.g., 1 year).",
+    "counter": 2
+  },
+  {
+    "text": "If no matching Observation is found, respond with the predefined placeholder value `[-1]` as instructed by the task description.",
+    "counter": 2
+  },
+  {
+    "text": "Issue a new ServiceRequest (or equivalent order) only after confirming that the most recent lab result exceeds the age threshold; include a brief note explaining the reason for the order.",
+    "counter": 2
+  },
+  {
+    "text": "Always compare the observation’s date (effectiveDateTime or issued) to the current time; if the difference exceeds the required threshold (e.g., 1 year), issue a ServiceRequest (or appropriate order) for a new test.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple observations are returned, sort them by date descending and use the most recent entry as the “last” value before deciding whether to order a repeat test.",
+    "counter": 2
+  },
+  {
+    "text": "If no observation is found, return the designated sentinel value (e.g., [-1]) and, if the task requires, still create an order for the missing lab.",
+    "counter": 2
+  },
+  {
+    "text": "The FINISH response must include both the measurement value and its recording date in a clear, structured format, and only include an ordering action when the age‑based condition is satisfied.",
+    "counter": 2
+  },
+  {
+    "text": "Always restrict Observation searches to the exact time window required (e.g., last 24 hours) using appropriate date filters before evaluating results.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple observations are returned, sort them by effectiveDateTime descending and select the most recent entry within the filtered window for decision‑making.",
+    "counter": 2
+  },
+  {
+    "text": "Compare the selected observation’s numeric value against the task‑specific thresholds, confirming that units match (e.g., mg/dL) before determining whether a value is “low”.",
+    "counter": 2
+  },
+  {
+    "text": "If no observation is found within the required time window, do not place any order and finish with a clear statement that no recent measurement was available.",
+    "counter": 2
+  },
+  {
+    "text": "When multiple Observation resources are returned, always identify the most recent result by sorting on the effectiveDateTime (or issued if effectiveDateTime is absent) and selecting the latest entry.",
+    "counter": 2
+  },
+  {
+    "text": "Compare the date of the most recent observation to the current task time; if the difference exceeds 365 days, create a ServiceRequest using the specified LOINC code for the required test before finishing.",
+    "counter": 2
+  },
+  {
+    "text": "If no Observation matching the requested code is found, return [-1] as the answer and also place a new ServiceRequest for the test, since no prior measurement exists.",
+    "counter": 2
+  },
+  {
+    "text": "The FINISH payload must include both the retrieved value and its recording date (e.g., “5.7 % on 2023‑07‑07”) and, when a new order is placed, clearly indicate that the order was created.",
+    "counter": 2
+  },
+  {
+    "text": "When retrieving a series of Observation resources, always sort them by the effectiveDateTime field (most recent first) and use the first entry as the current value for decision‑making.",
+    "counter": 2
+  },
+  {
+    "text": "Before deciding to place a replacement medication order, compare the latest lab value against the clinical threshold; only issue the order if the value is truly outside the defined safe range.",
+    "counter": 2
+  },
+  {
+    "text": "If a medication order is required, calculate the dose based on the difference between the observed value and the target level, then create a MedicationRequest with the appropriate medicationCodeableConcept, dosageInstruction, status “active”, and intent “order”.",
+    "counter": 2
+  },
+  {
+    "text": "Whenever a medication order is placed that requires follow‑up monitoring, automatically generate a ServiceRequest for the appropriate follow‑up lab (using the correct LOINC code) with occurrenceDateTime set to the desired future time (e.g., next day at 08:00) and link it to the same patient.",
+    "counter": 2
+  }
+]

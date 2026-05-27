@@ -1,0 +1,44 @@
+[
+  {
+    "epoch": "baseline",
+    "score": 0.4583333333333333,
+    "n_correct": 11,
+    "n_total": 24,
+    "dev_score": null
+  },
+  {
+    "epoch": 0,
+    "score": 0.4583333333333333,
+    "n_correct": 11,
+    "n_total": 24,
+    "dev_score": 0.3076923076923077
+  },
+  {
+    "epoch": 1,
+    "score": 0.6666666666666666,
+    "n_correct": 16,
+    "n_total": 24,
+    "dev_score": 0.23076923076923078
+  },
+  {
+    "epoch": 2,
+    "score": 0.625,
+    "n_correct": 15,
+    "n_total": 24,
+    "dev_score": 0.4230769230769231
+  },
+  {
+    "epoch": 3,
+    "score": 0.6666666666666666,
+    "n_correct": 16,
+    "n_total": 24,
+    "dev_score": 0.6538461538461539
+  },
+  {
+    "epoch": 4,
+    "score": 0.625,
+    "n_correct": 15,
+    "n_total": 24,
+    "dev_score": 0.6538461538461539
+  }
+]

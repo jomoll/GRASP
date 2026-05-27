@@ -1,0 +1,16 @@
+{
+  "answer_format_extra_text": "Returned narrative explanatory text instead of the terse value/status format the task expected.",
+  "blood_pressure_observation_wrong_schema": "Recorded blood pressure using an invalid Observation structure/fields rather than proper BP coding and components.",
+  "potassium_replacement_dose_misapplied": "Detected low potassium but selected the wrong replacement regimen/dose for the observed level.",
+  "date_upper_bound_omitted": "Applied only a lower date bound for a last-24-hours query and omitted the upper bound cutoff.",
+  "patient_id_not_resolved_for_order": "Created an order using the MRN-style identifier as the subject reference instead of the resolved patient resource id.",
+  "incorrect_age_computation": "Returned the wrong patient age after lookup, indicating an error in age calculation from birthDate.",
+  "stale_lab_not_reordered": "Reported an outdated lab result without placing the required repeat order for an old result.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "answer_submitted_before_verification": "answer submitted before verification",
+  "wrong_patient_reference_in_query": "Queried using an incorrect patient reference format/value, so the target observations were missed.",
+  "date_filter_omitted": "date filter omitted",
+  "malformed_query_string": "Built an invalid search URL/query string, causing the lookup to fail.",
+  "low_threshold_boundary_misclassified": "Treated a boundary value at the replacement threshold as normal instead of low/replaceable.",
+  "required_status_field_omitted": "Returned the lab value/date but omitted the required order-status/result-status field in the final answer."
+}

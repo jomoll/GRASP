@@ -1,0 +1,12 @@
+{
+  "missing_fhir_query_before_answer": "Agent gave reasoning or answer without performing the required FHIR query.",
+  "unnecessary_service_request_created": "Agent created a ServiceRequest/order that was not required by the instruction.",
+  "quantity_unit_mismatch": "quantity unit mismatch",
+  "wrong_answer_returned": "Agent returned an answer that does not satisfy the instruction (e.g., \"Patient not found\" when patient exists).",
+  "placeholder_error_value_returned": "Agent returned a placeholder error indicator (e.g., -1) instead of a valid result.",
+  "answer_format_wrong_type": "answer format wrong type",
+  "answer_type_mismatch": "Agent returned the correct value but in the wrong data type (e.g., string instead of integer).",
+  "patient_reference_used_in_observation_query": "Used a patient reference (Patient/ID) instead of an identifier in the Observation query, causing an incorrect lookup.",
+  "incorrect_low_threshold_logic": "Determined no replacement needed despite observation meeting low‑threshold criteria.",
+  "order_placed_without_verifying_low": "Placed a replacement order without first confirming the observation value is low."
+}

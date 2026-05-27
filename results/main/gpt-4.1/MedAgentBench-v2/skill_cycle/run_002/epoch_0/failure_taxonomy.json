@@ -1,0 +1,15 @@
+{
+  "date_range_filter_format_incorrect": "Used an incorrect or malformed date range filter in FHIR query.",
+  "date_filter_omitted": "date filter omitted",
+  "wrong_resource_type_queried": "wrong resource type queried",
+  "previous_result_included_in_summary": "Included previous (not just most recent) result in summary when only most recent was required.",
+  "date_range_filter_omitted": "Did not apply required date range filter to FHIR query.",
+  "medication_status_filter_omitted": "Did not filter MedicationRequest by 'active' status when required.",
+  "fhir_resource_reference_format_incorrect": "FHIR resource reference field used wrong format (e.g., missing 'Patient/' prefix).",
+  "active_order_count_not_verified_post_update": "Did not verify the count of active orders after updating/discontinuing orders.",
+  "active_medication_class_filter_omitted": "Did not filter for active opioid analgesic class when checking for naloxone match.",
+  "order_discontinuation_not_executed": "Did not execute discontinuation of extra orders after identifying duplicates.",
+  "order_creation_not_completed": "Did not actually create the required order after stating intent to do so.",
+  "order_duplicate_check_omitted": "Did not check for or prevent duplicate DVT prophylaxis orders.",
+  "answer_format_wrong_type": "answer format wrong type"
+}

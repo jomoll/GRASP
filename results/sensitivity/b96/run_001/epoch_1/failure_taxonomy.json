@@ -1,0 +1,18 @@
+{
+  "answer_format_string_instead_of_integer": "Agent returns the numeric answer as a string instead of an integer type.",
+  "missing_service_request_creation": "Agent does not create the required ServiceRequest resource for the referral or order.",
+  "missing_paired_order": "Agent omits the secondary (paired) order that should accompany the primary action.",
+  "observation_not_created": "Agent fails to create a required Observation resource after receiving the measurement.",
+  "answer_submitted_before_query": "Agent provides an answer without first performing the required FHIR query.",
+  "answer_format_single_string_instead_of_two_items": "Agent returns a single concatenated string when two separate items (value and date) were required.",
+  "sentinel_value_used_in_answer": "Agent returns a placeholder sentinel value (e.g., -1) instead of the actual result.",
+  "answer_format_multiple_strings": "Agent returns multiple separate strings in a list where a different answer structure was expected.",
+  "answer_format_extra_text": "Agent includes explanatory prose in the answer where only the raw value(s) were expected.",
+  "quantity_unit_missing": "Numeric result is returned without the required unit of measurement.",
+  "missing_final_answer": "Agent stops after making a request without producing the final answer.",
+  "subject_reference_missing_patient_prefix": "Agent uses an incorrect subject reference format lacking the 'Patient/' prefix.",
+  "answer_format_extra_item": "Agent includes an extra item in the answer list beyond what was specified.",
+  "answer_format_list_instead_of_string": "Final answer returned as a list of strings when a single string was expected.",
+  "unnecessary_test_order_created": "Agent orders a new test when it is not required by the instruction.",
+  "date_filter_omitted": "date filter omitted"
+}

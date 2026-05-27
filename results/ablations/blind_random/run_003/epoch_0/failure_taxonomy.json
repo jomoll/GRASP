@@ -1,0 +1,10 @@
+{
+  "age_computation_incorrect": "Calculated patient age incorrectly from the birthdate.",
+  "duplicate_order_created": "Model created duplicate medication or service request orders for the same clinical need.",
+  "answer_format_wrong_type": "Final answer returned as free‑text string/list when a structured format (specific fields, units, or JSON) was expected.",
+  "patient_lookup_failed_missing_result": "Model reported \"Patient not found\" despite the patient existing in the dataset.",
+  "answer_submitted_without_fhir_query": "Model returned a final answer without performing any FHIR GET request to retrieve required data.",
+  "placeholder_minus_one_returned": "Model returned a sentinel value \"-1\" instead of a real measurement or appropriate message.",
+  "quantity_unit_mismatch": "Returned a numeric value without the required unit or with an incorrect unit.",
+  "missing_paired_order_when_no_replacement_needed": "Failure to include required paired order (e.g., follow‑up test) when potassium level is not low and no replacement is ordered."
+}

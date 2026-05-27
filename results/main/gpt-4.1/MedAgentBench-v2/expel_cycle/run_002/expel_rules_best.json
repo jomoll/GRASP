@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Always ensure all relevant API sources are checked before concluding that required clinical data is absent.",
+    "counter": 2
+  },
+  {
+    "text": "Only order a clinical intervention (e.g., booster) if there is evidence that the patient meets the criteria for it based on available data.",
+    "counter": 2
+  },
+  {
+    "text": "Avoid repeating identical or redundant API queries that do not add new information.",
+    "counter": 2
+  },
+  {
+    "text": "Summarize reasoning explicitly in the final answer, including which sources were checked and why the action was or was not taken.",
+    "counter": 2
+  },
+  {
+    "text": "Always review all relevant existing active medication orders to identify duplicates or alternative medications before creating a new order.",
+    "counter": 2
+  },
+  {
+    "text": "When creating summary statements, ensure they accurately reflect the presence or absence of relevant orders and any actions taken.",
+    "counter": 2
+  },
+  {
+    "text": "Discontinue or deactivate duplicate or outdated orders when more than one relevant order is found, keeping only the most recent, as required.",
+    "counter": 2
+  },
+  {
+    "text": "Interpret medication names and classes broadly according to the clinical context to ensure all relevant orders (e.g., anticoagulants) are considered.",
+    "counter": 2
+  },
+  {
+    "text": "Always compare the procedure date to the current date to determine if follow-up actions, such as new orders, are required.",
+    "counter": 2
+  },
+  {
+    "text": "Ensure the logic for time intervals (e.g., “12 months ago”) is correctly implemented using precise date comparison.",
+    "counter": 2
+  },
+  {
+    "text": "If a required follow-up action is indicated by the instruction but not triggered by the data, clearly state the reason in the final answer.",
+    "counter": 2
+  },
+  {
+    "text": "Review all task requirements and confirm that all conditional steps are checked and executed before finishing.",
+    "counter": 2
+  },
+  {
+    "text": "Always thoroughly review all relevant API results to ensure correct identification of the required clinical information before concluding or taking action.",
+    "counter": 2
+  },
+  {
+    "text": "When searching for medications or procedures by name or code, ensure to check for all possible variations or synonyms relevant to the clinical context.",
+    "counter": 2
+  },
+  {
+    "text": "Do not finalize or recommend actions (such as ordering a medication) if there is uncertainty or incomplete search for the relevant information; exhaust all reasonable data sources first.",
+    "counter": 2
+  },
+  {
+    "text": "Clearly distinguish between absence of evidence and evidence of absence; only conclude something is not present after confirming all appropriate resources have been checked with the correct filters.",
+    "counter": 2
+  },
+  {
+    "text": "Always verify that the data retrieved covers the correct time ranges for each requested calculation or answer.",
+    "counter": 2
+  },
+  {
+    "text": "Use precise filtering for temporal queries to ensure all relevant data points are included and none are omitted.",
+    "counter": 2
+  },
+  {
+    "text": "Clearly distinguish between different calculation windows when multiple time periods are requested.",
+    "counter": 2
+  },
+  {
+    "text": "If insufficient or ambiguous data is returned, request additional information or clarify before finalizing an answer.",
+    "counter": 2
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "text": "When ordering an immunization, use the ServiceRequest resource (not MedicationRequest) and include the CPT code, authoredOn, status, intent, priority, subject (as a Patient reference), note, and occurrenceDateTime as required by the API.",
+    "counter": 2
+  },
+  {
+    "text": "Always format the patient reference as \"Patient/{patient_id}\" in FHIR payloads to satisfy reference validation.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating an order, search for prior administrations using the Procedure resource with the appropriate CPT code; if a record is found, compare its date to the current date to decide whether a new order is needed (e.g., >365 days).",
+    "counter": 2
+  },
+  {
+    "text": "emit exactly one API action per turn, and when finishing, return a FINISH call with a JSON‑loadable list of quoted strings.",
+    "counter": 2
+  },
+  {
+    "text": "Before creating a new medication order, always verify whether an active order for the same therapeutic class already exists to avoid duplicate prophylaxis orders.",
+    "counter": 2
+  },
+  {
+    "text": "If multiple active orders match the target therapy, determine the newest order by the authoredOn date and discontinue all older orders so that only one active order remains.",
+    "counter": 2
+  },
+  {
+    "text": "Use precise medication identifiers (exact text match or coding) in the GET request to filter for relevant anticoagulant orders and exclude unrelated medications.",
+    "counter": 2
+  },
+  {
+    "text": "issue exactly one API action per turn and use FINISH only after all required actions are completed and a concise summary is provided.",
+    "counter": 2
+  },
+  {
+    "text": "When scanning MedicationRequest resources, examine both the medicationCodeableConcept.text and any coding entries, using case‑insensitive and partial‑match logic against a predefined list of target drug names (including synonyms) to reliably identify relevant orders.",
+    "counter": 2
+  },
+  {
+    "text": "For any FHIR Bundle response, check for a \"next\" link and iteratively retrieve subsequent pages until all entries have been processed before drawing conclusions about the presence or absence of specific orders.",
+    "counter": 2
+  },
+  {
+    "text": "After identifying active target medication orders, explicitly verify that a matching companion order (e.g., an active naloxone prescription) exists; if none is found, construct and send a proper POST MedicationRequest to create the required order.",
+    "counter": 2
+  },
+  {
+    "text": "Always apply appropriate filters (e.g., status=active) and confirm the correct patient identifier is used in the query; if the API permits, include additional parameters (such as category) to narrow the search to medication orders relevant to the task.",
+    "counter": 2
+  },
+  {
+    "text": "Before using observation data, confirm that both the observation code (e.g., “HEARTRATE”) and its category (e.g., “vital‑signs”) match the metric requested in the task.",
+    "counter": 2
+  },
+  {
+    "text": "For any aggregate calculation (average, sum, etc.), query for **all** observations that fall within the specified time window and compute the result from the full set, rather than using a single or most‑recent record.",
+    "counter": 2
+  },
+  {
+    "text": "If a query returns no observations for the required time range, return a clear message that the data is unavailable instead of fabricating or reusing unrelated values.",
+    "counter": 2
+  },
+  {
+    "text": "Extract numeric values from valueQuantity (or valueString when appropriate), ensure units are consistent, and perform the arithmetic on these numbers to produce the final aggregated value.",
+    "counter": 2
+  },
+  {
+    "text": "Always retrieve the most recent procedure date (if any) and compare it to the current date to decide whether the 12‑month threshold has been exceeded before placing a new order.",
+    "counter": 2
+  },
+  {
+    "text": "Include all relevant CPT codes in a single Procedure search (e.g., `code=IMGCT0491,IMGIL0001`) to ensure no existing study is missed.",
+    "counter": 2
+  },
+  {
+    "text": "Use the proper FHIR patient reference format (`\"Patient/<patient_id>\"`) in all create (POST) requests to guarantee the resource is linked correctly.",
+    "counter": 2
+  },
+  {
+    "text": "When no prior procedure is found, explicitly note that the new order is being placed because either no study exists or the most recent study is older than 12 months, rather than assuming absence automatically satisfies the timing condition.",
+    "counter": 2
+  }
+]
