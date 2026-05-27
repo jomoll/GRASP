@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 # then `import grasp`.
 name = "grasp-skills"
 version = "0.1.0"
-description = "GRASP — self-improvement via a regression-gated skill library learned from an agent's own failure traces"
+description = "GRASP (Gated Regression-Aware Skill Proposer) — self-improvement via a regression-gated skill library learned from an agent's own failure traces"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }

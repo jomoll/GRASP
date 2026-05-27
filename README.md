@@ -1,12 +1,17 @@
-# GRASP
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/jomoll/GRASP/main/assets/grasp_banner.png" alt="GRASP — Gated Regression-Aware Skill Proposer" width="100%">
 
 <!--- BADGES: START --->
-[![PyPI](https://img.shields.io/pypi/v/grasp-skills?color=00B7EB&logo=pypi&logoColor=white)](https://pypi.org/project/grasp-skills/)
+[![PyPI](https://img.shields.io/pypi/v/grasp-skills?label=grasp-skills&color=00B7EB&logo=pypi&logoColor=white)](https://pypi.org/project/grasp-skills/)
 [![Python version](https://img.shields.io/badge/python-3.9+-important?logo=python&logoColor=important)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 <!--- BADGES: END --->
 
-**GRASP** learns a small, **regression-gated skill library** from an agent's own
+</div>
+
+**GRASP** (Gated Regression-Aware Skill Proposer) learns a small,
+**regression-gated skill library** from an agent's own
 failure traces: a proposed skill is kept only when it demonstrably improves
 performance on a held-out probe set, so the library grows by keeping what helps
 and discarding what doesn't. This repository serves two use cases:
@@ -212,7 +217,7 @@ If you use GRASP, please cite the paper (see [`CITATION.cff`](CITATION.cff)).
 
 ```bibtex
 @article{moll2026grasp,
-  title  = {GRASP: self-improvement via a regression-gated skill library},
+  title  = {GRASP: Gated Regression-Aware Skill Proposer for Self-Improving LLM Agents},
   author = {Moll, Johannes and Corbeil, Jean-Philippe and Pan, Jiazhen and
             Hadamitzky, Martin and Rueckert, Daniel and Adams, Lisa and Bressem, Keno},
   year   = {2026}

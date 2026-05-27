@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use GRASP, please cite the paper and/or this repository."
-title: "GRASP: self-improvement via a regression-gated skill library"
+title: "GRASP: Gated Regression-Aware Skill Proposer for Self-Improving LLM Agents"
 authors:
   - family-names: Moll
     given-names: Johannes
@@ -21,7 +21,7 @@ license: MIT
 # TODO: replace with the published paper reference once available.
 preferred-citation:
   type: article
-  title: "GRASP: self-improvement via a regression-gated skill library"
+  title: "GRASP: Gated Regression-Aware Skill Proposer for Self-Improving LLM Agents"
   authors:
     - family-names: Moll
       given-names: Johannes

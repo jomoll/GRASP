@@ -1,4 +1,5 @@
-"""GRASP — self-improvement via a regression-gated skill library.
+"""GRASP (Gated Regression-Aware Skill Proposer) — self-improvement via a
+regression-gated skill library.
 
 GRASP learns a small library of reusable skills from an agent's own failure
 traces, accepting a proposed skill edit only when it improves performance on a
