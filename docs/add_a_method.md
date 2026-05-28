@@ -12,29 +12,29 @@ constructs it with a resolved config, a run directory to write into, and the
 
 ```python
 from grasp import Method
+from grasp.agent import build_agent
 
 class MyMethod(Method):
     # self.config: dict   self.run_dir: Path   self.task: Task
     def run(self) -> None:
         dev = self.task.samples("dev")
         val = self.task.samples("val")
+        agent = build_agent(self.config["agent"])
 
         for epoch in range(self.config["cycle"]["epochs"]):
             for sample in dev:
-                rollout = self.task.rollout(sample, self._agent())
+                rollout = self.task.rollout(sample, agent)
                 correct = self.task.evaluate(sample, rollout)
                 # ... update your memory / skills / prompt from failures ...
 
             # monitor on val (do not learn from it)
-            score = sum(self.task.evaluate(s, self.task.rollout(s, self._agent()))
+            score = sum(self.task.evaluate(s, self.task.rollout(s, agent))
                         for s in val) / len(val)
             # ... write artifacts into self.run_dir ...
 ```
 
-You build the executing agent from the resolved backend block with
-`grasp.agent.build_agent(self.config["agent"])`, and — if your method injects
-learned context — wrap it the way GRASP wraps its agent in
-[`grasp/cycle.py`](../grasp/cycle.py).
+If your method injects learned context, wrap the agent the way GRASP does in
+[`grasp/cycle.py`](../grasp/cycle.py) (see `SkillAwareAgent`).
 
 ### Conventional outputs
 
@@ -55,6 +55,23 @@ run_method(MyMethod, MyTask(), "path/to/config.yaml", agent="local")
 `run_method` loads the config, resolves the backend (CLI `agent` >
 `GRASP_BACKEND` env > config `agent_preset`), creates the run directory, and
 calls `MyMethod(config, run_dir, task).run()`.
+
+## Backend setup
+
+The `agent` argument (or `agent_preset` in the config) is a name resolved
+against a YAML file in `<config dir>/agents/`. The quickstart ships a `local`
+preset at [`examples/quickstart/configs/agents/local.yaml`](../examples/quickstart/configs/agents/local.yaml)
+that works with any OpenAI-compatible endpoint — configure it via env vars:
+
+```bash
+export OPENAI_BASE_URL="http://localhost:8000/v1"   # your endpoint
+export OPENAI_API_KEY="sk-..."                        # or "EMPTY" for local
+export GRASP_MODEL="your-model-name"
+```
+
+Copy that file into your own config directory and adjust as needed. A Gemini
+preset using Vertex AI is at
+[`examples/quickstart/configs/agents/gemini.yaml`](../examples/quickstart/configs/agents/gemini.yaml).
 
 ## Worked references: the five baselines
 

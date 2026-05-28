@@ -231,6 +231,16 @@ and docs. See [`CONTRIBUTING.md`](CONTRIBUTING.md). The core stays
 benchmark-agnostic (anything environment-specific belongs behind a `Task` hook);
 the `benchmarks/` stay faithful to the paper.
 
+## Acknowledgements
+
+GRASP builds on three external benchmarks:
+
+- **[MedAgentBench](https://github.com/stanfordmlgroup/MedAgentBench)** — the clinical FHIR task suite that `benchmarks/MedAgentBench` and the quickstart are based on.
+- **[FHIR-AgentBench](https://github.com/glee4810/FHIR-AgentBench)** — the FHIR environment and graders vendored under `benchmarks/FHIR-AgentBench/`.
+- **[AgentBench](https://github.com/THUDM/AgentBench)** — the multi-environment agent benchmark vendored under `benchmarks/AgentBench/`.
+
+We are grateful to the authors of these projects for releasing their work openly. If you use GRASP with any of these benchmarks, please include the original citations for the respective benchmark.
+
 ## License
 
 MIT (see [`LICENSE`](LICENSE)) for the GRASP core, examples, and docs. Vendored
