@@ -239,7 +239,7 @@ GRASP builds on three external benchmarks:
 - **[FHIR-AgentBench](https://github.com/glee4810/FHIR-AgentBench)** — the FHIR environment and graders vendored under `benchmarks/FHIR-AgentBench/`.
 - **[AgentBench](https://github.com/THUDM/AgentBench)** — the multi-environment agent benchmark vendored under `benchmarks/AgentBench/`.
 
-We are grateful to the authors of these projects for releasing their work openly.
+We are grateful to the authors of these projects for releasing their work openly. If you use GRASP with any of these benchmarks, please include the original citations for the respective benchmark.
 
 ## License
 
