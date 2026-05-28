@@ -1,21 +1,23 @@
 """
-FHIRQuickstartTask — a self-contained GRASP task built from MedAgentBench's
-read-only FHIR lookup tasks, served by an in-process mock (no Docker, no server).
+FHIRQuickstartTask — a single-task quickstart built from MedAgentBench's
+**task4** (most recent magnesium within 24 h), served by an in-process mock
+FHIR store (no Docker, no server).
 
 It reproduces MedAgentBench's agent protocol and grading:
 
 - The agent sees a JSON task prompt and replies with exactly one action per turn:
-  ``GET <url>?<params>``, ``POST <url>\\n<json>``, or ``FINISH([answers])``.
+  ``GET <url>?<params>`` or ``FINISH([answer])`` (POST is allowed but disqualifies
+  a read-only run, mirroring the original grader).
 - GET requests are routed to the mock FHIR store; the response is fed back.
-- Grading mirrors the read-only graders (tasks 1, 2, 4, 6, 7): a POST disqualifies
-  the run, and the FINISH answer is checked against the reference solution
-  (re-querying the mock where the original grader does).
+- Grading reuses MedAgentBench's task4 logic (re-queries the mock to compute the
+  reference answer, then compares to the FINISH list).
 
-The learnable behaviour (which GRASP discovers from the agent's own failures) is
-exactly what the released MedAgentBench skill libraries capture: how to build the
-Patient/Observation search, which fields to read (``valueQuantity.value``,
-``effectiveDateTime``), and how to format the FINISH answer (a bare number, not a
-sentence). Nothing about the skill is hand-written here.
+One mechanism, one failure mode, one learnable skill — exactly the kind of
+skill the released MedAgentBench libraries call ``observation_value_extraction``:
+extract ``valueQuantity.value`` as a number, filter by ``effectiveDateTime``
+within the 24-hour window, and FINISH a bare number (or ``-1`` when none).
+Nothing about that skill is hand-written here — GRASP learns it from the
+agent's own failures.
 """
 
 import json
@@ -139,59 +141,20 @@ class FHIRQuickstartTask(Task):
     def _get(self, url: str) -> Dict[str, Any]:
         return json.loads(self.mock.get(url)["data"])
 
-    @staticmethod
-    def _calculate_age(dob: datetime) -> int:
-        today = datetime(2023, 11, 13)
-        age = today.year - dob.year
-        if (today.month, today.day) < (dob.month, dob.day):
-            age -= 1
-        return age
-
-    def _grade_task1(self, sample, rollout) -> bool:
-        return sample["sol"] == json.loads(rollout.answer)
-
-    def _grade_task2(self, sample, rollout) -> bool:
-        res = self._get(f"{_API_BASE}Patient?identifier={sample['eval_MRN']}&_format=json")
-        dob = datetime.strptime(res["entry"][0]["resource"]["birthDate"], "%Y-%m-%d")
-        return [self._calculate_age(dob)] == json.loads(rollout.answer)
-
-    def _recent_within_24h(self, mrn, code):
-        res = self._get(f"{_API_BASE}Observation?patient={mrn}&code={code}&_count=5000&_format=json")
-        cutoff = _NOW
-        last_meas, last_value = None, None
-        for i in res.get("entry", []):
-            eff = datetime.fromisoformat(i["resource"]["effectiveDateTime"])
-            val = i["resource"]["valueQuantity"]["value"]
-            if eff >= (cutoff - timedelta(hours=24)) and (last_meas is None or eff > last_meas):
-                last_meas, last_value = eff, val
-        return [last_value if last_value is not None else -1]
-
     def _grade_task4(self, sample, rollout) -> bool:
-        return self._recent_within_24h(sample["eval_MRN"], "MG") == json.loads(rollout.answer)
-
-    def _grade_task6(self, sample, rollout) -> bool:
-        res = self._get(f"{_API_BASE}Observation?patient={sample['eval_MRN']}&code=GLU&_count=5000&_format=json")
-        cutoff = _NOW
-        total, count = 0.0, 0.0
-        for i in res.get("entry", []):
-            eff = datetime.fromisoformat(i["resource"]["effectiveDateTime"])
-            val = i["resource"]["valueQuantity"]["value"]
-            if eff >= (cutoff - timedelta(hours=24)):
-                total += val
-                count += 1
-        ref = total / count if count else -1
-        parsed = json.loads(rollout.answer)
-        return len(parsed) == 1 and abs(parsed[0] - ref) < 0.1
-
-    def _grade_task7(self, sample, rollout) -> bool:
-        res = self._get(f"{_API_BASE}Observation?patient={sample['eval_MRN']}&code=GLU&_count=5000&_format=json")
+        """Most recent MG observation within the last 24h; -1 if none."""
+        res = self._get(
+            f"{_API_BASE}Observation?patient={sample['eval_MRN']}&code=MG"
+            f"&_count=5000&_format=json"
+        )
         last_meas, last_value = None, None
         for i in res.get("entry", []):
             eff = datetime.fromisoformat(i["resource"]["effectiveDateTime"])
             val = i["resource"]["valueQuantity"]["value"]
-            if last_meas is None or eff > last_meas:
+            if eff >= (_NOW - timedelta(hours=24)) and (last_meas is None or eff > last_meas):
                 last_meas, last_value = eff, val
-        return [last_value if last_value is not None else -1] == json.loads(rollout.answer)
+        ref = [last_value if last_value is not None else -1]
+        return ref == json.loads(rollout.answer)
 
     # -- failure attribution ----------------------------------------------
 

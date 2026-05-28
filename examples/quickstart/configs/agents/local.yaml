@@ -13,4 +13,4 @@ parameters:
   base_url: ${OPENAI_BASE_URL:-http://localhost:8000/v1}
   api_key: ${OPENAI_API_KEY:-EMPTY}
   model: ${GRASP_MODEL:-local-model}
-  max_tokens: 1024
+  max_tokens: 32768

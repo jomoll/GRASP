@@ -58,9 +58,9 @@ pip install -e .                  # core depends only on PyYAML
 
 ## Quickstart
 
-Watch GRASP learn skills on a laptop in minutes — **no Docker, no live FHIR
-server**. The quickstart runs GRASP on a self-contained slice of MedAgentBench's
-read-only FHIR lookup tasks, served by an in-process mock.
+Watch GRASP learn one useful skill on a laptop in minutes — **no Docker, no
+live FHIR server**. The quickstart runs GRASP on a single MedAgentBench task
+(*most recent magnesium within the last 24 hours*) served by an in-process mock.
 
 ```bash
 # point the 'local' backend at any OpenAI-compatible endpoint

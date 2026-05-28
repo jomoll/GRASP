@@ -15,11 +15,11 @@ skills:
 cycle:
   epochs: 3
   update_every: 100        # one full-epoch batch over the dev split
-  batch_concurrency: 4
+  batch_concurrency: 10
   max_proposals: 1
   max_learned_skills: 6
   grpo_k: 3                 # candidate proposals sampled per update
   grpo_eval_n: 8           # probe set size (failing + passing)
   run_baseline: true
-  proposal_temperature: 0.8
+  proposal_temperature: 0.7
   seed: 1

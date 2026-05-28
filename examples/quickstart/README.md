@@ -1,27 +1,33 @@
-# GRASP quickstart — FHIR lookup (no Docker, no server)
+# GRASP quickstart — magnesium 24h (no Docker, no server)
 
-Watch GRASP learn useful skills on a laptop in minutes. This example runs GRASP
-on a self-contained slice of [MedAgentBench](../../benchmarks/MedAgentBench)'s
-**read-only FHIR lookup tasks**, served by an in-process mock FHIR store — no
-Docker, no live FHIR server, no clinical data.
+Watch GRASP learn **one** useful skill on a laptop in minutes. The quickstart
+runs GRASP on a single MedAgentBench task family — **task4: most recent
+magnesium within the last 24 hours** — served by an in-process mock FHIR store
+(no Docker, no live FHIR server, no clinical data).
 
 ## What it does
 
-The agent answers clinical lookup questions by issuing FHIR `GET` requests and a
-final `FINISH([...])`, across five read-only task families:
+The agent answers the same question for 12 patients:
 
-| Family | Question | Skill it tends to teach |
+> *What is the most recent magnesium level of patient `<MRN>` within the last 24 hours?*
+>
+> *The answer should be a single number in mg/dL, or `-1` if no measurement
+> within the last 24 hours is available.*
+
+By design, **half** the patients have a magnesium reading within 24 h (real
+numeric answer) and **half** do not (answer `-1` — either no MG observations at
+all, or only readings older than 24 h). Splits: **8 dev / 4 val**, balanced.
+
+The behaviour GRASP needs to learn — which it discovers from the agent's own
+failures, **without anything hand-written here** — is the one captured by the
+released MedAgentBench skill called `observation_value_extraction`:
+
+| Behaviour | Correct | Wrong |
 |---|---|---|
-| `task1` | MRN of a patient by name + DOB | how to build the `Patient` search |
-| `task2` | Age of a patient by MRN | read `birthDate`, compute age |
-| `task4` | Most recent magnesium within 24h | `Observation` recency + time window |
-| `task6` | Average glucose within 24h | aggregate `valueQuantity.value` |
-| `task7` | Most recent glucose | most-recent-by-`effectiveDateTime` |
-
-GRASP discovers these skills **from the agent's own failure traces** — nothing
-about them is hand-written. The behaviours mirror the released MedAgentBench
-skill libraries (e.g. patient lookup, observation value extraction, formatting
-`FINISH` as a bare number rather than a sentence with units).
+| Extract the numeric value | `valueQuantity.value` as a number | the formatted string with units |
+| Apply the 24-hour window | filter by `effectiveDateTime >= now − 24h` | most-recent overall |
+| Sentinel when none | `FINISH([-1])` | `FINISH([])`, `"no data"`, etc. |
+| Format | `FINISH([2.1])` | `FINISH(["2.1 mg/dL"])`, prose |
 
 ## Run it
 
@@ -51,14 +57,14 @@ Artifacts are written under `examples/quickstart/runs/<run-name>/`:
 - `run.log` — full console log
 
 A successful run shows val accuracy rising above the no-skills baseline as GRASP
-accepts skills that pass its regression gate.
+accepts a skill that passes its regression gate.
 
 ## How it's wired (use it as a template)
 
 - [`mock_fhir.py`](mock_fhir.py) — in-process FHIR search (Patient / Observation)
-- [`data.py`](data.py) — canned patients, observations, and the dev/val samples
+- [`data.py`](data.py) — canned patients, magnesium observations, and the dev/val samples
 - [`task.py`](task.py) — a `grasp.Task`: the rollout protocol loop and the
-  read-only graders, plus optional `failure_tags` / `updater_*` hooks
+  task4 grader, plus optional `failure_tags` / `updater_*` hooks
 - [`run.py`](run.py) — ties the task to `grasp.run_grasp`
 
 To learn GRASP on your own environment, copy `task.py` and implement
