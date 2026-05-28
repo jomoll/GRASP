@@ -56,6 +56,23 @@ run_method(MyMethod, MyTask(), "path/to/config.yaml", agent="local")
 `GRASP_BACKEND` env > config `agent_preset`), creates the run directory, and
 calls `MyMethod(config, run_dir, task).run()`.
 
+## Backend setup
+
+The `agent` argument (or `agent_preset` in the config) is a name resolved
+against a YAML file in `<config dir>/agents/`. The quickstart ships a `local`
+preset at [`examples/quickstart/configs/agents/local.yaml`](../examples/quickstart/configs/agents/local.yaml)
+that works with any OpenAI-compatible endpoint — configure it via env vars:
+
+```bash
+export OPENAI_BASE_URL="http://localhost:8000/v1"   # your endpoint
+export OPENAI_API_KEY="sk-..."                        # or "EMPTY" for local
+export GRASP_MODEL="your-model-name"
+```
+
+Copy that file into your own config directory and adjust as needed. A Gemini
+preset using Vertex AI is at
+[`examples/quickstart/configs/agents/gemini.yaml`](../examples/quickstart/configs/agents/gemini.yaml).
+
 ## Worked references: the five baselines
 
 The paper implements five self-improvement baselines alongside GRASP, in every

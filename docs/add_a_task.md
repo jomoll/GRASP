@@ -70,6 +70,22 @@ cycle:
   grpo_eval_n: 8
 ```
 
+`agent_preset: local` resolves to `<config dir>/agents/local.yaml`. The
+quickstart ships a ready-made preset at
+[`examples/quickstart/configs/agents/local.yaml`](../examples/quickstart/configs/agents/local.yaml)
+that works with any OpenAI-compatible endpoint — set three env vars to point it
+at your model:
+
+```bash
+export OPENAI_BASE_URL="http://localhost:8000/v1"   # your endpoint
+export OPENAI_API_KEY="sk-..."                        # or "EMPTY" for local
+export GRASP_MODEL="your-model-name"
+```
+
+Copy that file into your config directory and adjust as needed. A Gemini preset
+using Vertex AI is at
+[`examples/quickstart/configs/agents/gemini.yaml`](../examples/quickstart/configs/agents/gemini.yaml).
+
 ## Wiring an AgentBench environment
 
 `benchmarks/AgentBench` ships ten task families; four are wired for the paper
