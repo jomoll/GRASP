@@ -17,8 +17,8 @@ authors:
   - family-names: Bressem
     given-names: Keno
 repository-code: "https://github.com/jomoll/GRASP"
+url: "https://jomoll.github.io/grasp/"
 license: MIT
-# TODO: replace with the published paper reference once available.
 preferred-citation:
   type: article
   title: "GRASP: Gated Regression-Aware Skill Proposer for Self-Improving LLM Agents"
@@ -38,3 +38,9 @@ preferred-citation:
     - family-names: Bressem
       given-names: Keno
   year: 2026
+  journal: "arXiv preprint arXiv:2605.29668"
+  url: "https://arxiv.org/abs/2605.29668"
+  identifiers:
+    - type: other
+      value: "arXiv:2605.29668"
+      description: "arXiv identifier"
