@@ -3,6 +3,8 @@
 <img src="https://raw.githubusercontent.com/jomoll/GRASP/main/assets/grasp_banner.png" alt="GRASP — Gated Regression-Aware Skill Proposer" width="100%">
 
 <!--- BADGES: START --->
+[![arXiv](https://img.shields.io/badge/arXiv-2605.29668-b31b1b.svg?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2605.29668)
+[![Project Page](https://img.shields.io/badge/🌐_Project-Page-blue)](https://jomoll.github.io/grasp/)
 [![PyPI](https://img.shields.io/pypi/v/grasp-skills?label=grasp-skills&color=00B7EB&logo=pypi&logoColor=white)](https://pypi.org/project/grasp-skills/)
 [![Python version](https://img.shields.io/badge/python-3.9+-important?logo=python&logoColor=important)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -218,9 +220,9 @@ If you use GRASP, please cite the paper (see [`CITATION.cff`](CITATION.cff)).
 ```bibtex
 @article{moll2026grasp,
   title  = {GRASP: Gated Regression-Aware Skill Proposer for Self-Improving LLM Agents},
-  author = {Moll, Johannes and Corbeil, Jean-Philippe and Pan, Jiazhen and
-            Hadamitzky, Martin and Rueckert, Daniel and Adams, Lisa and Bressem, Keno},
-  year   = {2026}
+  author = {Moll, Johannes and Corbeil, Jean-Philippe and Pan, Jiazhen and Hadamitzky, Martin and Rueckert, Daniel and Adams, Lisa and Bressem, Keno},
+  journal={arXiv preprint arXiv:2605.29668},
+  year={2026}
 }
 ```
 
